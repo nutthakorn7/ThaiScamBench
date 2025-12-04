@@ -1,0 +1,7 @@
+{"id": "msg_0007", "text": "ระบบตรวจพบบัญชีถูกระงับ โทร 02-XXX-XXXX ด่วน", "label": "banking_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961816", "language": "th"}}
+{"id": "msg_0009", "text": "ตรวจพบการใช้งานผิดปกติ กรอกรหัส OTP ที่ https://fake-bank.com", "label": "banking_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961818", "language": "th"}}
+{"id": "msg_0015", "text": "ขอแสดงความยินดี ได้ทอง 2 บาท ชำระค่าธรรมเนียม 500", "label": "prize_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961825", "language": "th"}}
+{"id": "msg_0016", "text": "ลงทุนน้อย รวยเร็ว กำไร 30% ต่อเดือน Forex รับประกัน", "label": "investment_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961826", "language": "th"}}
+{"id": "msg_0018", "text": "MLM ธุรกิจออนไลน์ รายได้เดือนละแสน ผลตอบแทน 300%", "label": "investment_scam", "source": "synthetic", "metadata": {"channel": "WhatsApp", "created_at": "2025-12-05T02:31:51.961905", "language": "th"}}
+{"id": "msg_0002", "text": "Kerry Express แจ้งพัสดุของคุณถูกกัก ค่าธรรมเนียม 45 บาท", "label": "parcel_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961807", "language": "th"}}
+{"id": "msg_0008", "text": "บัตรเครดิตหมดอายุ กรุณายืนยันตัวตน", "label": "banking_scam", "source": "synthetic", "metadata": {"channel": "Email", "created_at": "2025-12-05T02:31:51.961817", "language": "th"}}

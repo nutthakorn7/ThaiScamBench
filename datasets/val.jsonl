@@ -1,0 +1,5 @@
+{"id": "msg_0003", "text": "DHL พัสดุรอชำระ กดลิงก์เพื่อยืนยันที่อยู่ http://bit.ly/xxxxx", "label": "parcel_scam", "source": "synthetic", "metadata": {"channel": "WhatsApp", "created_at": "2025-12-05T02:31:51.961810", "language": "th"}}
+{"id": "msg_0036", "text": "อากาศวันนี้ดีมาก ไปเดินเล่นกันไหม", "label": "normal", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961928", "language": "th"}}
+{"id": "msg_0029", "text": "สินเชื่อออนไลน์ อนุมัติ 24 ชม. โอนเงินทันที", "label": "loan_scam", "source": "synthetic", "metadata": {"channel": "WhatsApp", "created_at": "2025-12-05T02:31:51.961921", "language": "th"}}
+{"id": "msg_0024", "text": "ด่วน! คดีความผิดทางอาญา ติดต่อกลับทันที", "label": "impersonation_scam", "source": "synthetic", "metadata": {"channel": "Email", "created_at": "2025-12-05T02:31:51.961915", "language": "th"}}
+{"id": "msg_0022", "text": "กรมสรรพากรแจ้งว่าท่านค้างภาษี ติดต่อ 02-XXX-XXXX ด่วน", "label": "impersonation_scam", "source": "synthetic", "metadata": {"channel": "LINE", "created_at": "2025-12-05T02:31:51.961913", "language": "th"}}

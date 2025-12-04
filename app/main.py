@@ -68,6 +68,10 @@ app.add_middleware(
 from app.middleware.security import SecurityMiddleware
 app.add_middleware(SecurityMiddleware)
 
+# Add monitoring middleware
+from app.middleware.monitoring import MonitoringMiddleware
+app.add_middleware(MonitoringMiddleware)
+
 # Add cache control middleware to prevent browser caching issues
 from app.middleware.cache_control import CacheControlMiddleware
 app.add_middleware(CacheControlMiddleware)

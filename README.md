@@ -126,6 +126,79 @@ print(response.json())
 
 ---
 
+## 📊 Benchmark
+
+### Dataset
+
+ThaiScamBench includes curated datasets for research and evaluation:
+
+- **Train:** 26 examples (70%)
+- **Val:** 5 examples (15%)  
+- **Test:** 7 examples (15%)
+- **Labels:** 7 scam categories + normal
+
+**Categories:**
+- `parcel_scam` - Fake parcel delivery
+- `banking_scam` - Bank/OTP phishing
+- `prize_scam` - Fake prize/lottery
+- `investment_scam` - Investment fraud
+- `impersonation_scam` - Government official impersonation
+- `loan_scam` - Loan scams
+- `normal` - Safe messages
+
+📖 **Full specification:** [`datasets/README.md`](datasets/README.md)
+
+### Evaluation
+
+Run benchmark evaluation:
+
+```bash
+# Generate dataset (first time only)
+python scripts/create_dataset.py
+
+# Run evaluation on test set
+python scripts/evaluate.py --test-file datasets/test.jsonl
+
+# Results saved to evaluation_results.json
+cat evaluation_results.json
+```
+
+### Baselines
+
+| Model | Accuracy | F1-Score | Speed | Status |
+|-------|----------|----------|-------|--------|
+| Keyword Matching | ~65% | ~0.62 | < 5ms | ✅ Available |
+| TF-IDF + LR | TBD | TBD | ~15ms | 🚧 Planned |
+| Thai BERT | TBD | TBD | ~50ms | 🚧 Planned |
+
+📖 **Details:** [`baselines/README.md`](baselines/README.md)
+
+### Leaderboard
+
+**We welcome contributions!** Submit your model:
+
+1. Fork this repo
+2. Add your model to `baselines/`
+3. Run evaluation: `python scripts/evaluate.py`
+4. Submit PR with results
+
+**See:** [Contributing](#-contributing)
+
+---
+
+## 🔒 Privacy & PDPA
+
+ThaiScamBench is designed with privacy-first principles:
+
+- ✅ **No message storage** - Messages deleted immediately after detection
+- ✅ **Hash-based tracking** - Only SHA-256 hashes stored
+- ✅ **Auto-deletion** - Data removed after 30 days
+- ✅ **PDPA compliant** - Full compliance with Thai data protection law
+
+**Full policy:** [`PRIVACY_POLICY.md`](PRIVACY_POLICY.md)
+
+---
+
 ## 📊 Scam Categories
 
 | Category | Thai Name | Example |

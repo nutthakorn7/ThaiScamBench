@@ -61,6 +61,11 @@ class Detection(Base):
     request_id = Column(String(36), nullable=False, unique=True, index=True)
     user_ref = Column(String(255), nullable=True)  # Partner's reference
     
+    # Explanation fields (added for refactoring)
+    reason = Column(String(2000), nullable=True)  # Detection reason
+    advice = Column(String(2000), nullable=True)  # Safety advice
+    extra_data = Column(String(1000), nullable=True)  # JSON extra data (not 'metadata' - reserved!)
+    
     # Relationship to partner
     partner = relationship("Partner", back_populates="detections")
     

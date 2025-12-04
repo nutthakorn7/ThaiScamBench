@@ -52,7 +52,7 @@ uvicorn app.main:app --reload
 **Access:**
 - **Web UI:** http://localhost:8000
 - **API Docs:** http://localhost:8000/docs
-- **Admin:** http://localhost:8000/admin.html (token: `admin-secret-key-2024`)
+- **Admin:** http://localhost:8000/admin.html (token: see `.env` file)
 
 ---
 
@@ -152,7 +152,7 @@ print(response.json())
 
 ## 📈 Admin Dashboard
 
-Access at `/admin.html` with token `admin-secret-key-2024`
+Access at `/admin.html` with your admin token from `.env` file (`ADMIN_TOKEN` variable)
 
 **Features:**
 - Real-time statistics

@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     secret_key: str = "your-secret-key-change-in-production"  # For future JWT use
     
     # Admin Authentication
-    admin_token: str = "admin-secret-key-2024"  # Token for admin API access
+    admin_token: str = "change-this-token-in-production"  # ⚠️ CHANGE IN PRODUCTION!
     admin_allowed_ips: str = ""  # Comma-separated IPs (empty = allow all)
     
     # Detection Thresholds

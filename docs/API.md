@@ -23,13 +23,15 @@ Requires API key via Bearer token:
 ```bash
 Authorization: Bearer YOUR_API_KEY
 ```
+> **Security:** Never commit your actual API key. Use environment variables.
 Rate limit: **100 requests/minute**
 
 ### Admin API
 Requires admin token:
 ```bash
-Authorization: Bearer admin-secret-key-2024
+Authorization: Bearer $ADMIN_TOKEN
 ```
+> **Security:** Never commit your actual admin token. Use environment variables.
 
 ---
 

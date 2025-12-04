@@ -101,8 +101,8 @@ SCAM_CLASSIFIER_TYPE=mock
 ENVIRONMENT=prod
 LOG_LEVEL=WARNING
 DATABASE_URL=postgresql://user:pass@localhost/thaiscam
-ADMIN_TOKEN=<strong-random-token>
-SECRET_KEY=<strong-random-key>
+ADMIN_TOKEN=<generate-strong-token-here>
+SECRET_KEY=<generate-strong-secret-here>
 RATE_LIMIT_REQUESTS=100
 ```
 
@@ -189,7 +189,7 @@ Open browser: http://localhost:8000/docs
 ### 5. Test Admin Dashboard
 
 1. Go to: http://localhost:8000/admin.html
-2. Enter token: `admin-secret-key-2024`
+2. Enter token from your `.env` file (`ADMIN_TOKEN`)
 3. Should see dashboard stats
 
 ---

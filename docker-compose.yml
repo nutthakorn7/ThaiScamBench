@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: thaiscam-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=prod
+      - DATABASE_URL=postgresql://thaiscam:password@db:5432/thaiscam
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-admin-secret-key-2024}
+    depends_on:
+      - db
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - thaiscam-network
+
+  db:
+    image: postgres:14-alpine
+    container_name: thaiscam-db
+    environment:
+      - POSTGRES_DB=thaiscam
+      - POSTGRES_USER=thaiscam
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - thaiscam-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: thaiscam-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+    networks:
+      - thaiscam-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  thaiscam-network:
+    driver: bridge

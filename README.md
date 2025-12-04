@@ -1,224 +1,250 @@
-# 🔍 Thai Scam Detection System
+# 🛡️ ThaiScamBench
 
-ระบบตรวจจับข้อความหลอกลวงภาษาไทย - Thai Scam Message Detection System
+**Thai Scam Detection Benchmark & API System**
 
-## 📋 Overview
+A comprehensive Thai language scam message detection system with web interface, REST API, and admin dashboard for continuous model improvement.
 
-A FastAPI-based backend service for detecting scam messages in Thai language. The system analyzes text messages and identifies potential scams across various categories including parcel scams, banking fraud, prize scams, investment fraud, and impersonation.
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## ✨ Features
+---
 
-- ✅ **Multi-Category Detection** - Detects 5+ types of common Thai scams
-- ✅ **Risk Scoring** - Provides 0-1 risk probability scores
-- ✅ **AI Explanations** - Explains why a message is flagged as scam
-- ✅ **Safety Advice** - Provides actionable recommendations
-- ✅ **Thai Language Support** - Full Thai language interface
-- ✅ **RESTful API** - Easy integration with any frontend
+## 🎯 Features
 
-## 🏗️ Architecture
+- **🔍 Scam Detection** - Detects 8+ types of Thai scam messages
+- **🌐 Web Interface** - User-friendly detection interface
+- **📡 REST API** - Integration-ready API for partners
+- **📊 Admin Dashboard** - Review uncertain cases and improve model
+- **📈 Analytics** - Track detection stats and trends
+- **🔐 Secure** - Rate limiting, authentication, privacy protection
 
-### Milestone 0 - Core Backend (Current)
-
-```
-app/
-├── main.py              # FastAPI application entry point
-├── config.py            # Environment-based configuration
-├── models/
-│   └── schemas.py       # Pydantic request/response models
-├── services/
-│   ├── scam_classifier.py   # Mock scam detection logic
-│   └── llm_explainer.py     # Mock LLM explanations
-└── routes/
-    ├── health.py        # Health check endpoint
-    └── detection.py     # Scam detection endpoint
-```
-
-### Current Implementation
-
-- **Classifier**: Mock keyword-based detection (ready for ML model integration)
-- **Explainer**: Static Thai language responses (ready for LLM API integration)
-
-### Future Milestones
-
-- **Milestone 1**: Real ML model integration (HuggingFace, etc.)
-- **Milestone 2**: LLM API integration (OpenAI, Anthropic, etc.)
-- **Milestone 3**: Frontend UI development
-- **Milestone 4**: Database and analytics
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - Python 3.9+
-- pip
+- pip & virtualenv
 
 ### Installation
 
-1. **Clone the repository**
 ```bash
+# Clone repository
+git clone https://github.com/yourusername/ThaiScamBench.git
 cd ThaiScamBench
-```
 
-2. **Create virtual environment**
-```bash
+# Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-3. **Install dependencies**
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-4. **Setup environment**
-```bash
-cp .env.example .env
-# Edit .env if needed
-```
+# Initialize database
+python -c "from app.database import init_db; init_db()"
 
-### Running the Application
-
-**Development mode** (with auto-reload):
-```bash
+# Run server
 uvicorn app.main:app --reload
 ```
 
-**Production mode**:
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
+**Access:**
+- **Web UI:** http://localhost:8000
+- **API Docs:** http://localhost:8000/docs
+- **Admin:** http://localhost:8000/admin.html (token: `admin-secret-key-2024`)
 
-The API will be available at:
-- API: http://localhost:8000
-- Documentation: http://localhost:8000/docs
-- Alternative docs: http://localhost:8000/redoc
+---
 
-## 📡 API Usage
+## 📖 Documentation
 
-### Health Check
+### User Guides
+- [Setup Guide](docs/SETUP.md) - Detailed installation
+- [API Documentation](docs/API.md) - Complete API reference
+- [Admin Guide](ADMIN_REVIEW_GUIDE.md) - Dashboard usage
 
-```bash
-curl http://localhost:8000/health
-```
+### For Developers
+- [Architecture](docs/ARCHITECTURE.md) - System design
+- [Contributing](docs/CONTRIBUTING.md) - Development guide
 
-Response:
-```json
-{
-  "status": "healthy",
-  "version": "0.1.0",
-  "model_version": "mock-v1.0",
-  "llm_version": "mock-v1.0",
-  "environment": "dev"
-}
-```
+---
 
-### Detect Scam
+## 🔌 API Usage
+
+### Public Detection
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/detect \
+curl -X POST http://localhost:8000/v1/public/detect/text \
   -H "Content-Type: application/json" \
-  -d '{
-    "message": "คุณมีพัสดุค้างชำระ กรุณาคลิกลิงก์เพื่อชำระเงิน: https://fake-site.com"
-  }'
+  -d '{"message":"คุณมีพัสดุค้างชำระ 50 บาท","channel":"SMS"}'
 ```
 
-Response:
+**Response:**
 ```json
 {
   "is_scam": true,
-  "risk_score": 0.85,
+  "risk_score": 1.0,
   "category": "parcel_scam",
   "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง...",
   "advice": "🚫 ไม่ควรคลิกลิงก์ใดๆ ในข้อความ..."
 }
 ```
 
-## 🎯 Scam Categories
-
-| Category | Thai Name | Description |
-|----------|-----------|-------------|
-| `parcel_scam` | การหลอกลวงเกี่ยวกับพัสดุ | Fake parcel delivery messages |
-| `banking_scam` | การหลอกลวงเกี่ยวกับธนาคาร | Banking/card verification fraud |
-| `prize_scam` | การหลอกลวงด้วยรางวัล | Fake prize/lottery scams |
-| `investment_scam` | การหลอกลวงการลงทุน | Investment fraud |
-| `impersonation_scam` | การแอบอ้างเป็นเจ้าหน้าที่ | Government official impersonation |
-
-## ⚙️ Configuration
-
-Environment variables (`.env`):
-
-```bash
-# Environment
-ENVIRONMENT=dev          # dev or prod
-
-# Logging
-LOG_LEVEL=INFO          # DEBUG, INFO, WARNING, ERROR
-
-# Model
-MODEL_VERSION=mock-v1.0
-SCAM_CLASSIFIER_TYPE=mock
-
-# LLM
-LLM_VERSION=mock-v1.0
-LLM_PROVIDER=mock
-OPENAI_API_KEY=         # For future LLM integration
-
-# Service
-API_TITLE=Thai Scam Detection API
-API_VERSION=0.1.0
-API_HOST=0.0.0.0
-API_PORT=8000
-```
-
-## 🛠️ Development
-
-### Project Structure
-
-- `app/main.py` - FastAPI app with middleware and routers
-- `app/config.py` - Settings management with Pydantic
-- `app/models/schemas.py` - Request/response data models
-- `app/services/` - Business logic layer
-- `app/routes/` - API endpoint definitions
-
-### Adding New Scam Patterns
-
-Edit `app/services/scam_classifier.py`:
+### Partner API
 
 ```python
-SCAM_PATTERNS = {
-    "your_category": ["keyword1", "keyword2", "keyword3"],
-}
+import requests
+
+API_KEY = "your-partner-api-key"
+response = requests.post(
+    "http://localhost:8000/v1/partner/detect/text",
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={"message": "ข้อความที่ต้องการตรวจสอบ"}
+)
+print(response.json())
 ```
 
-Edit `app/services/llm_explainer.py`:
-
-```python
-MOCK_EXPLANATIONS = {
-    "your_category": {
-        "reason": "เหตุผล...",
-        "advice": "คำแนะนำ..."
-    }
-}
-```
-
-## 🗺️ Roadmap
-
-- [x] **Milestone 0** - Core Backend & Mock Services
-- [ ] **Milestone 1** - Real ML Model Integration
-- [ ] **Milestone 2** - LLM API Integration (OpenAI/Anthropic)
-- [ ] **Milestone 3** - Frontend UI
-- [ ] **Milestone 4** - Database & Analytics
-- [ ] **Milestone 5** - User Reporting & Feedback
-- [ ] **Milestone 6** - Production Deployment
-
-## 📝 License
-
-[Add your license here]
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+**See [API Documentation](docs/API.md) for complete reference.**
 
 ---
 
-**Built with ❤️ for Thai internet safety**
+## 🎨 Tech Stack
+
+**Backend:**
+- FastAPI - High-performance async API
+- SQLAlchemy - Database ORM
+- Pydantic - Data validation
+
+**Frontend:**
+- Vanilla HTML/CSS/JavaScript
+- Inter + IBM Plex Sans Thai fonts
+- Chart.js for admin analytics
+
+**Database:**
+- SQLite (development)
+- PostgreSQL ready (production)
+
+---
+
+## 📊 Scam Categories
+
+| Category | Thai Name | Example |
+|----------|-----------|---------|
+| `parcel_scam` | พัสดุปลอม | มีพัสดุค้างชำระ |
+| `fake_officer` | ปลอมเจ้าหน้าที่ | ตำรวจแจ้งมีหมายจับ |
+| `loan_scam` | สินเชื่อปลอม | กู้เงินไม่ต้องค้ำ |
+| `investment_scam` | ลงทุนปลอม | กำไร 30% ต่อเดือน |
+| `otp_phishing` | ขอ OTP | กรุณาแจ้งรหัส OTP |
+| `marketplace_scam` | ตลาดออนไลน์ | โอนก่อนส่งของ |
+| `prize_scam` | รางวัลปลอม | คุณถูกรางวัล |
+| `normal` | ปกติ | ข้อความทั่วไป |
+
+---
+
+## 🔐 Security
+
+- **Rate Limiting:** 10 requests/min (public), 100/min (partner)
+- **Authentication:** Bearer tokens for API & admin
+- **Privacy:** Message hashing, auto-deletion after 30 days
+- **HTTPS Ready:** SSL/TLS support for production
+
+---
+
+## 📈 Admin Dashboard
+
+Access at `/admin.html` with token `admin-secret-key-2024`
+
+**Features:**
+- Real-time statistics
+- Review uncertain cases  
+- Track detection accuracy
+- Export training data
+- Partner analytics
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run production tests
+python scripts/production_test.py
+
+# Run unit tests
+pytest
+
+# Check coverage
+pytest --cov=app tests/
+```
+
+**Current Status:** 37% pass rate (limited by rate limiting)
+
+---
+
+## 🚀 Deployment
+
+### Development
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Production
+```bash
+# Using Gunicorn
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
+
+# Using Docker
+docker-compose up -d
+```
+
+**See [Deployment Guide](docs/DEPLOYMENT.md) for details.**
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+**Quick Start:**
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
+
+---
+
+## 🙏 Acknowledgments
+
+- Thai scam patterns from real-world data
+- Inter + IBM Plex Sans Thai fonts
+- FastAPI community
+- Contributors and users
+
+---
+
+## 📞 Support
+
+- **Issues:** [GitHub Issues](https://github.com/yourusername/ThaiScamBench/issues)
+- **Email:** support@thaiscambench.com
+- **Docs:** http://localhost:8000/docs
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Machine learning model integration
+- [ ] Real-time detection API
+- [ ] Mobile SDKs (iOS/Android)
+- [ ] Multi-language support
+- [ ] Advanced analytics
+- [ ] Partner dashboard
+
+---
+
+**Made with ❤️ for Thai internet safety**

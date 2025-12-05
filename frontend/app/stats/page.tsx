@@ -1,129 +1,185 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart3, TrendingUp, Users, ShieldAlert, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Shield, AlertTriangle, BarChart3, Users } from "lucide-react";
 import { getStats } from "@/lib/api";
 
+interface StatsData {
+  total_detections: number;
+  scam_percentage: number;
+  top_categories: Array<{
+    category: string;
+    count: number;
+    percentage: number;
+  }>;
+  period: string;
+}
+
 export default function StatsPage() {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStats = async () => {
       try {
         const data = await getStats();
         setStats(data);
       } catch (err) {
-        console.error("Failed to fetch stats", err);
+        console.error("Failed to load stats:", err);
+        setError("ไม่สามารถโหลดสถิติได้");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchStats();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      <div className="container mx-auto px-4 py-16">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
       </div>
     );
   }
 
-  // Fallback if stats fail to load or are empty
-  const totalScams = stats?.total_detections || 12540;
-  const highRisk = stats?.risk_distribution?.high_risk || 8920;
-  const accuracy = "98.5%"; 
-  const activeScammers = stats?.top_scam_types?.length ? stats.top_scam_types.length * 15 : 142; // Mock logic if real count missing
+  if (error || !stats) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <Card className="border-red-500/20">
+          <CardContent className="pt-6">
+            <p className="text-red-500 text-center">{error || "ไม่พบข้อมูล"}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="container px-4 py-12 mx-auto">
+    <div className="container mx-auto px-4 py-16">
+      {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">สถิติการหลอกลวงแบบ Real-time</h1>
-        <p className="text-muted-foreground">
-          ข้อมูลล่าสุดจากระบบตรวจสอบของเรา เพื่อให้คุณรู้ทันสถานการณ์ปัจจุบัน
+        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          สถิติการตรวจสอบ
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          ข้อมูลการใช้งานระบบตรวจสอบกลโกงออนไลน์
         </p>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <Card className="border-blue-500/20 bg-blue-500/5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">การตรวจสอบทั้งหมด</CardTitle>
-            <BarChart3 className="h-4 w-4 text-blue-500" />
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* Total Detections */}
+        <Card className="border-blue-500/20 hover:shadow-lg transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-blue-600">
+              <Users className="h-5 w-5" />
+              ตรวจสอบทั้งหมด
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalScams.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+18% จากเดือนที่แล้ว</p>
+            <div className="text-4xl font-bold mb-2">
+              {stats.total_detections.toLocaleString()}
+            </div>
+            <p className="text-sm text-muted-foreground">ข้อความที่ผ่านการตรวจสอบ</p>
           </CardContent>
         </Card>
 
-        <Card className="border-red-500/20 bg-red-500/5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">พบความเสี่ยงสูง</CardTitle>
-            <ShieldAlert className="h-4 w-4 text-red-500" />
+        {/* Scam Percentage */}
+        <Card className="border-red-500/20 hover:shadow-lg transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              พบการหลอกลวง
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-500">{highRisk.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">คิดเป็น {(highRisk / totalScams * 100).toFixed(1)}% ของทั้งหมด</p>
+            <div className="text-4xl font-bold mb-2 text-red-600">
+              {stats.scam_percentage.toFixed(1)}%
+            </div>
+            <p className="text-sm text-muted-foreground">ของการตรวจสอบทั้งหมด</p>
           </CardContent>
         </Card>
 
-        <Card className="border-green-500/20 bg-green-500/5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">ความแม่นยำ AI</CardTitle>
-            <TrendingUp className="h-4 w-4 text-green-500" />
+        {/* Safe Percentage */}
+        <Card className="border-green-500/20 hover:shadow-lg transition-shadow">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <Shield className="h-5 w-5" />
+              ปลอดภัย
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">{accuracy}</div>
-            <p className="text-xs text-muted-foreground">F1-Score บนชุดทดสอบมาตรฐาน</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-orange-500/20 bg-orange-500/5">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">มิจฉาชีพที่เฝ้าระวัง</CardTitle>
-            <Users className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-500">{activeScammers.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">กลุ่ม/เบอร์โทร ที่มีการรายงานซ้ำ</p>
+            <div className="text-4xl font-bold mb-2 text-green-600">
+              {(100 - stats.scam_percentage).toFixed(1)}%
+            </div>
+            <p className="text-sm text-muted-foreground">ข้อความปกติ</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Top Scam Types (Simple List for now) */}
-      <h2 className="text-2xl font-bold mb-6">รูปแบบกลโกงที่พบบ่อย (Top 5)</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats?.top_scam_types ? (
-          Object.entries(stats.top_scam_types).map(([type, count]: any, index: number) => (
-             <Card key={index} className="hover:bg-accent/50 transition-colors">
-                <CardHeader>
-                    <CardTitle className="text-lg">{type}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-3xl font-bold">{count}</div>
-                    <p className="text-sm text-muted-foreground">ครั้งที่ตรวจพบ</p>
-                </CardContent>
-             </Card>
-          ))
-        ) : (
-            // Fallback content if no data
-            <>
-                {['Google Play ปลอม', 'Digiwallet scam', 'Tiktok scam', 'หลอกให้กู้เงิน', 'บัญชีม้า'].map((scam, i) => (
-                    <Card key={i} className="hover:bg-accent/50 transition-colors">
-                        <CardHeader>
-                            <CardTitle className="text-lg">{scam}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-3xl font-bold">{(500 - i * 50).toLocaleString()}</div>
-                            <p className="text-sm text-muted-foreground">ครั้งที่ตรวจพบ</p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </>
-        )}
+      {/* Top Categories */}
+      <Card className="border-purple-500/20">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            ประเภทการหลอกลวงยอดนิยม
+          </CardTitle>
+          <CardDescription>
+            รูปแบบการหลอกลวงที่พบบ่อยที่สุด
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {stats.top_categories && stats.top_categories.length > 0 ? (
+              stats.top_categories.map((cat, index) => (
+                <div key={cat.category} className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium capitalize">
+                        {cat.category.replace(/_/g, " ")}
+                      </span>
+                      <Badge variant="secondary">
+                        {cat.count.toLocaleString()} ครั้ง
+                      </Badge>
+                    </div>
+                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all"
+                        style={{ width: `${cat.percentage}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {cat.percentage.toFixed(1)}% ของการตรวจสอบที่เป็นกลโกง
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                ไม่มีข้อมูลประเภทการหลอกลวง
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Period Info */}
+      <div className="mt-8 text-center text-sm text-muted-foreground">
+        <p>ข้อมูล ณ วันที่ {new Date().toLocaleDateString("th-TH", {
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        })}</p>
+        {stats.period && <p className="mt-1">ช่วงเวลา: {stats.period}</p>}
       </div>
     </div>
   );

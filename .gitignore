@@ -53,3 +53,6 @@ secrets/
 *.pem
 *.key
 *.crt
+
+# Documentation with secrets
+SERVER_CREDENTIALS.md

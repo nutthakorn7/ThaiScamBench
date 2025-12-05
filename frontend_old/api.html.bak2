@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Thai Scam Detection</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .api-section {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .endpoint-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .method-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+        }
+
+        .method-post { background: #10b981; color: white; }
+        .method-get { background: #3b82f6; color: white; }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        .code-block code {
+            color: #e2e8f0;
+        }
+
+        .keyword { color: #c792ea; }
+        .string { color: #c3e88d; }
+        .comment { color: #546e7a; font-style: italic; }
+        .function { color: #82aaff; }
+        .number { color: #f78c6c; }
+
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .param-table {
+            width: 100%;
+            margin: 1rem 0;
+            border-collapse: collapse;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .param-table th {
+            color: #60a5fa;
+            font-weight: 600;
+        }
+
+        .param-table code {
+            background: rgba(96, 165, 250, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .response-example {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s;
+            margin: 1rem 0.5rem 1rem 0;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card h3 {
+            color: #60a5fa;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="api-section">
+            <h1 style="text-align: center; font-size: 2.5rem; margin-bottom: 0.5rem;">
+                🔌 API สำหรับ Partner
+            </h1>
+            <p style="text-align: center; font-size: 1.2rem; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">
+                เชื่อมต่อระบบตรวจสอบการหลอกลวงเข้ากับแพลตฟอร์มของคุณได้ง่าย ๆ
+            </p>
+
+            <!-- Features -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>⚡ รวดเร็ว</h3>
+                    <p>Response time < 100ms ตอบกลับทันทีภายในเสี้ยววินาที</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 แม่นยำ</h3>
+                    <p>ตรวจจับ 8 ประเภทการหลอกลวงที่พบบ่อยในไทย</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 ปลอดภัย</h3>
+                    <p>API Key authentication และ Rate limiting</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 ติดตาม</h3>
+                    <p>Dashboard สำหรับดูสถิติการใช้งาน</p>
+                </div>
+            </div>
+
+            <!-- Main Endpoint -->
+            <div class="endpoint-card">
+                <h2>📡 Main Endpoint</h2>
+                <div style="margin: 1.5rem 0;">
+                    <span class="method-badge method-post">POST</span>
+                    <span class="endpoint-url">/v1/partner/detect/text</span>
+                </div>
+
+                <p style="font-size: 1.1rem; margin: 1rem 0;">
+                    ส่งข้อความมาตรวจสอบ → ได้ผลลัพธ์ว่าเป็น scam หรือไม่ พร้อม risk score และคำอธิบาย
+                </p>
+
+                <h3 style="margin-top: 2rem;">🔑 Authentication</h3>
+                <p>ใช้ API Key ผ่าน Bearer Token ใน Header:</p>
+                <div class="code-block">
+                    <pre>Authorization: Bearer YOUR_API_KEY_HERE</pre>
+                </div>
+
+                <h3 style="margin-top: 2rem;">📝 Request Parameters</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>message</code></td>
+                            <td>string</td>
+                            <td>✅ Yes</td>
+                            <td>ข้อความที่ต้องการตรวจสอบ (ภาษาไทย)</td>
+                        </tr>
+                        <tr>
+                            <td><code>user_ref</code></td>
+                            <td>string</td>
+                            <td>❌ No</td>
+                            <td>Reference ID ของ user ในระบบของคุณ</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin-top: 2rem;">✅ Response Format</h3>
+                <div class="response-example">
+                    <pre style="margin: 0; color: #fff;">{
+  "is_scam": true,
+  "risk_score": 0.85,
+  "category": "parcel_scam",
+  "reason": "ข้อความมีลักษณะการหลอกลวงแบบพัสดุปลอม...",
+  "advice": "ไม่ควรคลิกลิงก์หรือโอนเงิน...",
+  "model_version": "v1.0",
+  "llm_version": "v1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440000"
+}</pre>
+                </div>
+
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>is_scam</code></td>
+                            <td>boolean</td>
+                            <td>true = มีความเสี่ยง, false = ปกติ</td>
+                        </tr>
+                        <tr>
+                            <td><code>risk_score</code></td>
+                            <td>float</td>
+                            <td>ค่าความเสี่ยง 0.0-1.0 (ยิ่งสูงยิ่งเสี่ยง)</td>
+                        </tr>
+                        <tr>
+                            <td><code>category</code></td>
+                            <td>string</td>
+                            <td>ประเภทการหลอกลวงที่ตรวจพบ</td>
+                        </tr>
+                        <tr>
+                            <td><code>reason</code></td>
+                            <td>string</td>
+                            <td>เหตุผลว่าทำไมถึงเป็น scam</td>
+                        </tr>
+                        <tr>
+                            <td><code>advice</code></td>
+                            <td>string</td>
+                            <td>คำแนะนำสำหรับผู้ใช้</td>
+                        </tr>
+                        <tr>
+                            <td><code>request_id</code></td>
+                            <td>string</td>
+                            <td>ID สำหรับติดตามและ debug</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Code Examples -->
+            <div class="endpoint-card">
+                <h2>💻 Code Examples</h2>
+                <p style="margin-bottom: 2rem;">เลือกภาษาที่คุณใช้:</p>
+
+                <div class="tab-container">
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('curl')">cURL</button>
+                        <button class="tab" onclick="switchTab('python')">Python</button>
+                        <button class="tab" onclick="switchTab('node')">Node.js</button>
+                        <button class="tab" onclick="switchTab('php')">PHP</button>
+                    </div>
+
+                    <!-- cURL -->
+                    <div id="curl" class="tab-content active">
+                        <h3>cURL Example</h3>
+                        <div class="code-block">
+<pre><span class="comment"># Basic request</span>
+curl -X POST https://api.thaiscamdetector.com/v1/partner/detect/text \
+  -H <span class="string">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "message": "คุณมีพัสดุค้างชำระ 50 บาท กรุณาคลิกลิงก์",
+    "user_ref": "user_12345"
+  }'</span>
+
+<span class="comment"># Response:</span>
+<span class="comment"># {"is_scam":true,"risk_score":0.85,"category":"parcel_scam",...}</span></pre>
+                        </div>
+                    </div>
+
+                    <!-- Python -->
+                    <div id="python" class="tab-content">
+                        <h3>Python Example (requests library)</h3>
+                        <div class="code-block">
+<pre><span class="keyword">import</span> requests
+
+<span class="comment"># Your API credentials</span>
+API_KEY = <span class="string">"YOUR_API_KEY_HERE"</span>
+BASE_URL = <span class="string">"https://api.thaiscamdetector.com"</span>
+
+<span class="keyword">def</span> <span class="function">check_scam</span>(message, user_ref=<span class="keyword">None</span>):
+    <span class="string">"""Check if a message is a scam"""</span>
+    url = <span class="string">f"{BASE_URL}/v1/partner/detect/text"</span>
+    
+    headers = {
+        <span class="string">"Authorization"</span>: <span class="string">f"Bearer {API_KEY}"</span>,
+        <span class="string">"Content-Type"</span>: <span class="string">"application/json"</span>
+    }
+    
+    payload = {
+        <span class="string">"message"</span>: message,
+        <span class="string">"user_ref"</span>: user_ref
+    }
+    
+    response = requests.post(url, json=payload, headers=headers)
+    
+    <span class="keyword">if</span> response.status_code == <span class="number">200</span>:
+        <span class="keyword">return</span> response.json()
+    <span class="keyword">else</span>:
+        <span class="keyword">raise</span> Exception(<span class="string">f"Error: {response.status_code}"</span>)
+
+<span class="comment"># Usage example</span>
+message = <span class="string">"คุณมีพัสดุค้างชำระ 50 บาท"</span>
+result = check_scam(message, user_ref=<span class="string">"user_12345"</span>)
+
+<span class="keyword">if</span> result[<span class="string">"is_scam"</span>]:
+    <span class="keyword">print</span>(<span class="string">f"⚠️ Scam detected! Risk: {result['risk_score']}"</span>)
+    <span class="keyword">print</span>(<span class="string">f"Category: {result['category']}"</span>)
+    <span class="keyword">print</span>(<span class="string">f"Reason: {result['reason']}"</span>)
+<span class="keyword">else</span>:
+    <span class="keyword">print</span>(<span class="string">"✅ Message looks safe"</span>)</pre>
+                        </div>
+                    </div>
+
+                    <!-- Node.js -->
+                    <div id="node" class="tab-content">
+                        <h3>Node.js Example (axios)</h3>
+                        <div class="code-block">
+<pre><span class="keyword">const</span> axios = <span class="keyword">require</span>(<span class="string">'axios'</span>);
+
+<span class="comment">// Your API credentials</span>
+<span class="keyword">const</span> API_KEY = <span class="string">'YOUR_API_KEY_HERE'</span>;
+<span class="keyword">const</span> BASE_URL = <span class="string">'https://api.thaiscamdetector.com'</span>;
+
+<span class="comment">/**
+ * Check if a message is a scam
+ */</span>
+<span class="keyword">async function</span> <span class="function">checkScam</span>(message, userRef = <span class="keyword">null</span>) {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> response = <span class="keyword">await</span> axios.post(
+      <span class="string">`${BASE_URL}/v1/partner/detect/text`</span>,
+      {
+        message: message,
+        user_ref: userRef
+      },
+      {
+        headers: {
+          <span class="string">'Authorization'</span>: <span class="string">`Bearer ${API_KEY}`</span>,
+          <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+        }
+      }
+    );
+    
+    <span class="keyword">return</span> response.data;
+  } <span class="keyword">catch</span> (error) {
+    console.error(<span class="string">'Error:'</span>, error.response?.data || error.message);
+    <span class="keyword">throw</span> error;
+  }
+}
+
+<span class="comment">// Usage example</span>
+(<span class="keyword">async</span> () => {
+  <span class="keyword">const</span> message = <span class="string">'คุณมีพัสดุค้างชำระ 50 บาท'</span>;
+  <span class="keyword">const</span> result = <span class="keyword">await</span> <span class="function">checkScam</span>(message, <span class="string">'user_12345'</span>);
+  
+  <span class="keyword">if</span> (result.is_scam) {
+    console.log(<span class="string">`⚠️ Scam detected! Risk: ${result.risk_score}`</span>);
+    console.log(<span class="string">`Category: ${result.category}`</span>);
+    console.log(<span class="string">`Reason: ${result.reason}`</span>);
+  } <span class="keyword">else</span> {
+    console.log(<span class="string">'✅ Message looks safe'</span>);
+  }
+})();</pre>
+                        </div>
+                    </div>
+
+                    <!-- PHP -->
+                    <div id="php" class="tab-content">
+                        <h3>PHP Example</h3>
+                        <div class="code-block">
+<pre><span class="keyword">&lt;?php</span>
+
+<span class="comment">// Your API credentials</span>
+<span class="keyword">$apiKey</span> = <span class="string">'YOUR_API_KEY_HERE'</span>;
+<span class="keyword">$baseUrl</span> = <span class="string">'https://api.thaiscamdetector.com'</span>;
+
+<span class="comment">/**
+ * Check if a message is a scam
+ */</span>
+<span class="keyword">function</span> <span class="function">checkScam</span>(<span class="keyword">$message</span>, <span class="keyword">$userRef</span> = <span class="keyword">null</span>) {
+    <span class="keyword">global</span> <span class="keyword">$apiKey</span>, <span class="keyword">$baseUrl</span>;
+    
+    <span class="keyword">$url</span> = <span class="keyword">$baseUrl</span> . <span class="string">'/v1/partner/detect/text'</span>;
+    
+    <span class="keyword">$payload</span> = [
+        <span class="string">'message'</span> => <span class="keyword">$message</span>,
+        <span class="string">'user_ref'</span> => <span class="keyword">$userRef</span>
+    ];
+    
+    <span class="keyword">$ch</span> = curl_init(<span class="keyword">$url</span>);
+    curl_setopt(<span class="keyword">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="keyword">true</span>);
+    curl_setopt(<span class="keyword">$ch</span>, CURLOPT_POST, <span class="keyword">true</span>);
+    curl_setopt(<span class="keyword">$ch</span>, CURLOPT_POSTFIELDS, json_encode(<span class="keyword">$payload</span>));
+    curl_setopt(<span class="keyword">$ch</span>, CURLOPT_HTTPHEADER, [
+        <span class="string">'Authorization: Bearer '</span> . <span class="keyword">$apiKey</span>,
+        <span class="string">'Content-Type: application/json'</span>
+    ]);
+    
+    <span class="keyword">$response</span> = curl_exec(<span class="keyword">$ch</span>);
+    <span class="keyword">$httpCode</span> = curl_getinfo(<span class="keyword">$ch</span>, CURLINFO_HTTP_CODE);
+    curl_close(<span class="keyword">$ch</span>);
+    
+    <span class="keyword">if</span> (<span class="keyword">$httpCode</span> == <span class="number">200</span>) {
+        <span class="keyword">return</span> json_decode(<span class="keyword">$response</span>, <span class="keyword">true</span>);
+    } <span class="keyword">else</span> {
+        <span class="keyword">throw new</span> Exception(<span class="string">"Error: "</span> . <span class="keyword">$httpCode</span>);
+    }
+}
+
+<span class="comment">// Usage example</span>
+<span class="keyword">$message</span> = <span class="string">'คุณมีพัสดุค้างชำระ 50 บาท'</span>;
+<span class="keyword">$result</span> = checkScam(<span class="keyword">$message</span>, <span class="string">'user_12345'</span>);
+
+<span class="keyword">if</span> (<span class="keyword">$result</span>[<span class="string">'is_scam'</span>]) {
+    <span class="keyword">echo</span> <span class="string">"⚠️ Scam detected! Risk: "</span> . <span class="keyword">$result</span>[<span class="string">'risk_score'</span>] . <span class="string">"\n"</span>;
+    <span class="keyword">echo</span> <span class="string">"Category: "</span> . <span class="keyword">$result</span>[<span class="string">'category'</span>] . <span class="string">"\n"</span>;
+} <span class="keyword">else</span> {
+    <span class="keyword">echo</span> <span class="string">"✅ Message looks safe\n"</span>;
+}
+
+<span class="keyword">?&gt;</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="endpoint-card">
+                <h2>📂 Scam Categories</h2>
+                <p>ระบบสามารถตรวจจับการหลอกลวง 8 ประเภท:</p>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>ชื่อไทย</th>
+                            <th>ตัวอย่าง</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>fake_officer</code></td>
+                            <td>ปลอมเป็นเจ้าหน้าที่</td>
+                            <td>ตำรวจแจ้งว่ามีหมายจับ</td>
+                        </tr>
+                        <tr>
+                            <td><code>parcel_scam</code></td>
+                            <td>พัสดุปลอม</td>
+                            <td>มีพัสดุค้างชำระ</td>
+                        </tr>
+                        <tr>
+                            <td><code>loan_scam</code></td>
+                            <td>สินเชื่อปลอม</td>
+                            <td>กู้เงินไม่ต้องค้ำ</td>
+                        </tr>
+                        <tr>
+                            <td><code>investment_scam</code></td>
+                            <td>ลงทุนปลอม</td>
+                            <td>กำไรสูง 30% ต่อเดือน</td>
+                        </tr>
+                        <tr>
+                            <td><code>otp_phishing</code></td>
+                            <td>ขอ OTP</td>
+                            <td>กรุณาแจ้งรหัส OTP</td>
+                        </tr>
+                        <tr>
+                            <td><code>marketplace_scam</code></td>
+                            <td>ตลาดออนไลน์ปลอม</td>
+                            <td>โอนก่อนส่งของ</td>
+                        </tr>
+                        <tr>
+                            <td><code>other_scam</code></td>
+                            <td>หลอกลวงอื่น ๆ</td>
+                            <td>รูปแบบอื่น</td>
+                        </tr>
+                        <tr>
+                            <td><code>normal</code></td>
+                            <td>ข้อความปกติ</td>
+                            <td>ไม่พบความเสี่ยง</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Rate Limits -->
+            <div class="endpoint-card">
+                <h2>⚡ Rate Limits</h2>
+                <p>จำกัดจำนวนการเรียกใช้ API เพื่อความเป็นธรรมและเสถียรภาพของระบบ:</p>
+                <ul style="font-size: 1.1rem; line-height: 2;">
+                    <li>🔓 <strong>Free Tier:</strong> 100 requests / ชั่วโมง</li>
+                    <li>💼 <strong>Basic Plan:</strong> 1,000 requests / ชั่วโมง</li>
+                    <li>⭐ <strong>Pro Plan:</strong> 10,000 requests / ชั่วโมง</li>
+                    <li>🚀 <strong>Enterprise:</strong> ไม่จำกัด (ติดต่อ sales)</li>
+                </ul>
+                <p style="margin-top: 1rem;">
+                    เมื่อเกินจำนวน จะได้ HTTP 429 (Too Many Requests)
+              <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">🛡️ ThaiScam Guard</div>
+                <nav class="nav-links">
+                    <a href="/content.html">📚 เนื้อหา</a>
+                    <a href="/api.html">📡 API</a>
+                    <a href="/privacy.html">🔒 ความเป็นส่วนตัว</a>
+                    <a href="/admin.html" style="color: #fbbf24;">⚙️ Admin</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+                    <tbody>
+                        <tr>
+                            <td><code>200</code></td>
+                            <td>✅ Success</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>400</code></td>
+                            <td>❌ Bad Request</td>
+                            <td>ตรวจสอบ request format</td>
+                        </tr>
+                        <tr>
+                            <td><code>401</code></td>
+                            <td>🔒 Unauthorized</td>
+                            <td>ตรวจสอบ API Key</td>
+                        </tr>
+                        <tr>
+                            <td><code>429</code></td>
+                            <td>⏰ Too Many Requests</td>
+                            <td>รอแล้วลองใหม่อีกครั้ง</td>
+                        </tr>
+                        <tr>
+                            <td><code>500</code></td>
+                            <td>💥 Server Error</td>
+                            <td>ติดต่อ support</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CTA -->
+            <div style="text-align: center; margin: 3rem 0;">
+                <h2 style="margin-bottom: 1.5rem;">พร้อมเริ่มใช้งานหรือยัง?</h2>
+                <p style="font-size: 1.1rem; color: rgba(255,255,255,0.8); margin-bottom: 2rem;">
+                    สมัครเป็น Partner และรับ API Key ฟรี
+                </p>
+                <a href="mailto:contact@thaiscamdetector.com" class="cta-button">
+                    📧 ติดต่อขอ API Key
+                </a>
+                <a href="/docs" class="cta-button" style="background: rgba(255,255,255,0.1);">
+                    📖 เอกสารเพิ่มเติม
+                </a>
+            </div>
+
+            <!-- Support -->
+            <div class="endpoint-card" style="text-align: center; background: rgba(96, 165, 250, 0.1);">
+                <h3>💬 ต้องการความช่วยเหลือ?</h3>
+                <p style="margin: 1rem 0;">
+                    ทีมงานพร้อมให้คำปรึกษาและช่วยเหลือในการ integration
+                </p>
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
+                    Email: support@thaiscamdetector.com<br>
+                    LINE: @thaiscamdetector<br>
+                    เวลาทำการ: จันทร์-ศุกร์ 9:00-18:00
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

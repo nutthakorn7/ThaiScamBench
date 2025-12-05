@@ -134,20 +134,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content=error_response.model_dump()
     )
 
-# CORS Configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://scamdetect.th",
-        "https://www.scamdetect.th",
-        "http://localhost:8000",  # For local testing
-        "http://localhost:3000",  # For frontend dev
-    ] if not settings.is_development else ["*"],  # Allow all in dev
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Admin-Token"],
-)
-
 # Security headers
 from app.middleware.security import SecurityMiddleware
 app.add_middleware(SecurityMiddleware)

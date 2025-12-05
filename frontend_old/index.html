@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ระบบ AI ตรวจจับข้อความหลอกลวงสำหรับคนไทย ตรวจสอบ SMS, LINE, Facebook ฟรี">
+    <title>ตรวจจับข้อความหลอกลวง | Thai Scam Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#detector" class="skip-link">ข้ามไปที่ฟอร์มตรวจสอบ</a>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <a href="./index.html" class="logo">
+                    <span aria-hidden="true">🛡️</span> ThaiScamBench
+                </a>
+                
+                <!-- Hamburger Menu Toggle -->
+                <button class="nav-toggle" aria-label="เปิดเมนู" aria-expanded="false" onclick="toggleNav()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <nav class="nav-links" id="navLinks" aria-label="เมนูหลัก">
+                    <a href="./content.html">
+                        <span aria-hidden="true">📚</span> เนื้อหา
+                    </a>
+                    <a href="./api.html">
+                        <span aria-hidden="true">📡</span> API
+                    </a>
+                    <a href="./privacy.html">
+                        <span aria-hidden="true">🔒</span> ความเป็นส่วนตัว
+                    </a>
+                    <a href="./admin.html" class="nav-admin">
+                        <span aria-hidden="true">⚙️</span> Admin
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section (Compact) -->
+    <section class="hero hero-compact" aria-labelledby="hero-title">
+        <div class="container">
+            <div class="hero-icon" aria-hidden="true">🛡️</div>
+            <h1 id="hero-title" class="hero-title">ThaiScam Guard</h1>
+            <p class="hero-subtitle">ระบบ AI ช่วยคนไทยเช็กข้อความหลอกลวง</p>
+        </div>
+    </section>
+
+    <!-- Main Detection Form (Above the Fold) -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Detection Form -->
+            <div class="detection-card" id="detector">
+                <h2 class="card-title">
+                    <span aria-hidden="true">📱</span> วางข้อความที่ต้องการตรวจสอบ
+                </h2>
+                
+                <form id="detectionForm" class="detection-form">
+                    <div class="form-group">
+                        <label for="messageInput" class="form-label">ข้อความ</label>
+                        <div class="textarea-wrapper">
+                            <textarea 
+                                id="messageInput" 
+                                name="message" 
+                                class="form-textarea" 
+                                rows="5" 
+                                placeholder="วางข้อความที่ได้รับ เช่น SMS, LINE, Facebook ฯลฯ"
+                                maxlength="5000"
+                                required
+                                aria-describedby="charCountDesc privacyNote"
+                            ></textarea>
+                            <button type="button" class="clear-btn" id="clearBtn" onclick="clearTextarea()" aria-label="ล้างข้อความ" title="ล้างข้อความ">
+                                ✕
+                            </button>
+                        </div>
+                        <div class="char-counter" id="charCountDesc">
+                            <span id="charCount">0</span> / 5000 ตัวอักษร
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="channelSelect" class="form-label">ช่องทางที่ได้รับข้อความ (ถ้ามี)</label>
+                        <select id="channelSelect" name="channel" class="form-select">
+                            <option value="">-- ไม่ระบุ --</option>
+                            <option value="SMS">SMS</option>
+                            <option value="LINE">LINE</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="Email">Email</option>
+                            <option value="อื่นๆ">อื่นๆ</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="checkButton">
+                        <span class="btn-text">
+                            <span aria-hidden="true">🔍</span> ตรวจสอบข้อความนี้
+                        </span>
+                        <span class="btn-loader" style="display: none;" aria-live="polite">
+                            <span class="spinner" aria-hidden="true"></span> กำลังตรวจสอบ...
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Example Messages -->
+                <div class="example-messages">
+                    <p><span aria-hidden="true">💡</span> ลองตัวอย่าง:</p>
+                    <div class="example-buttons">
+                        <button type="button" class="btn-example" onclick="loadExample('คุณได้รับพัสดุจาก Kerry กรุณายืนยันที่อยู่จัดส่งที่ bit.ly/kerry-xxx')">
+                            <span aria-hidden="true">📦</span> พัสดุปลอม
+                        </button>
+                        <button type="button" class="btn-example" onclick="loadExample('ยินดีด้วย! คุณได้รับเงินรางวัล 50,000 บาท โอนค่าธรรมเนียม 500 บาทก่อนรับเงิน')">
+                            <span aria-hidden="true">💰</span> เงินรางวัล
+                        </button>
+                        <button type="button" class="btn-example" onclick="loadExample('แจ้งเตือน: บัญชีธนาคารของท่านถูกระงับ กรุณายืนยันตัวตนที่ลิงก์นี้')">
+                            <span aria-hidden="true">🏦</span> ธนาคารปลอม
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Privacy Notice (Compact) -->
+                <details class="privacy-notice" id="privacyNote">
+                    <summary>
+                        <span aria-hidden="true">🔒</span> ความเป็นส่วนตัว – เราเก็บเพียง hash เข้ารหัส
+                    </summary>
+                    <p>
+                        ข้อความที่คุณส่งมาจะถูกเก็บเป็น <strong>hash เข้ารหัส</strong> (ไม่สามารถย้อนกลับเป็นข้อความได้) 
+                        เพื่อวิเคราะห์และปรับปรุงระบบเท่านั้น เราจะลบข้อมูลอัตโนมัติภายใน <strong>30 วัน</strong>
+                        <a href="./privacy.html">อ่านนโยบายเพิ่มเติม</a>
+                    </p>
+                </details>
+            </div>
+
+            <!-- Skeleton Loader (Hidden) -->
+            <div id="skeletonContainer" class="results-skeleton" style="display: none;" aria-hidden="true">
+                <div class="skeleton-bar xl" style="width: 40%;"></div>
+                <div class="skeleton-bar lg" style="width: 100%; margin-top: 1rem;"></div>
+                <div class="skeleton-bar" style="width: 80%;"></div>
+                <div class="skeleton-bar" style="width: 60%;"></div>
+                <div class="skeleton-bar lg" style="width: 100%; margin-top: 1rem;"></div>
+                <div class="skeleton-bar" style="width: 90%;"></div>
+            </div>
+
+            <!-- Results Display -->
+            <div id="resultsContainer" class="results-container" style="display: none;" role="region" aria-live="polite" aria-label="ผลการตรวจสอบ">
+                <div class="results-card">
+                    <h2 class="card-title">
+                        <span aria-hidden="true">📊</span> ผลการตรวจสอบ
+                    </h2>
+                    
+                    <!-- Risk Indicator -->
+                    <div id="riskIndicator" class="risk-indicator">
+                        <div class="risk-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div id="riskFill" class="risk-fill"></div>
+                        </div>
+                        <div id="riskLabel" class="risk-label"></div>
+                        <div id="riskScore" class="risk-score"></div>
+                    </div>
+
+                    <!-- Category Badge -->
+                    <div class="category-section">
+                        <span class="category-label">ประเภท:</span>
+                        <span id="categoryBadge" class="category-badge"></span>
+                    </div>
+
+                    <!-- Reason -->
+                    <div class="info-section">
+                        <h3 class="info-title">
+                            <span aria-hidden="true">💡</span> เหตุผล
+                        </h3>
+                        <p id="reasonText" class="info-text"></p>
+                    </div>
+
+                    <!-- Advice -->
+                    <div class="info-section">
+                        <h3 class="info-title">
+                            <span aria-hidden="true">✅</span> คำแนะนำ
+                        </h3>
+                        <div id="adviceText" class="info-text advice-text"></div>
+                    </div>
+
+                    <!-- Model Version -->
+                    <div class="model-version">
+                        <small>Model: <span id="modelVersion"></span></small>
+                    </div>
+
+                    <!-- Feedback Section -->
+                    <div id="feedbackSection" class="feedback-section">
+                        <h3>
+                            <span aria-hidden="true">💭</span> ผลลัพธ์ตรงหรือไม่?
+                        </h3>
+                        <p>ข้อมูลจากคุณจะช่วยให้ระบบแม่นยำขึ้น</p>
+                        <div class="feedback-buttons">
+                            <button type="button" class="btn-feedback btn-correct" onclick="submitFeedback('correct')">
+                                <span aria-hidden="true">✅</span> ผลลัพธ์ตรง
+                            </button>
+                            <button type="button" class="btn-feedback btn-incorrect" onclick="submitFeedback('incorrect')">
+                                <span aria-hidden="true">❌</span> ผลลัพธ์ไม่ตรง
+                            </button>
+                        </div>
+                        <div id="feedbackMessage" class="feedback-message" role="status" aria-live="polite" style="display: none;"></div>
+                    </div>
+
+                    <button type="button" class="btn-secondary" onclick="resetForm()">
+                        <span aria-hidden="true">🔄</span> ตรวจสอบข้อความใหม่
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Display -->
+            <div id="errorContainer" class="error-container" style="display: none;" role="alert" aria-live="assertive">
+                <div class="error-card">
+                    <h3 class="error-title">
+                        <span aria-hidden="true">⚠️</span> เกิดข้อผิดพลาด
+                    </h3>
+                    <p id="errorMessage" class="error-message"></p>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">
+                        ลองใหม่อีกครั้ง
+                    </button>
+                </div>
+            </div>
+
+            <!-- How It Works (Collapsible) -->
+            <section class="content-section" style="margin-top: 2rem;">
+                <button type="button" class="collapsible-trigger" onclick="toggleCollapsible('howItWorks')" aria-expanded="false" aria-controls="howItWorksContent">
+                    <span aria-hidden="true">📱</span> วิธีใช้งาน 3 ขั้นตอน
+                    <span class="arrow" aria-hidden="true">▼</span>
+                </button>
+                <div id="howItWorksContent" class="collapsible-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                        <div class="step-card">
+                            <div class="step-icon" aria-hidden="true">📋</div>
+                            <h3>1. วางข้อความ</h3>
+                            <p>คัดลอกข้อความที่ได้รับจาก SMS, LINE, Facebook หรือช่องทางอื่น ๆ แล้ววางลงในช่อง</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon" aria-hidden="true">🤖</div>
+                            <h3>2. AI วิเคราะห์</h3>
+                            <p>ระบบ AI วิเคราะห์ข้อความและประเมินความเสี่ยง ใช้เวลาเพียงไม่กี่วินาที</p>
+                        </div>
+                        <div class="step-card">
+                            <div class="step-icon" aria-hidden="true">✅</div>
+                            <h3>3. รับผลลัพธ์</h3>
+                            <p>ดูผลการตรวจสอบพร้อมระดับความเสี่ยง คำอธิบาย และคำแนะนำทันที</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Features Compact -->
+    <section class="features-compact" aria-label="จุดเด่นของระบบ">
+        <div class="feature-chip">
+            <span aria-hidden="true">🇹🇭</span>
+            <span>รองรับภาษาไทย 100%</span>
+        </div>
+        <div class="feature-chip">
+            <span aria-hidden="true">🎯</span>
+            <span>แยก Scam 8 ประเภท</span>
+        </div>
+        <div class="feature-chip">
+            <span aria-hidden="true">⚡</span>
+            <span>ผลลัพธ์ใน 1 วินาที</span>
+        </div>
+        <div class="feature-chip">
+            <span aria-hidden="true">🔒</span>
+            <span>ปลอดภัย PDPA</span>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">
+                <span aria-hidden="true">⚠️</span> <strong>ข้อจำกัด:</strong> ระบบนี้เป็นเครื่องมือช่วยประเมินเบื้องต้นเท่านั้น 
+                ไม่ควรใช้เป็นเกณฑ์เดียวในการตัดสินใจ กรุณาใช้วิจารณญาณของคุณเองด้วยเสมอ
+            </p>
+            <p class="footer-copyright">
+                © 2024 Thai Scam Detector | Made with <span aria-hidden="true">❤️</span><span class="sr-only">ความรัก</span> for Thai internet safety
+            </p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

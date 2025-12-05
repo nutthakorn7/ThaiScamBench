@@ -25,8 +25,10 @@ git pull origin main
 
 # Log in to GitHub Container Registry
 echo "🔐 Logging in to GitHub Container Registry..."
-echo "Enter your GitHub Personal Access Token (with read:packages permission):"
-read -s GITHUB_TOKEN
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "Enter your GitHub Personal Access Token (with read:packages permission):"
+    read -s GITHUB_TOKEN
+fi
 echo $GITHUB_TOKEN | docker login ghcr.io -u $(git config user.name) --password-stdin
 
 # Pull latest images

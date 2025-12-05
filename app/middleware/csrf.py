@@ -44,9 +44,26 @@ class CSRFProtection(BaseHTTPMiddleware):
         Raises:
             HTTPException: 403 if CSRF validation fails
         """
-        # Skip CSRF for safe methods
-        if request.method not in self.PROTECTED_METHODS:
-            return await call_next(request)
+        # Skip CSRF check for:
+        # - Safe methods (GET, HEAD, OPTIONS)
+        # - Health check endpoint
+        # - API documentation
+        # - Public API endpoints (no auth required, CORS-enabled)
+        # - Feedback endpoint (public submission)
+        exempt_paths = [
+            "/health",
+            "/docs", 
+            "/openapi.json",
+            "/redoc",
+        ]
+        
+        # Exempt all public API endpoints (no CSRF needed for stateless API)
+        if (
+            request.url.path in exempt_paths
+            or request.url.path.startswith("/v1/public/")
+            or request.url.path.startswith("/v1/feedback")  
+            or request.method in ["GET", "HEAD", "OPTIONS"]
+        ):    return await call_next(request)
         
         # Skip CSRF for exempt paths
         if request.url.path in self.EXEMPT_PATHS:

@@ -101,8 +101,8 @@ jobs:
             docker image prune -f
             
             # Check health
-            sleep 10
-            curl -f http://localhost:8000/health || exit 1
+            sleep 15
+            curl -f -k https://localhost/health || exit 1
       
       - name: Notify deployment success
         if: success()

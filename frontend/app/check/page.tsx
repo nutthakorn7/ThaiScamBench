@@ -121,7 +121,12 @@ Request ID: ${result.request_id}`;
                   {input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}
                 </p>
               </div>
-              <Button type="submit" size="lg" className="h-12 px-8" disabled={loading || input.trim().length < 5}>
+              <Button 
+                type="submit" 
+                size="lg" 
+                className="h-12 px-8" 
+                disabled={loading || input.trim().length < 5}
+              >
                 {loading ? (
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-5 w-5 animate-spin" />

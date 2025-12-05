@@ -25,9 +25,12 @@ export default function CheckPage() {
     setResult(null);
 
     try {
+      console.log('[DEBUG] Calling detectScam API...');
       const data = await detectScam({ text: input });
+      console.log('[DEBUG] API response:', data);
       setResult(data);
     } catch (err) {
+      console.error('[ERROR] API call failed:', err);
       setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่ภายหลัง");
       console.error(err);
     } finally {

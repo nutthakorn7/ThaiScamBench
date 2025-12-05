@@ -46,6 +46,19 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Configure CORS - Allow frontend to access API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://thaiscam.zcr.ai",
+        "https://thai-scam-bench.vercel.app",
+        "http://localhost:3000",  # For local development
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Add rate limiter state
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)

@@ -54,5 +54,25 @@ async def verify_partner_token(
             detail="Invalid API key"
         )
     
+    # Check if API key has expired
+    if partner.api_key_expires_at:
+        from datetime import datetime
+        if datetime.utcnow() > partner.api_key_expires_at:
+            logger.warning(f"Expired API key for partner: {partner.name}")
+            from app.models.error_responses import ErrorCode, create_error_response
+            error_response = create_error_response(
+                code=ErrorCode.INVALID_CREDENTIALS,
+                message="API key has expired. Please rotate your key.",
+                details={
+                    "expired_at": partner.api_key_expires_at.isoformat(),
+                    "partner_id": partner.id
+                }
+            )
+            from fastapi.responses import JSONResponse
+            raise HTTPException(
+                status_code=401,
+                detail="API key has expired. Please rotate your key."
+            )
+    
     logger.info(f"Authenticated partner: {partner.name} (ID: {partner.id})")
     return partner

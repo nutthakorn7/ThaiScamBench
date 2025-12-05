@@ -178,21 +178,31 @@
     </style>
 </head>
 <body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">ข้ามไปที่เนื้อหาหลัก</a>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
-                <a href="/" class="logo">🛡️ ThaiScamBench</a>
-                <nav class="nav-links">
-                    <a href="/content.html">📚 เนื้อหา</a>
-                    <a href="/api.html">📡 API</a>
-                    <a href="/privacy.html">🔒 ความเป็นส่วนตัว</a>
-                    <a href="/admin.html" style="color: #fbbf24;">⚙️ Admin</a>
+                <a href="./index.html" class="logo">
+                    <span aria-hidden="true">🛡️</span> ThaiScamBench
+                </a>
+                <button class="nav-toggle" aria-label="เปิดเมนู" aria-expanded="false" onclick="toggleNav()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav class="nav-links" id="navLinks" aria-label="เมนูหลัก">
+                    <a href="./content.html"><span aria-hidden="true">📚</span> เนื้อหา</a>
+                    <a href="./api.html"><span aria-hidden="true">📡</span> API</a>
+                    <a href="./privacy.html"><span aria-hidden="true">🔒</span> ความเป็นส่วนตัว</a>
+                    <a href="./admin.html" class="nav-admin"><span aria-hidden="true">⚙️</span> Admin</a>
                 </nav>
             </div>
         </div>
     </header>
-    <div class="container">
+    <div class="container" id="main-content">
 
         <div class="api-section">
             <h1 style="text-align: center; font-size: 2.5rem; margin-bottom: 0.5rem;">
@@ -579,20 +589,7 @@ result = check_scam(message, user_ref=<span class="string">"user_12345"</span>)
                 </ul>
                 <p style="margin-top: 1rem;">
                     เมื่อเกินจำนวน จะได้ HTTP 429 (Too Many Requests)
-              <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-wrapper">
-                <a href="/" class="logo">🛡️ ThaiScamBench</a>
-                <nav class="nav-links">
-                    <a href="/content.html">📚 เนื้อหา</a>
-                    <a href="/api.html">📡 API</a>
-                    <a href="/privacy.html">🔒 ความเป็นส่วนตัว</a>
-                    <a href="/admin.html" style="color: #fbbf24;">⚙️ Admin</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+          
                     <tbody>
                         <tr>
                             <td><code>200</code></td>
@@ -653,6 +650,16 @@ result = check_scam(message, user_ref=<span class="string">"user_12345"</span>)
     </div>
 
     <script>
+        // Navigation Toggle
+        function toggleNav() {
+            const navLinks = document.getElementById('navLinks');
+            const navToggle = document.querySelector('.nav-toggle');
+            navLinks.classList.toggle('open');
+            navToggle.classList.toggle('active');
+            const isOpen = navLinks.classList.contains('open');
+            navToggle.setAttribute('aria-expanded', isOpen);
+        }
+
         function switchTab(tabName) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {

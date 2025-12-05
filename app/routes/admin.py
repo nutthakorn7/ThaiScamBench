@@ -1,9 +1,10 @@
 """Admin API endpoints for statistics and monitoring"""
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.middleware.admin_auth import verify_admin_token
 from app.services.stats_service import get_summary_stats, get_partner_stats, get_category_distribution
+from app.models.pagination import PaginationParams, PaginatedResponse
 from typing import Optional
 import logging
 
@@ -49,22 +50,27 @@ async def stats_summary(
     description="Admin endpoint for partner usage statistics"
 )
 async def stats_partners(
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(50, ge=1, le=100, description="Items per page"),
     _authenticated: bool = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """
-    Get usage statistics per partner
+    Get usage statistics per partner with pagination
     
     Args:
+        page: Page number (1-indexed)
+        page_size: Items per page (max 100)
         _authenticated: Admin authentication dependency
         db: Database session
         
     Returns:
-        Partner usage statistics
+        Paginated partner usage statistics
     """
-    logger.info("Admin partner stats requested")
+    logger.info(f"Admin partner stats requested (page={page}, size={page_size})")
     
-    stats = get_partner_stats(db)
+    pagination = PaginationParams(page=page, page_size=page_size)
+    stats = get_partner_stats(db, pagination=pagination)
     return stats
 
 
@@ -74,23 +80,28 @@ async def stats_partners(
     description="Admin endpoint for category distribution"
 )
 async def stats_categories(
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     _authenticated: bool = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """
-    Get distribution of all scam categories
+    Get distribution of all scam categories with pagination
     
     Args:
+        page: Page number (1-indexed)
+        page_size: Items per page (max 100)
         _authenticated: Admin authentication dependency
         db: Database session
         
     Returns:
-        Category distribution
+        Paginated category distribution
     """
-    logger.info("Admin category stats requested")
+    logger.info(f"Admin category stats requested (page={page}, size={page_size})")
     
-    categories = get_category_distribution(db)
-    return {"categories": categories}
+    pagination = PaginationParams(page=page, page_size=page_size)
+    categories = get_category_distribution(db, pagination=pagination)
+    return categories
 
 
 @router.get(

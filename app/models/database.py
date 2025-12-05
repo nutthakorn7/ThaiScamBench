@@ -32,6 +32,8 @@ class Partner(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     name = Column(String(255), nullable=False, unique=True, index=True)
     api_key_hash = Column(String(255), nullable=False)
+    api_key_expires_at = Column(DateTime, nullable=True)  # None = never expires (backward compat)
+    last_rotated_at = Column(DateTime, nullable=True)  # Track key rotation
     status = Column(String(20), nullable=False, default=PartnerStatus.active.value)
     rate_limit_per_min = Column(Integer, nullable=False, default=100)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

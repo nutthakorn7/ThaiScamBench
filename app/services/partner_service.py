@@ -139,3 +139,48 @@ def get_partner_by_id(db: Session, partner_id: str) -> Optional[Partner]:
         Partner if found, None otherwise
     """
     return db.query(Partner).filter(Partner.id == partner_id).first()
+
+
+def rotate_partner_api_key(
+    db: Session,
+    partner_id: str,
+    expires_at: Optional[object] = None
+) -> str:
+    """
+    Rotate partner API key
+    
+    Args:
+        db: Database session
+        partner_id: Partner UUID
+        expires_at: Optional expiration datetime
+        
+    Returns:
+        New plain text API key
+        
+    Raises:
+        ValueError: If partner not found
+    """
+    from datetime import datetime
+    
+    partner = get_partner_by_id(db, partner_id)
+    if not partner:
+        raise ValueError(f"Partner with ID '{partner_id}' not found")
+    
+    # Generate new API key
+    new_api_key = generate_api_key()
+    new_api_key_hash = hash_api_key(new_api_key)
+    
+    # Update partner
+    partner.api_key_hash = new_api_key_hash
+    partner.api_key_expires_at = expires_at
+    partner.last_rotated_at = datetime.utcnow()
+    
+    db.commit()
+    db.refresh(partner)
+    
+    logger.info(
+        f"Rotated API key for partner: {partner.name} "
+        f"(expires: {expires_at.isoformat() if expires_at else 'never'})"
+    )
+    
+    return new_api_key

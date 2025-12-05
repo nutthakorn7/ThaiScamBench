@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from app.models.database import Detection, Partner, DetectionSource
+from app.models.pagination import PaginationParams, PaginatedResponse, paginate_query
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 import logging
@@ -92,17 +93,27 @@ def get_summary_stats(db: Session, days: int = 7) -> Dict[str, Any]:
     }
 
 
-def get_partner_stats(db: Session) -> Dict[str, Any]:
+def get_partner_stats(db: Session, pagination: Optional[PaginationParams] = None) -> Dict[str, Any]:
     """
-    Get usage statistics per partner
+    Get usage statistics per partner with pagination
     
     Args:
         db: Database session
+        pagination: Optional pagination parameters
         
     Returns:
-        Dictionary with partner stats
+        Dictionary with partner stats (paginated if pagination provided)
     """
-    partners = db.query(Partner).all()
+    # Get all partners
+    partners_query = db.query(Partner)
+    
+    # Apply pagination if provided
+    if pagination:
+        partners, total_partners = paginate_query(partners_query, pagination)
+    else:
+        partners = partners_query.all()
+        total_partners = len(partners)
+    
     partner_stats = []
     
     for partner in partners:
@@ -139,36 +150,74 @@ def get_partner_stats(db: Session) -> Dict[str, Any]:
     # Sort by total requests descending
     partner_stats.sort(key=lambda x: x['total_requests'], reverse=True)
     
-    return {
-        "total_partners": len(partners),
-        "active_partners": len([p for p in partners if p.status == 'active']),
-        "partners": partner_stats
-    }
+    # All active partners count
+    all_partners_count = db.query(func.count(Partner.id)).scalar() or 0
+    active_partners_count = db.query(func.count(Partner.id)).filter(Partner.status == 'active').scalar() or 0
+    
+    if pagination:
+        return PaginatedResponse.create(
+            data=partner_stats,
+            total=total_partners,
+            page=pagination.page,
+            page_size=pagination.page_size
+        ).model_dump()
+    else:
+        return {
+            "total_partners": all_partners_count,
+            "active_partners": active_partners_count,
+            "partners": partner_stats
+        }
 
 
-def get_category_distribution(db: Session) -> List[Dict[str, Any]]:
+def get_category_distribution(db: Session, pagination: Optional[PaginationParams] = None) -> Dict[str, Any]:
     """
-    Get distribution of all categories
+    Get distribution of all categories with pagination
     
     Args:
         db: Database session
+        pagination: Optional pagination parameters
         
     Returns:
-        List of category counts
+        Category distribution (paginated if pagination provided)
     """
-    categories = db.query(
+    categories_query = db.query(
         Detection.category,
         func.count(Detection.id).label('count')
     ).group_by(
         Detection.category
     ).order_by(
         desc('count')
-    ).all()
+    )
     
-    return [
-        {
-            "category": row.category,
-            "count": row.count
+    if pagination:
+        # Count total  categories
+        total = db.query(func.count(func.distinct(Detection.category))).scalar() or 0
+        
+        # Apply pagination
+        categories = categories_query.offset(pagination.offset).limit(pagination.limit).all()
+        
+        category_data = [
+            {
+                "category": row.category,
+                "count": row.count
+            }
+            for row in categories
+        ]
+        
+        return PaginatedResponse.create(
+            data=category_data,
+            total=total,
+            page=pagination.page,
+            page_size=pagination.page_size
+        ).model_dump()
+    else:
+        categories = categories_query.all()
+        return {
+            "categories": [
+                {
+                    "category": row.category,
+                    "count": row.count
+                }
+                for row in categories
+            ]
         }
-        for row in categories
-    ]

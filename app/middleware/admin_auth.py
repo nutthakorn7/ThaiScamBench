@@ -1,6 +1,7 @@
 """Admin authentication middleware"""
 from fastapi import Header, HTTPException, Request
 from app.config import settings
+from app.utils.jwt_utils import verify_access_token
 from typing import Optional
 import logging
 
@@ -13,11 +14,12 @@ def verify_admin_token(
     request: Request = None
 ) -> bool:
     """
-    Verify admin token from header and optionally check IP allowlist
+    Verify admin authentication - supports both JWT and static token
     
-    Supports both:
-    - Authorization: Bearer <token>
-    - X-Admin-Token: <token>
+    Supports:
+    1. JWT: Authorization: Bearer <jwt_token>
+    2. Static token: X-Admin-Token: <static_token>
+    3. Static token: Authorization: Bearer <static_token> (legacy)
     
     Args:
         authorization: Bearer token from Authorization header
@@ -30,14 +32,49 @@ def verify_admin_token(
     Raises:
         HTTPException: 403 if authentication fails
     """
-    # Extract token from Authorization header if present
+    # Extract token from headers
     token = None
+    
     if authorization and authorization.startswith("Bearer "):
-        token = authorization.replace("Bearer ", "").strip()
+        potential_token = authorization.replace("Bearer ", "").strip()
+        
+        # Try JWT first
+        jwt_payload = verify_access_token(potential_token)
+        if jwt_payload:
+            # Valid JWT token
+            username = jwt_payload.get("sub")
+            role = jwt_payload.get("role")
+            
+            if role != "admin":
+                logger.warning(f"Non-admin role in JWT: {role} for user {username}")
+                raise HTTPException(
+                    status_code=403,
+                    detail="Forbidden: Insufficient permissions"
+                )
+            
+            logger.info(f"Admin authenticated via JWT: {username} from {request.client.host if request else 'unknown'}")
+            
+            # Check IP allowlist (if configured)
+            if settings.admin_allowed_ips:
+                allowed_ips = [ip.strip() for ip in settings.admin_allowed_ips.split(',')]
+                client_ip = request.client.host if request else None
+                
+                if client_ip not in allowed_ips:
+                    logger.warning(f"Admin access denied for IP: {client_ip} (JWT authenticated)")
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Forbidden: IP not allowed"
+                    )
+            
+            return True
+        
+        # If JWT verification failed, this potential_token might be a static token
+        token = potential_token
+        
     elif x_admin_token:
         token = x_admin_token
     
-    # Check token
+    # Verify static token (backward compatibility)
     if not token or token != settings.admin_token:
         logger.warning(f"Invalid admin token attempt from {request.client.host if request else 'unknown'}")
         raise HTTPException(
@@ -45,17 +82,17 @@ def verify_admin_token(
             detail="Forbidden: Invalid admin token"
         )
     
-    # Check IP allowlist (if configured)
+    # Check IP allowlist for static token (if configured)
     if settings.admin_allowed_ips:
         allowed_ips = [ip.strip() for ip in settings.admin_allowed_ips.split(',')]
         client_ip = request.client.host if request else None
         
         if client_ip not in allowed_ips:
-            logger.warning(f"Admin access denied for IP: {client_ip}")
+            logger.warning(f"Admin access denied for IP: {client_ip} (static token authenticated)")
             raise HTTPException(
                 status_code=403,
                 detail="Forbidden: IP not allowed"
             )
     
-    logger.info(f"Admin authenticated from {request.client.host if request else 'unknown'}")
+    logger.info(f"Admin authenticated via static token from {request.client.host if request else 'unknown'}")
     return True

@@ -10,6 +10,7 @@ from app.database import get_db
 from app.config import settings
 from app.middleware.rate_limit import limiter
 from app.middleware.security import validate_message_content
+from app.cache import redis_client, generate_cache_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,16 @@ async def detect_scam_public(
         # Step 0: Validate message content (security)
         validate_message_content(body.message)
         
+        # CACHE CHECK: Try to get from cache first
+        cache_key = generate_cache_key(body.message, prefix="public")
+        cached_result = redis_client.get(cache_key)
+        
+        if cached_result:
+            logger.info(f"✅ Cache HIT for public detection")
+            return PublicDetectResponse(**cached_result)
+        
+        logger.info(f"⚠️  Cache MISS for public detection - processing...")
+        
         # Step 1: Classify the message with public threshold (conservative)
         is_scam, risk_score, category = classify_scam(body.message, settings.public_threshold)
         
@@ -82,6 +93,9 @@ async def detect_scam_public(
             model_version=settings.model_version
         )
         
+        # CACHE SET: Store result for future requests
+        redis_client.set(cache_key, response.model_dump(), ttl=settings.cache_ttl_seconds)
+        
         logger.info(
             f"Detection completed - is_scam: {is_scam}, "
             f"category: {category}, channel: {body.channel}"
@@ -90,7 +104,6 @@ async def detect_scam_public(
         return response
         
     except Exception as e:
-        logger.error(f"Error in public detection: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"เกิดข้อผิดพลาดในการตรวจสอบ: {str(e)}"

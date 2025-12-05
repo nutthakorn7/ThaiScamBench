@@ -1,0 +1,54 @@
+"""Application constants"""
+
+# API Limits
+MAX_MESSAGE_LENGTH = 5000
+MIN_MESSAGE_LENGTH = 1
+DEFAULT_PAGE_SIZE = 50
+MAX_PAGE_SIZE = 100
+
+# Cache Settings
+DEFAULT_CACHE_TTL_SECONDS = 86400  # 24 hours
+CACHE_KEY_PREFIX_PUBLIC = "public"
+CACHE_KEY_PREFIX_PARTNER = "partner"
+
+# Rate Limiting
+DEFAULT_RATE_LIMIT_REQUESTS = 10
+DEFAULT_RATE_LIMIT_WINDOW = 60  # seconds
+
+# Detection Thresholds
+PUBLIC_DETECTION_THRESHOLD = 0.5  # Conservative
+PARTNER_DETECTION_THRESHOLD = 0.7  # Strict
+
+# Scam Categories
+SCAM_CATEGORY_PARCEL = "parcel_scam"
+SCAM_CATEGORY_BANKING = "banking_scam"
+SCAM_CATEGORY_PRIZE = "prize_scam"
+SCAM_CATEGORY_INVESTMENT = "investment_scam"
+SCAM_CATEGORY_IMPERSONATION = "impersonation_scam"
+SCAM_CATEGORY_ROMANCE = "romance_scam"
+SCAM_CATEGORY_OTHER = "other"
+
+# Detection Sources
+SOURCE_PUBLIC = "public"
+SOURCE_PARTNER = "partner"
+
+# Partner Status
+PARTNER_STATUS_ACTIVE = "active"
+PARTNER_STATUS_INACTIVE = "inactive"
+
+# HTTP Status Codes (for clarity)
+HTTP_200_OK = 200
+HTTP_201_CREATED = 201
+HTTP_400_BAD_REQUEST = 400
+HTTP_401_UNAUTHORIZED = 401
+HTTP_403_FORBIDDEN = 403
+HTTP_404_NOT_FOUND = 404
+HTTP_429_TOO_MANY_REQUESTS = 429
+HTTP_500_INTERNAL_ERROR = 500
+
+# Log Messages
+LOG_CACHE_HIT = "✅ Cache HIT"
+LOG_CACHE_MISS = "⚠️  Cache MISS"
+LOG_DETECTION_START = "Detection request received"
+LOG_DETECTION_COMPLETE = "Detection completed"
+LOG_AUDIT_LOG_CREATED = "Audit log created"

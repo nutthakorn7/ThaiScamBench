@@ -11,16 +11,26 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
+    <!-- Skip Link -->
+    <a href="#loginContainer" class="skip-link">ข้ามไปที่ฟอร์ม Login</a>
+
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
-                <a href="/" class="logo">🛡️ ThaiScamBench</a>
-                <nav class="nav-links">
-                    <a href="/content.html">📚 เนื้อหา</a>
-                    <a href="/api.html">📡 API</a>
-                    <a href="/privacy.html">🔒 ความเป็นส่วนตัว</a>
-                    <a href="/admin.html" style="color: #fbbf24;">⚙️ Admin</a>
+                <a href="./index.html" class="logo">
+                    <span aria-hidden="true">🛡️</span> ThaiScamBench
+                </a>
+                <button class="nav-toggle" aria-label="เปิดเมนู" aria-expanded="false" onclick="toggleNav()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <nav class="nav-links" id="navLinks" aria-label="เมนูหลัก">
+                    <a href="./content.html"><span aria-hidden="true">📚</span> เนื้อหา</a>
+                    <a href="./api.html"><span aria-hidden="true">📡</span> API</a>
+                    <a href="./privacy.html"><span aria-hidden="true">🔒</span> ความเป็นส่วนตัว</a>
+                    <a href="./admin.html" class="nav-admin"><span aria-hidden="true">⚙️</span> Admin</a>
                 </nav>
             </div>
         </div>
@@ -152,6 +162,17 @@
         </div>
     </footer>
 
+    <script>
+        // Navigation Toggle
+        function toggleNav() {
+            const navLinks = document.getElementById('navLinks');
+            const navToggle = document.querySelector('.nav-toggle');
+            navLinks.classList.toggle('open');
+            navToggle.classList.toggle('active');
+            const isOpen = navLinks.classList.contains('open');
+            navToggle.setAttribute('aria-expanded', isOpen);
+        }
+    </script>
     <script src="admin.js"></script>
 </body>
 </html>

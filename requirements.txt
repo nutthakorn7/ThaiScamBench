@@ -9,6 +9,8 @@ sqlalchemy==2.0.25
 alembic==1.13.1
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
+psycopg2-binary==2.9.9  # PostgreSQL driver
+redis==5.0.1  # Redis for caching
 
 # Testing
 pytest==7.4.3

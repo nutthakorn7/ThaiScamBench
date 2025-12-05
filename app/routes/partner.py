@@ -11,6 +11,7 @@ from app.middleware.rate_limit import limiter
 from app.database import get_db
 from app.config import settings
 from app.middleware.security import validate_message_content
+from app.cache import redis_client, generate_cache_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,31 @@ async def detect_scam_partner(
         # Step 0: Validate message content (security)
         validate_message_content(body.message)
         
+        # CACHE CHECK: Try to get from cache first
+        cache_key = generate_cache_key(body.message, prefix="partner")
+        cached_result = redis_client.get(cache_key)
+        
+        if cached_result:
+            logger.info(f"✅ Cache HIT for partner detection ({partner.name})")
+            # Still need to log this detection even if cached
+            detection = log_detection(
+                db=db,
+                source=DetectionSource.partner,
+                message=body.message,
+                is_scam=cached_result['is_scam'],
+                category=cached_result['category'],
+                risk_score=cached_result['risk_score'],
+                model_version=settings.model_version,
+                llm_version=settings.llm_version,
+                channel=body.channel,
+                partner_id=partner.id,
+                user_ref=body.user_ref
+            )
+            cached_result['request_id'] = detection.request_id
+            return PartnerDetectResponse(**cached_result)
+        
+        logger.info(f"⚠️  Cache MISS for partner detection ({partner.name}) - processing...")
+        
         # Step 1: Classify the message with partner threshold (strict)
         is_scam, risk_score, category = classify_scam(body.message, settings.partner_threshold)
         
@@ -90,6 +116,11 @@ async def detect_scam_partner(
             model_version=settings.model_version,
             llm_version=settings.llm_version
         )
+        
+        # CACHE SET: Store result (without request_id)
+        cache_data = response.model_dump()
+        cache_data.pop('request_id', None)  # Don't cache request_id
+        redis_client.set(cache_key, cache_data, ttl=settings.cache_ttl_seconds)
         
         logger.info(
             f"Partner detection completed - "

@@ -4,44 +4,13 @@ Integration tests for API endpoints
 Tests full request/response flow.
 """
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.main import app
-from app.database import Base, get_db
 from app.config import settings
-
-
-# Test database
-TEST_DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
-TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def override_get_db():
-    """Override database dependency for testing"""
-    try:
-        db = TestSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-# Override dependency
-app.dependency_overrides[get_db] = override_get_db
-
-# Create tables
-Base.metadata.create_all(bind=engine)
-
-# Test client
-client = TestClient(app)
 
 
 class TestDetectionEndpoints:
     """Test detection endpoints"""
     
-    def test_detect_parcel_scam(self):
+    def test_detect_parcel_scam(self, client):
         """Test detecting parcel scam"""
         response = client.post(
             "/v1/public/detect/text",
@@ -60,7 +29,7 @@ class TestDetectionEndpoints:
         assert "reason" in data
         assert "advice" in data
     
-    def test_detect_safe_message(self):
+    def test_detect_safe_message(self, client):
         """Test detecting safe message"""
         response = client.post(
             "/v1/public/detect/text",
@@ -76,7 +45,7 @@ class TestDetectionEndpoints:
         assert data["is_scam"] is False
         assert data["category"] == "safe"
     
-    def test_detect_empty_message_error(self):
+    def test_detect_empty_message_error(self, client):
         """Test empty message returns 400"""
         response = client.post(
             "/v1/public/detect/text",
@@ -88,7 +57,7 @@ class TestDetectionEndpoints:
         
         assert response.status_code == 422  # Pydantic validation
     
-    def test_detect_missing_message_error(self):
+    def test_detect_missing_message_error(self, client):
         """Test missing message field"""
         response = client.post(
             "/v1/public/detect/text",
@@ -101,7 +70,7 @@ class TestDetectionEndpoints:
 class TestFeedbackEndpoints:
     """Test feedback endpoints"""
     
-    def test_submit_feedback_success(self):
+    def test_submit_feedback_success(self, client):
         """Test successful feedback submission"""
         # First create a detection
         detect_response = client.post(
@@ -126,7 +95,7 @@ class TestFeedbackEndpoints:
         assert data["success"] is True
         assert "feedback_id" in data
     
-    def test_submit_feedback_not_found(self):
+    def test_submit_feedback_not_found(self, client):
         """Test feedback for non-existent detection"""
         response = client.post(
             "/v1/public/feedback",
@@ -142,7 +111,7 @@ class TestFeedbackEndpoints:
 class TestHealthEndpoint:
     """Test health check endpoint"""
     
-    def test_health_check(self):
+    def test_health_check(self, client):
         """Test health endpoint"""
         response = client.get("/health")
         
@@ -155,14 +124,14 @@ class TestHealthEndpoint:
 class TestAdminEndpoints:
     """Test admin endpoints (with auth)"""
     
-    def test_stats_without_auth(self):
+    def test_stats_without_auth(self, client):
         """Test stats endpoint requires auth"""
         response = client.get("/admin/stats/summary")
         
         # Admin auth middleware returns 403 for missing/invalid token
         assert response.status_code == 403
     
-    def test_stats_with_auth(self):
+    def test_stats_with_auth(self, client):
         """Test stats endpoint with valid token"""
         headers = {"X-Admin-Token": settings.admin_token}
         

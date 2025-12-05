@@ -13,7 +13,9 @@ from fastapi.testclient import TestClient
 
 from app.database import Base, get_db
 from app.main import app
+# Import all models to ensure they are registered with Base.metadata
 from app.models.database import Detection, Feedback, Partner
+from app.models.audit_log import AuditLog
 
 
 # Test database URL (in-memory SQLite)
@@ -42,6 +44,10 @@ def test_db() -> Generator[Session, None, None]:
         connect_args={"check_same_thread": False},
         poolclass=StaticPool
     )
+    
+    # Import models to ensure they are registered with Base.metadata
+    from app.models.database import Detection, Feedback, Partner
+    from app.models.audit_log import AuditLog
     
     # Create tables
     Base.metadata.create_all(bind=engine)

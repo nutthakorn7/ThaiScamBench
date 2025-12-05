@@ -52,14 +52,15 @@ def verify_admin_token(
                     detail="Forbidden: Insufficient permissions"
                 )
             
-            logger.info(f"Admin authenticated via JWT: {username} from {request.client.host if request else 'unknown'}")
+            client_host = request.client.host if request and request.client else 'unknown'
+            logger.info(f"Admin authenticated via JWT: {username} from {client_host}")
             
             # Check IP allowlist (if configured)
             if settings.admin_allowed_ips:
                 allowed_ips = [ip.strip() for ip in settings.admin_allowed_ips.split(',')]
-                client_ip = request.client.host if request else None
+                client_ip = request.client.host if request and request.client else None
                 
-                if client_ip not in allowed_ips:
+                if client_ip and client_ip not in allowed_ips:
                     logger.warning(f"Admin access denied for IP: {client_ip} (JWT authenticated)")
                     raise HTTPException(
                         status_code=403,
@@ -76,7 +77,8 @@ def verify_admin_token(
     
     # Verify static token (backward compatibility)
     if not token or token != settings.admin_token:
-        logger.warning(f"Invalid admin token attempt from {request.client.host if request else 'unknown'}")
+        client_host = request.client.host if request and request.client else 'unknown'
+        logger.warning(f"Invalid admin token attempt from {client_host}")
         raise HTTPException(
             status_code=403,
             detail="Forbidden: Invalid admin token"
@@ -85,14 +87,15 @@ def verify_admin_token(
     # Check IP allowlist for static token (if configured)
     if settings.admin_allowed_ips:
         allowed_ips = [ip.strip() for ip in settings.admin_allowed_ips.split(',')]
-        client_ip = request.client.host if request else None
+        client_ip = request.client.host if request and request.client else None
         
-        if client_ip not in allowed_ips:
+        if client_ip and client_ip not in allowed_ips:
             logger.warning(f"Admin access denied for IP: {client_ip} (static token authenticated)")
             raise HTTPException(
                 status_code=403,
                 detail="Forbidden: IP not allowed"
             )
     
-    logger.info(f"Admin authenticated via static token from {request.client.host if request else 'unknown'}")
+    client_host = request.client.host if request and request.client else 'unknown'
+    logger.info(f"Admin authenticated via static token from {client_host}")
     return True

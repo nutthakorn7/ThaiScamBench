@@ -7,8 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { detectScam, type DetectionResponse } from "@/lib/api";
+import { type DetectionResponse } from "@/lib/api"; // Only import type
 import { cn } from "@/lib/utils";
+
+// 🎭 MOCK DATA MODE - Using simulated AI detection instead of real API
 
 export default function CheckPage() {
   const [input, setInput] = useState("");
@@ -25,14 +27,64 @@ export default function CheckPage() {
     setResult(null);
 
     try {
-      const data = await detectScam({ text: input });
-      setResult(data);
+      // Mock Data Mode - Simulate AI Detection
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+      
+      const mockResult = generateMockDetection(input);
+      setResult(mockResult);
     } catch (err) {
-      setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาลองใหม่ภายหลัง");
+      setError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Mock Detection Logic
+  const generateMockDetection = (text: string): DetectionResponse => {
+    const lowerText = text.toLowerCase();
+    
+    // High-risk patterns
+    const highRiskPatterns = [
+      'โอนเงิน', 'รับของรางวัล', 'bit.ly', 'คลิก', 'ด่วน',
+      'แจ้งเตือน', 'บัญชีถูกระงับ', 'ยืนยัน otp', 'เข้าลิงก์',
+      'google play', 'digiwallet', 'แชร์ลิงก์', 'รับเงิน'
+    ];
+    
+    // Suspicious patterns
+    const suspiciousPatterns = [
+      'ฟรี', 'โปรโมชั่น', 'ชนะรางวัล', 'คลิกเลย', 'รีบ', 
+      'โอกาส', 'สมัคร', 'ลงทะเบียน', 'กดรับ'
+    ];
+    
+    const highRiskCount = highRiskPatterns.filter(p => lowerText.includes(p)).length;
+    const suspiciousCount = suspiciousPatterns.filter(p => lowerText.includes(p)).length;
+    
+    let risk_level: 'safe' | 'suspicious' | 'high_risk' = 'safe';
+    let confidence = 0.75;
+    let reasoning = '';
+    
+    if (highRiskCount >= 3) {
+      risk_level = 'high_risk';
+      confidence = 0.92;
+      reasoning = 'ตรวจพบคำเตือนหลายคำที่บ่งชี้ว่าเป็นข้อความหลอกลวง เช่น การเร่งรัดให้โอนเงิน การใช้ลิงก์ย่อ และการเรียกร้องให้กดลิงก์ทันที';
+    } else if (highRiskCount >= 1 || suspiciousCount >= 3) {
+      risk_level = 'suspicious';
+      confidence = 0.78;
+      reasoning = 'พบรูปแบบที่น่าสงสัย ควรตรวจสอบความน่าเชื่อถือของผู้ส่งก่อนดำเนินการใดๆ โดยเฉพาะการโอนเงินหรือกรอกข้อมูลส่วนตัว';
+    } else {
+      risk_level = 'safe';
+      confidence = 0.85;
+      reasoning = 'ไม่พบรูปแบบที่บ่งชี้การหลอกลวงอย่างชัดเจน แต่ควรใช้วิจารณญาณในการตัดสินใจเสมอ';
+    }
+    
+    return {
+      is_scam: risk_level !== 'safe',
+      confidence,
+      risk_level,
+      reasoning,
+      request_id: `mock-${Date.now()}`
+    };
   };
 
   return (

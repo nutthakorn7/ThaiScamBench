@@ -24,7 +24,9 @@ export interface DetectionResponse {
 }
 
 export const detectScam = async (data: DetectionRequest): Promise<DetectionResponse> => {
-  const response = await api.post<DetectionResponse>('/public/detect', data);
+  const response = await api.post<DetectionResponse>('/public/detect/text', {
+    message: data.text, // Backend expects "message" not "text"
+  });
   return response.data;
 };
 

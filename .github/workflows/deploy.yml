@@ -100,9 +100,17 @@ jobs:
             # Clean up old images
             docker image prune -f
             
-            # Check health
-            sleep 30
-            curl -v -f -k https://127.0.0.1/health || exit 1
+            # Check health with retry loop (max 12 attempts * 5s = 60s)
+            for i in {1..12}; do
+              if curl -v -f -k https://127.0.0.1/health; then
+                echo "✅ Health check passed!"
+                exit 0
+              fi
+              echo "Health check failed, retrying in 5s... ($i/12)"
+              sleep 5
+            done
+            echo "❌ Health check failed after 60s"
+            exit 1
       
       - name: Notify deployment success
         if: success()

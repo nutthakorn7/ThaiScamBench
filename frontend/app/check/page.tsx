@@ -80,19 +80,19 @@ export default function CheckPage() {
       {result && (
         <Card className={cn(
           "overflow-hidden border-2 animate-in fade-in slide-in-from-bottom-8 duration-500",
-          result.risk_level === 'high_risk' ? "border-red-500/50 bg-red-500/5" :
-          result.risk_level === 'suspicious' ? "border-orange-500/50 bg-orange-500/5" :
+          result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
+          result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
           "border-green-500/50 bg-green-500/5"
         )}>
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl flex items-center gap-2">
-                {result.risk_level === 'high_risk' ? (
+                {result.risk_score >= 0.7 ? (
                   <>
                     <ShieldAlert className="h-6 w-6 text-red-500" />
                     <span className="text-red-500">อันตราย! พบความเสี่ยงสูง</span>
                   </>
-                ) : result.risk_level === 'suspicious' ? (
+                ) : result.risk_score >= 0.4 ? (
                   <>
                     <AlertTriangle className="h-6 w-6 text-orange-500" />
                     <span className="text-orange-500">น่าสงสัย! โปรดระวัง</span>
@@ -105,14 +105,14 @@ export default function CheckPage() {
                 )}
               </CardTitle>
               <Badge variant={
-                result.risk_level === 'high_risk' ? "destructive" :
-                result.risk_level === 'suspicious' ? "secondary" : 
-                "default" // shadcn badge default is primary (black/white), maybe add distinct green later
+                result.risk_score >= 0.7 ? "destructive" :
+                result.risk_score >= 0.4 ? "secondary" : 
+                "default"
               } className={cn(
                 "text-sm px-3 py-1",
-                result.risk_level === 'safe' && "bg-green-500 hover:bg-green-600 border-transparent text-white"
+                result.risk_score < 0.4 && "bg-green-500 hover:bg-green-600 border-transparent text-white"
               )}>
-                Confidence: {(result.confidence * 100).toFixed(1)}%
+                Risk Score: {(result.risk_score * 100).toFixed(1)}%
               </Badge>
             </div>
             <CardDescription>
@@ -124,11 +124,11 @@ export default function CheckPage() {
               <div className="p-4 rounded-lg bg-background/50 border border-border/50">
                 <h4 className="font-medium mb-2 text-sm text-muted-foreground">เหตุผลการวิเคราะห์:</h4>
                 <p className="leading-relaxed">
-                  {result.reasoning || "ระบบตรวจพบรูปแบบข้อความที่สอดคล้องกับฐานข้อมูล Scam (เช่น การเร่งรัดให้โอนเงิน, ลิงก์ปลอม, หรือบัญชีม้า)"}
+                  {result.reason || result.reasoning || "ระบบตรวจพบรูปแบบข้อความที่สอดคล้องกับฐานข้อมูล Scam"}
                 </p>
               </div>
               
-              {result.risk_level !== 'safe' && (
+              {result.risk_score >= 0.4 && (
                 <div className="bg-background/50 border border-border/50 p-4 rounded-lg">
                    <h4 className="font-medium mb-2 text-sm text-muted-foreground">คำแนะนำ:</h4>
                    <ul className="list-disc list-inside space-y-1 text-sm">

@@ -15,12 +15,18 @@ export interface DetectionRequest {
 }
 
 export interface DetectionResponse {
+  request_id: string;
   is_scam: boolean;
-  confidence: number;
-  risk_level: 'safe' | 'suspicious' | 'high_risk';
+  risk_score: number;
+  category: string;
+  reason: string;
+  advice: string;
+  model_version: string;
+  // Legacy fields for backward compatibility
+  confidence?: number;
+  risk_level?: 'safe' | 'suspicious' | 'high_risk';
   scam_type?: string;
   reasoning?: string;
-  request_id: string;
 }
 
 export const detectScam = async (data: DetectionRequest): Promise<DetectionResponse> => {

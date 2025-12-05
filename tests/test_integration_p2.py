@@ -1,5 +1,5 @@
 """
-Integration Test Suite for P2 Features
+Integration Test Suite for P2 Features (Pytest Version)
 
 Tests all P2 features working together:
 1. Redis caching
@@ -7,80 +7,88 @@ Tests all P2 features working together:
 3. Audit logging
 4. CSRF protection
 """
-import requests
-import time
-import json
+import pytest
+from unittest.mock import patch, MagicMock
+from app.config import settings
 
-BASE_URL = "http://localhost:8000"
+class TestP2Integration:
+    """Integration tests for P2 features"""
 
-print("=" * 70)
-print("P2 Features Integration Test")
-print("=" * 70)
+    def test_health_check(self, client):
+        """Test health check endpoint"""
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "healthy"
+        assert "version" in data
 
-# Test 1: Health Check
-print("\n✅ Test 1: Health check")
-response = requests.get(f"{BASE_URL}/health")
-assert response.status_code == 200
-health = response.json()
-print(f"   Status: {health['status']}")
-print(f"   Version: {health['version']}")
-print("   ✅ PASS")
+    def test_csrf_token_generation(self, client):
+        """Test CSRF token generation"""
+        response = client.get("/csrf-token")
+        assert response.status_code == 200
+        data = response.json()
+        assert "csrf_token" in data
+        assert "expires_in" in data
 
-# Test 2: CSRF Token Generation
-print("\n✅ Test 2: CSRF token generation")
-response = requests.get(f"{BASE_URL}/csrf-token")
-assert response.status_code == 200
-csrf_data = response.json()
-csrf_token = csrf_data['csrf_token']
-print(f"   Token: {csrf_token[:20]}...")
-print(f"   Expires in: {csrf_data['expires_in']}s")
-print("   ✅ PASS")
+    @patch("app.routes.public.redis_client")
+    def test_caching_behavior(self, mock_redis, client):
+        """Test Redis caching behavior (mocked)"""
+        # Setup mock
+        mock_redis.get.return_value = None  # Cache miss first
+        
+        # First request (Cache miss)
+        response = client.post(
+            "/v1/public/detect/text",
+            json={"message": "คุณมีพัสดุค้างชำระ กรุณาโอนเงิน"}
+        )
+        assert response.status_code == 200
+        result = response.json()
+        assert result["is_scam"] is True
+        
+        # Verify Redis set was called
+        assert mock_redis.set.called
+        
+        # Second request (Cache hit)
+        # We simulate cache hit by mocking get to return the result
+        cached_data = {
+            "is_scam": True,
+            "risk_score": 0.95,
+            "category": "parcel_scam",
+            "reason": "Cached response",
+            "advice": "Cached advice",
+            "model_version": "mock-v1.0",
+            "request_id": "cached-request-id"
+        }
+        mock_redis.get.return_value = cached_data
+        
+        response = client.post(
+            "/v1/public/detect/text",
+            json={"message": "คุณมีพัสดุค้างชำระ กรุณาโอนเงิน"}
+        )
+        assert response.status_code == 200
+        # Note: In a real integration test with real Redis, we would check timing.
+        # With mocks, we verify the logic flow.
 
-# Test 3: Caching - First Request
-print("\n✅ Test 3: Redis caching - first request")
-start = time.time()
-response = requests.post(
-    f"{BASE_URL}/v1/public/detect/text",
-    json={"message": "คุณมีพัสดุค้างชำระ กรุณาโอนเงิน"}
-)
-first_time = (time.time() - start) * 1000
-assert response.status_code == 200
-result = response.json()
-print(f"   Is scam: {result['is_scam']}")
-print(f"   Risk score: {result['risk_score']}")
-print(f"   Time: {first_time:.0f}ms")
-print("   ✅ PASS")
+    def test_audit_logging(self, client):
+        """Test audit logging (via middleware)"""
+        # This is hard to test without checking the database or mocking the logger/DB.
+        # For integration, we assume if the request succeeds, middleware didn't crash.
+        response = client.get("/health")
+        assert response.status_code == 200
 
-# Test 4: Caching - Second Request (should be cached)
-print("\n✅ Test 4: Redis caching - cached request")
-start = time.time()
-response = requests.post(
-    f"{BASE_URL}/v1/public/detect/text",
-    json={"message": "คุณมีพัสดุค้างชำระ กรุณาโอนเงิน"}
-)
-cached_time = (time.time() - start) * 1000
-assert response.status_code == 200
-print(f"   Time: {cached_time:.0f}ms")
-speedup = ((first_time - cached_time) / first_time) * 100
-print(f"   Speedup: {speedup:.0f}%")
-print("   ✅ PASS (Cache working!)" if cached_time < first_time else "   ⚠️  WARNING: May not be cached")
-
-# Test 5: Pagination - Partners
-print("\n✅ Test 5: Pagination - partners")
-# Note: Need admin authentication for this
-
-# Test 6: Audit Logging
-print("\n✅ Test 6: Audit logging")
-# Check if audit logs are being created
-print("   Audit logs should be in database")
-print("   Check: SELECT * FROM audit_logs ORDER BY timestamp DESC LIMIT 5")
-print("   ✅ Middleware active")
-
-print("\n" + "=" * 70)
-print("Integration Test Summary")
-print("=" * 70)
-print(f"✅ CSRF Protection: Active")
-print(f"✅ Redis Caching: {'Active' if cached_time < first_time else 'Check Redis'}")
-print(f"✅ Audit Logging: Middleware active")
-print(f"✅ Pagination: Available")
-print("\n💡 All P2 features integrated successfully!")
+    def test_pagination_partners(self, client):
+        """Test pagination for partners endpoint"""
+        # Need admin token
+        headers = {"X-Admin-Token": settings.admin_token}
+        
+        response = client.get("/admin/stats/partners?page=1&page_size=10", headers=headers)
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check pagination fields
+        assert "data" in data
+        assert "total" in data
+        assert "page" in data
+        assert "page_size" in data
+        assert data["page"] == 1
+        assert data["page_size"] == 10

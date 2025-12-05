@@ -115,8 +115,7 @@ class TestFeedbackEndpoints:
             "/v1/public/feedback",
             json={
                 "request_id": request_id,
-                "is_correct": False,
-                "user_category": "normal",
+                "feedback_type": "incorrect",
                 "comment": "ไม่ใช่การหลอกลวง"
             }
         )
@@ -133,7 +132,7 @@ class TestFeedbackEndpoints:
             "/v1/public/feedback",
             json={
                 "request_id": "nonexistent-request-id",
-                "is_correct": True
+                "feedback_type": "correct"
             }
         )
         
@@ -160,16 +159,19 @@ class TestAdminEndpoints:
         """Test stats endpoint requires auth"""
         response = client.get("/admin/stats/summary")
         
-        assert response.status_code == 401
+        # Admin auth middleware returns 403 for missing/invalid token
+        assert response.status_code == 403
     
     def test_stats_with_auth(self):
         """Test stats endpoint with valid token"""
-        headers = {"Authorization": f"Bearer {settings.admin_token}"}
+        headers = {"X-Admin-Token": settings.admin_token}
         
         response = client.get("/admin/stats/summary", headers=headers)
         
         assert response.status_code == 200
         data = response.json()
         
-        assert "summary" in data
-        assert "category_breakdown" in data
+        assert "total_requests" in data
+        assert "scam_ratio" in data
+        assert "requests_per_day" in data
+        assert "top_categories" in data

@@ -101,9 +101,9 @@ class TestStatsService:
         assert stats['active_partners'] == 0
         assert len(stats['partners']) == 0
     
-    def test_partner_stats_with_partners(self, test_db, test_partner):
+    def test_partner_stats_with_partners(self, test_db, test_partner_with_key):
         """Test partner stats with partners"""
-        partner, _ = test_partner
+        partner, _ = test_partner_with_key
         
         stats = get_partner_stats(test_db)
         
@@ -121,9 +121,10 @@ class TestStatsService:
         """Test category distribution with no detections"""
         result = get_category_distribution(test_db)
         
-        # get_category_distribution returns a list
-        assert isinstance(result, list)
-        assert len(result) == 0
+        # get_category_distribution returns a dict with 'categories' key
+        assert isinstance(result, dict)
+        assert "categories" in result
+        assert len(result["categories"]) == 0
     
     def test_category_distribution_with_data(self, test_db):
         """Test category distribution with detections"""
@@ -147,12 +148,13 @@ class TestStatsService:
         
         result = get_category_distribution(test_db)
         
-        # Result is a list of dicts
-        assert isinstance(result, list)
-        assert len(result) >= 3
+        # Result is a dict
+        assert isinstance(result, dict)
+        assert "categories" in result
+        assert len(result["categories"]) >= 3
         
         # Check category counts
-        category_names = [c['category'] for c in result]
+        category_names = [c['category'] for c in result["categories"]]
         assert "parcel_scam" in category_names
         assert "loan_scam" in category_names
         assert "fake_officer" in category_names

@@ -81,6 +81,7 @@ class PublicDetectRequest(BaseModel):
 
 class PublicDetectResponse(BaseModel):
     """Response model for public scam detection endpoint"""
+    request_id: str = Field(..., description="Unique request ID")
     is_scam: bool = Field(..., description="เป็นข้อความหลอกลวงหรือไม่")
     risk_score: float = Field(..., ge=0.0, le=1.0, description="คะแนนความเสี่ยง 0-1")
     category: str = Field(..., description="ประเภทการหลอกลวง")

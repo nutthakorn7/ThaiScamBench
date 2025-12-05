@@ -31,9 +31,9 @@ class TestDetectionLogger:
         assert len(detection.message_hash) > 0
         assert detection.request_id is not None
     
-    def test_log_partner_detection(self, test_db, test_partner):
+    def test_log_partner_detection(self, test_db, test_partner_with_key):
         """Test logging partner detection"""
-        partner, _ = test_partner
+        partner, _ = test_partner_with_key
         
         detection = log_detection(
             db=test_db,
@@ -53,9 +53,9 @@ class TestDetectionLogger:
         assert detection.user_ref == "user_123"
         assert detection.channel is None
     
-    def test_log_detection_with_all_fields(self, test_db, test_partner):
+    def test_log_detection_with_all_fields(self, test_db, test_partner_with_key):
         """Test logging with all optional fields"""
-        partner, _ = test_partner
+        partner, _ = test_partner_with_key
         
         detection = log_detection(
             db=test_db,

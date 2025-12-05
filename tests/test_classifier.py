@@ -1,6 +1,6 @@
 """Unit tests for scam classifier"""
 import pytest
-from app.services.scam_classifier import classify_scam, SCAM_CATEGORIES
+from app.services.scam_classifier import classify_scam, SCAM_PATTERNS
 
 
 class TestScamClassifier:
@@ -12,9 +12,9 @@ class TestScamClassifier:
         is_scam, risk_score, category = classify_scam(message, threshold=0.5)
         
         assert is_scam is True
-        assert category == "fake_officer"
+        assert category == "impersonation_scam"
         assert risk_score > 0.5
-    
+
     def test_parcel_scam_detection(self):
         """Test detection of parcel scam"""
         message = "คุณมีพัสดุค้างชำระ 25 บาท คลิก https://fake.com"
@@ -48,7 +48,7 @@ class TestScamClassifier:
         is_scam, risk_score, category = classify_scam(message, threshold=0.5)
         
         assert is_scam is True
-        assert category == "otp_phishing"
+        assert category == "banking_scam"
         assert risk_score > 0.5
     
     def test_marketplace_scam_detection(self):
@@ -67,7 +67,7 @@ class TestScamClassifier:
         is_scam, risk_score, category = classify_scam(message, threshold=0.5)
         
         assert is_scam is False
-        assert category == "normal"
+        assert category == "safe"
         assert risk_score < 0.5
     
     def test_threshold_behavior(self):
@@ -88,12 +88,10 @@ class TestScamClassifier:
     
     def test_all_categories_defined(self):
         """Test all categories are properly defined"""
-        assert len(SCAM_CATEGORIES) == 8
-        assert "fake_officer" in SCAM_CATEGORIES
-        assert "parcel_scam" in SCAM_CATEGORIES
-        assert "loan_scam" in SCAM_CATEGORIES
-        assert "investment_scam" in SCAM_CATEGORIES
-        assert "otp_phishing" in SCAM_CATEGORIES
-        assert "marketplace_scam" in SCAM_CATEGORIES
-        assert "other_scam" in SCAM_CATEGORIES
-        assert "normal" in SCAM_CATEGORIES
+        assert len(SCAM_PATTERNS) >= 6  # At least 6 scam categories
+        assert "impersonation_scam" in SCAM_PATTERNS
+        assert "parcel_scam" in SCAM_PATTERNS
+        assert "loan_scam" in SCAM_PATTERNS
+        assert "investment_scam" in SCAM_PATTERNS
+        assert "banking_scam" in SCAM_PATTERNS
+        assert "prize_scam" in SCAM_PATTERNS

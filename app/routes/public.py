@@ -85,6 +85,7 @@ async def detect_scam_public(
         
         # Step 4: Build response
         response = PublicDetectResponse(
+            request_id=detection.request_id,
             is_scam=is_scam,
             risk_score=risk_score,
             category=category,
@@ -103,6 +104,8 @@ async def detect_scam_public(
         
         return response
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,

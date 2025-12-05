@@ -30,7 +30,13 @@ def validate_message(
         raise ValidationError(f"Message too long (max: {max_length})")
     
     # XSS/injection checks
-    _validate_xss(message)
+    try:
+        _validate_xss(message)
+    except Exception as e:
+        # Convert HTTPException or others to ValueError for Pydantic
+        if hasattr(e, 'detail'):
+            raise ValueError(e.detail)
+        raise ValueError(str(e))
 
 
 def validate_pagination_params(

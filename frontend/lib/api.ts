@@ -42,14 +42,12 @@ export const getStats = async () => {
 }
 
 export interface FeedbackRequest {
-    request_id?: string;
-    text?: string;
-    is_scam_actual: boolean;
-    feedback_type: 'false_positive' | 'false_negative' | 'general';
-    comments?: string;
+    request_id: string;
+    feedback_type: 'correct' | 'incorrect';
+    comment?: string;
 }
 
 export const submitFeedback = async (data: FeedbackRequest) => {
-    const response = await api.post('/feedback', data);
+    const response = await api.post('/public/feedback', data);
     return response.data;
 };

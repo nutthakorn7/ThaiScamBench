@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Loader2, Copy, CheckCircle2 } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Loader2, Copy, CheckCircle2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { detectScam, type DetectionResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { FeedbackDialog } from "@/components/FeedbackDialog";
 
 export default function CheckPage() {
   const [input, setInput] = useState("");
@@ -19,6 +20,7 @@ export default function CheckPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [inputError, setInputError] = useState("");
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,6 +209,15 @@ Request ID: ${result.request_id}`;
                     </>
                   )}
                 </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFeedbackOpen(true)}
+                  className="gap-2"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  รายงานผล
+                </Button>
               </div>
             </div>
             <CardDescription>
@@ -236,6 +247,15 @@ Request ID: ${result.request_id}`;
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Feedback Dialog */}
+      {result && (
+        <FeedbackDialog
+          open={feedbackOpen}
+          onOpenChange={setFeedbackOpen}
+          requestId={result.request_id}
+        />
       )}
     </div>
   );

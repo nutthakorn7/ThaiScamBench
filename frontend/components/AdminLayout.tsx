@@ -36,6 +36,11 @@ const navigation = [
     icon: MessageSquare,
   },
   {
+    name: "Users",
+    href: "/admin/users",
+    icon: Users,
+  },
+  {
     name: "Partners",
     href: "/admin/partners",
     icon: Users,

@@ -7,32 +7,32 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <ShieldAlert className="h-8 w-8 text-blue-600" />
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">
+          <ShieldAlert className="h-8 w-8 text-primary" />
+          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
             ThaiScamDetector
           </span>
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <Link href="/" className="transition-colors hover:text-blue-600">
+          <Link href="/" className="transition-colors hover:text-primary">
             หน้าแรก
           </Link>
-          <Link href="/check" className="transition-colors hover:text-blue-600">
+          <Link href="/check" className="transition-colors hover:text-primary">
             ตรวจสอบ
           </Link>
-          <Link href="/stats" className="transition-colors hover:text-blue-600">
+          <Link href="/stats" className="transition-colors hover:text-primary">
             สถิติ
           </Link>
-          <Link href="/report" className="transition-colors hover:text-blue-600">
+          <Link href="/report" className="transition-colors hover:text-primary">
             แจ้งเบาะแส
           </Link>
-          <Link href="/partner/login" className="transition-colors hover:text-blue-600">
+          <Link href="/partner/login" className="transition-colors hover:text-primary">
             สำหรับพาร์ทเนอร์
           </Link>
           <ModeToggle />
           <Link 
             href="/check" 
-            className="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
             เริ่มตรวจสอบ
           </Link>

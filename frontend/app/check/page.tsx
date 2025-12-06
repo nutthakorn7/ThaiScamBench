@@ -104,41 +104,46 @@ Request ID: ${result.request_id}`;
   };
 
   return (
-    <div className="container px-4 py-12 mx-auto max-w-2xl">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">ตรวจสอบความเสี่ยง</h1>
-        <p className="text-muted-foreground">
-          กรอกข้อความ SMS, ลิงก์เว็บไซต์ หรือเลขบัญชีธนาคาร เพื่อให้ AI ช่วยวิเคราะห์
+    <div className="container px-4 py-8 md:py-12 mx-auto max-w-4xl">
+      <div className="text-center mb-8 md:mb-12">
+        <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+          ตรวจสอบความเสี่ยง
+        </h1>
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          ใส่ข้อความ SMS, ลิงก์, หรือเลขบัญชีที่น่าสงสัย เพื่อให้ AI ช่วยวิเคราะห์ความปลอดภัย
         </p>
       </div>
 
-      <Card className="border-blue-500/20 shadow-lg shadow-blue-500/5 mb-8">
-        <CardContent className="pt-6">
-          <form onSubmit={handleCheck} className="space-y-3">
-            <div className="flex flex-col gap-4">
-              <div className="flex-1">
-                <Textarea
-                  placeholder="วางข้อความ SMS, ลิงก์ หรือเลขบัญชีที่ต้องการตรวจสอบที่นี่..."
-                  value={input}
-                  onChange={(e) => {
-                    setInput(e.target.value);
-                    setInputError("");
-                  }}
-                  className={cn(
-                    "min-h-[150px] text-base md:text-lg resize-none p-4",
-                    "focus-visible:ring-blue-500/50 focus-visible:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-shadow duration-300",
-                    inputError && "border-red-500 focus-visible:ring-red-500"
-                  )}
-                  disabled={loading}
-                />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Input Form */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="border-primary/20 shadow-lg shadow-primary/5 backdrop-blur-sm bg-card/60">
+            <CardContent className="pt-6">
+              <form onSubmit={handleCheck} className="space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                  <Textarea
+                    placeholder="วางข้อความที่ต้องการตรวจสอบที่นี่..."
+                    value={input}
+                    onChange={(e) => {
+                       setInput(e.target.value);
+                       setInputError("");
+                    }}
+                    className={cn(
+                      "relative flex min-h-[150px] w-full resize-none rounded-lg border border-input bg-background/80 px-4 py-3 text-base md:text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-300 shadow-sm",
+                      "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:border-primary",
+                      inputError && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  />
+                </div>
                 {inputError && (
                   <p className="text-sm text-red-500 mt-1">{inputError}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-2 flex justify-between items-center">
-                  <span>{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
+                 <p className="text-xs text-muted-foreground mt-2 flex justify-between items-center">
+                   <span>{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
+                   <button
+                     type="button"
+                     onClick={() => {
                         const SCAM_EXAMPLES = [
                             "ยินดีด้วย! คุณได้รับสิทธิ์กู้เงิน 50,000 บาท ดอกเบี้ยต่ำ คลิกเลย bit.ly/fake-loan",
                             "ธ.กสิกร แจ้งบัญชีของท่านมีความเสี่ยง โปรดยืนยันตัวตนที่ kbank-security-update.com",
@@ -150,66 +155,64 @@ Request ID: ${result.request_id}`;
                         const randomExample = SCAM_EXAMPLES[Math.floor(Math.random() * SCAM_EXAMPLES.length)];
                         setInput(randomExample);
                         setInputError("");
-                    }}
-                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer py-1 px-2 rounded hover:bg-blue-50/50 transition-colors"
-                  >
-                    🎲 ลองดูตัวอย่าง
-                  </button>
-                </p>
-              </div>
-              
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full h-12 text-lg font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" 
-                disabled={loading || input.trim().length < 5}
-              >
-                {loading ? (
-                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                ) : (
-                  <Search className="mr-2 h-5 w-5" />
-                )}
-                {loading ? "กำลังตรวจสอบ..." : "ตรวจสอบความเสี่ยง"}
-              </Button>
-            </div>
-            
-            <AnimatePresence>
-              {loading && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="pt-2"
+                     }}
+                     className="text-primary hover:text-primary/80 hover:underline cursor-pointer py-1 px-2 rounded hover:bg-primary/10 transition-colors"
+                   >
+                     🎲 ลองดูตัวอย่าง
+                   </button>
+                 </p>
+
+                <Button 
+                  type="submit" 
+                  size="lg" 
+                  className="w-full h-12 text-lg font-medium rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/40 transition-all" 
+                  disabled={loading || input.trim().length < 5}
                 >
-                  <AnimatedProgress />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </form>
-        </CardContent>
-      </Card>
+                  {loading ? (
+                     <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                  ) : (
+                    <Search className="mr-2 h-5 w-5" />
+                  )}
+                  {loading ? "กำลังตรวจสอบ..." : "ตรวจสอบความเสี่ยง"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-      {error && (
-        <Alert variant="destructive" className="mb-8 animate-in fade-in slide-in-from-bottom-4">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+          <AnimatePresence>
+            {loading && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="pt-2"
+              >
+                <AnimatedProgress />
+              </motion.div>
+            )}
+          </AnimatePresence>
+      
+          {error && (
+            <Alert variant="destructive" className="animate-in fade-in slide-in-from-bottom-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>เกิดข้อผิดพลาด</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      {result && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-        <Card className={cn(
-          "overflow-hidden border-2 duration-500",
-          result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
-          result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
-          "border-green-500/50 bg-green-500/5"
-        )}>
+          {result && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+            <Card className={cn(
+              "overflow-hidden border-2 duration-500",
+              result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
+              result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
+              "border-green-500/50 bg-green-500/5"
+            )}>
 
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">

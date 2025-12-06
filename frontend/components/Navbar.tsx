@@ -25,6 +25,9 @@ export default function Navbar() {
           <Link href="/report" className="transition-colors hover:text-blue-600">
             แจ้งเบาะแส
           </Link>
+          <Link href="/partner/login" className="transition-colors hover:text-blue-600">
+            สำหรับพาร์ทเนอร์
+          </Link>
           <Link 
             href="/check" 
             className="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"

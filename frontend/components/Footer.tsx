@@ -17,6 +17,7 @@ export default function Footer() {
                 <li><a href="/check" className="hover:text-blue-600">ตรวจสอบข้อความ</a></li>
                 <li><a href="/report" className="hover:text-blue-600">แจ้งเบาะแส</a></li>
                 <li><a href="/privacy" className="hover:text-blue-600">นโยบายความเป็นส่วนตัว</a></li>
+                <li><a href="/partner/login" className="hover:text-amber-600 font-medium">Partner Portal</a></li>
               </ul>
             </div>
             <div>

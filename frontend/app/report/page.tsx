@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send, AlertTriangle, CheckCircle2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { submitReport } from "@/lib/api";
+import { toast } from "sonner";
+import Confetti from "react-confetti";
+import { useWindowSize } from "@/hooks/use-window-size";
 
 export default function ReportPage() {
   const [formData, setFormData] = useState({
@@ -18,6 +21,22 @@ export default function ReportPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
+
+  // Keyboard shortcut: Cmd/Ctrl + Enter to submit
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !loading) {
+        const form = document.querySelector('form');
+        if (form) {
+          form.requestSubmit();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +52,22 @@ export default function ReportPage() {
       });
       
       setSuccess(true);
+      setShowConfetti(true);
       setFormData({ text: "", is_scam_actual: "true", comments: "" });
+      
+      // Success toast with celebration
+      toast.success("รายงานส่งสำเร็จ! 🎉", {
+        description: "ขอบคุณที่ช่วยเป็นหูเป็นตาให้สังคมออนไลน์ปลอดภัยขึ้น!",
+        duration: 5000,
+      });
+
+      // Stop confetti after 5 seconds
+      setTimeout(() => setShowConfetti(false), 5000);
     } catch (err) {
       setError("ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่ภายหลัง");
+      toast.error("เกิดข้อผิดพลาด", {
+        description: "ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่ภายหลัง",
+      });
       console.error(err);
     } finally {
       setLoading(false);
@@ -43,15 +75,33 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="container px-4 py-12 mx-auto max-w-2xl">
-      <div className="text-center mb-12 md:mb-16">
-        <h1 className="text-5xl md:text-6xl font-black mb-6 text-slate-900 dark:text-white">
-          แจ้งเบาะแสการหลอกลวง
-        </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          ช่วยเราป้องกันการหลอกลวงออนไลน์ ข้อมูลของคุณจะช่วยคนอื่นไม่ให้ตกเป็นเหยื่อ
-        </p>
-      </div>
+    <>
+      {/* Success Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.3}
+        />
+      )}
+
+      <div className="container px-4 py-12 mx-auto max-w-2xl">
+        {/* Screen reader announcement */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {loading && "กำลังส่งข้อมูล กรุณารอสักครู่..."}
+          {success && "ส่งรายงานสำเร็จแล้ว!"}
+        </div>
+
+        <div className="text-center mb-12 md:mb-16">
+          <h1 className="text-5xl md:text-6xl font-black mb-6 text-slate-900 dark:text-white">
+            แจ้งเบาะแสการหลอกลวง
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            ช่วยเราป้องกันการหลอกลวงออนไลน์ ข้อมูลของคุณจะช่วยคนอื่นไม่ให้ตกเป็นเหยื่อ
+          </p>
+        </div>
 
       <Card className="border-primary/20 shadow-lg shadow-primary/5">
         <CardHeader>
@@ -66,10 +116,15 @@ export default function ReportPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
-              <Label htmlFor="text" className="text-lg font-semibold">1. ข้อความ / ลิงก์ / เลขบัญชี ที่ต้องการรายงาน</Label>
+              <Label htmlFor="text" className="text-lg font-semibold">
+                1. ข้อความ / ลิงก์ / เลขบัญชี ที่ต้องการรายงาน
+              </Label>
               <div className="relative">
                 <textarea
                    id="text"
+                   aria-label="รายละเอียดการหลอกลวงที่ต้องการแจ้ง"
+                   aria-required="true"
+                   aria-describedby="text-hint"
                    className="flex min-h-64 w-full rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
                    placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน, เลขบัญชีที่น่าสงสัย..."
                    value={formData.text}
@@ -77,12 +132,17 @@ export default function ReportPage() {
                    required
                    rows={10}
                 />
+                <p id="text-hint" className="text-xs text-muted-foreground mt-2">
+                  กรุณากรอกข้อมูลอย่างละเอียดเพื่อช่วยให้การวิเคราะห์แม่นยำ
+                </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <Label className="text-lg font-semibold">2. สิ่งนี้คือ Scam (มิจฉาชีพ) ใช่หรือไม่?</Label>
-              <div className="flex gap-4">
+              <Label className="text-lg font-semibold">
+                2. สิ่งนี้คือ Scam (มิจฉาชีพ) ใช่หรือไม่?
+              </Label>
+              <fieldset aria-label="ประเภทของข้อมูล" className="flex gap-4">
                  <label className="flex items-center space-x-3 border-2 p-4 rounded-xl cursor-pointer hover:bg-accent transition-colors flex-1 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-600">
                     <input 
                         type="radio" 
@@ -91,6 +151,7 @@ export default function ReportPage() {
                         checked={formData.is_scam_actual === "true"}
                         onChange={(e) => setFormData({...formData, is_scam_actual: e.target.value})}
                         className="h-5 w-5"
+                        aria-label="เป็นข้อมูลหลอกลวง"
                     />
                     <span className="text-base font-medium">ใช่ (เป็น Scam)</span>
                  </label>
@@ -102,10 +163,11 @@ export default function ReportPage() {
                         checked={formData.is_scam_actual === "false"}
                         onChange={(e) => setFormData({...formData, is_scam_actual: e.target.value})}
                         className="h-5 w-5"
+                        aria-label="เป็นข้อมูลปลอดภัย"
                     />
                     <span className="text-base font-medium">ไม่ใช่ (ปลอดภัย)</span>
                  </label>
-              </div>
+              </fieldset>
             </div>
 
             <div className="space-y-3">
@@ -127,7 +189,7 @@ export default function ReportPage() {
       </Card>
 
       {success && (
-        <Alert className="mt-8 border-green-500/50 bg-green-500/10 text-green-600 animate-in fade-in slide-in-from-bottom-4">
+        <Alert className="mt-8 border-green-500/50 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 animate-in fade-in slide-in-from-bottom-4">
           <CheckCircle2 className="h-4 w-4" />
           <AlertTitle>ได้รับข้อมูลแล้ว</AlertTitle>
           <AlertDescription>ขอบคุณที่ช่วยเป็นหูเป็นตาให้สังคมออนไลน์ปลอดภัยขึ้น!</AlertDescription>
@@ -142,5 +204,6 @@ export default function ReportPage() {
         </Alert>
       )}
     </div>
+    </>
   );
 }

@@ -285,6 +285,8 @@ Request ID: ${result.request_id}`;
           requestId={result.request_id}
         />
       )}
+      </div>
+      </div>
     </div>
   );
 }

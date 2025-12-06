@@ -22,7 +22,7 @@ export default async function StatsPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             สถิติภัยไซเบอร์ Real-time
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -32,9 +32,9 @@ export default async function StatsPage() {
 
         {/* Top KPI Cards (Server Rendered for speed) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <Card className="border-blue-500/10 bg-blue-500/5 backdrop-blur-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-sm font-medium text-blue-600">
+          <Card className="border-primary/10 bg-primary/5 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-primary">
                 <Users className="h-4 w-4" /> ตรวจสอบทั้งหมด
               </CardTitle>
             </CardHeader>

@@ -51,10 +51,10 @@ export default function ReportPage() {
         </p>
       </div>
 
-      <Card className="border-blue-500/20 shadow-lg shadow-blue-500/5">
+      <Card className="border-primary/20 shadow-lg shadow-primary/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-blue-500" />
+            <MessageSquare className="h-5 w-5 text-primary" />
             แบบฟอร์มแจ้งเบาะแส
           </CardTitle>
           <CardDescription>
@@ -115,7 +115,7 @@ export default function ReportPage() {
                 />
             </div>
 
-            <Button type="submit" className="w-full h-12 text-base font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" disabled={loading}>
+            <Button type="submit" className="w-full h-12 text-base font-medium rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/40 transition-all" disabled={loading}>
               {loading ? "กำลังส่งข้อมูล..." : "ส่งรายงาน"} <Send className="ml-2 h-4 w-4" />
             </Button>
           </form>

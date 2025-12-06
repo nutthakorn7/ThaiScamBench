@@ -57,11 +57,11 @@ export default function PartnerLoginPage() {
       >
         <Card className="w-full max-w-md shadow-xl bg-card/60 backdrop-blur-xl border-border/50">
           <CardHeader className="text-center space-y-4">
-            <div className="mx-auto bg-blue-500/10 p-4 rounded-full w-fit mb-2 ring-1 ring-blue-500/20">
-              <Shield className="h-8 w-8 text-blue-500" />
+            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-2 ring-1 ring-primary/20">
+              <Shield className="h-8 w-8 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                 Partner Portal
               </CardTitle>
               <CardDescription className="mt-2 text-base">
@@ -88,7 +88,7 @@ export default function PartnerLoginPage() {
               <div className="space-y-4">
                 <Button 
                   type="submit" 
-                  className="w-full h-11 text-base font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" 
+                  className="w-full h-11 text-base font-medium rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/40 transition-all" 
                   disabled={loading}
                 >
                   {loading ? (

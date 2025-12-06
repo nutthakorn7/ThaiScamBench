@@ -21,8 +21,18 @@ interface StatsChartsProps {
   barData: any[];
 }
 
-const COLORS = ['#ef4444', '#22c55e'];
-const CATEGORY_COLORS = ['#3b82f6', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e'];
+// Theme colors: Blue for Scam (danger), Green for Safe
+const COLORS = ['#ef4444', '#22c55e']; // Red for Scam, Green for Safe
+
+// Blue to Teal gradient for categories - matching theme
+const CATEGORY_COLORS = [
+  '#2563eb', // blue-600
+  '#0891b2', // cyan-600  
+  '#14b8a6', // teal-500
+  '#06b6d4', // cyan-500
+  '#3b82f6', // blue-500
+  '#0284c7'  // sky-600
+];
 
 export function StatsCharts({ pieData, barData }: StatsChartsProps) {
   return (
@@ -44,11 +54,13 @@ export function StatsCharts({ pieData, barData }: StatsChartsProps) {
                   data={pieData}
                   cx="50%"
                   cy="50%"
+                  labelLine={false}
+                  outerRadius={100}
                   innerRadius={60}
-                  outerRadius={80}
                   fill="#8884d8"
-                  paddingAngle={5}
                   dataKey="value"
+                  strokeWidth={3}
+                  stroke="currentColor"
                 >
                   {pieData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

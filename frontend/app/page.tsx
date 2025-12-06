@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShieldCheck, Search, AlertTriangle, TrendingUp, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";
+import { RecentActivityTicker } from "@/components/recent-activity-ticker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -162,6 +163,10 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+
+      {/* Social Proof Ticker */}
+      <RecentActivityTicker />
     </div>
   );
 }

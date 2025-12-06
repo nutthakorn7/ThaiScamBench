@@ -54,52 +54,44 @@
     --font-prompt: 'Prompt', sans-serif;
     
     /* 
-      THEME: PUBLIC (Default / Dark Cyberpunk)
-      Used for: /, /check, /stats, /report
+      THEME: UNIFIED "Teal-Cyan Enterprise"
+      Used for: ALL PORTALS (Public, Partner, Admin)
     */
-    --color-bg: oklch(0.05 0 0);           /* Zinc 950 */
-    --color-bg-elevated: oklch(0.1 0 0);   /* Zinc 900 */
-    --color-primary: oklch(0.6 0.15 250);  /* Blue 500 equivalent */
-    --color-accent: oklch(0.65 0.2 40);    /* Orange 500 */
-    --color-danger: oklch(0.5 0.2 25);     /* Red 600 */
-    --color-text: oklch(0.985 0 0);        /* White */
-    --color-text-inverse: oklch(1 1 1);    /* White */
-    --color-text-soft: oklch(0.7 0.05 260); /* Zinc 400 */
-    --color-border: oklch(0.25 0.05 250);  /* Zinc 800 */
+    /* Deep Navy Black */
+    --color-bg: #020617;
+    /* Card / Panel */
+    --color-bg-elevated: #0b1220; 
+    
+    /* Deep Teal (Brand) */
+    --color-primary: #0f766e;
+    /* Soft Teal (Hover/Active) */
+    --color-primary-soft: #14b8a6;
+    
+    /* Cyan (AI Highlight) */
+    --color-accent: #22d3ee; 
+    
+    /* Semantic Colors */
+    --color-danger: #ef4444;
+    --color-warning: #facc15;
+    --color-success: #22c55e;
+    
+    /* Typography */
+    --color-text: #e5e7eb;
+    --color-text-inverse: #ffffff;
+    --color-text-soft: #94a3b8;
+    
+    /* Border */
+    --color-border: rgba(148,163,184,0.25);
   }
 
   /* 
-    THEME: PARTNER (Unified Cyberpunk Blue)
-    Used for: /partner
+    Partner & Admin themes now inherit the main theme to ensure consistency 
+    as requested ("Teal-Cyan Enterprise" everywhere).
+    We can override specific semantic actions if needed, but for now, UNIFY.
   */
-  .theme-partner {
-    --color-bg: oklch(0.05 0 0);           /* Zinc 950 (Unified) */
-    --color-bg-elevated: oklch(0.1 0 0);   /* Zinc 900 */
-    --color-primary: oklch(0.6 0.15 250);  /* Blue 600 */
-    --color-accent: oklch(0.5 0.2 260);    /* Indigo 600 */
-    --color-danger: oklch(0.5 0.2 25);     /* Red 600 */
-    --color-text: oklch(0.985 0 0);        /* White */
-    --color-text-inverse: oklch(1 1 1);    /* White */
-    --color-text-soft: oklch(0.7 0.05 260);/* Zinc 400 */
-    --color-border: oklch(0.25 0.05 250);  /* Zinc 800 */
+  .theme-partner, .theme-admin {
+    /* Inherit from root */
   }
-
-  /* 
-    THEME: ADMIN (Unified Cyberpunk Red)
-    Used for: /admin
-  */
-  .theme-admin {
-    --color-bg: oklch(0.05 0 0);           /* Zinc 950 (Unified) */
-    --color-bg-elevated: oklch(0.1 0 0);   /* Zinc 900 */
-    --color-primary: oklch(0.5 0.2 25);    /* Red 600 */
-    --color-accent: oklch(0.65 0.2 40);    /* Orange 500 */
-    --color-danger: oklch(0.4 0.2 25);     /* Darker Red */
-    --color-text: oklch(0.985 0 0);        /* White */
-    --color-text-inverse: oklch(1 1 1);    /* White */
-    --color-text-soft: oklch(0.7 0.05 260);/* Zinc 400 */
-    --color-border: oklch(0.25 0.05 250);  /* Zinc 800 */
-  }
-
 
   body {
     background-color: var(--color-bg);

@@ -54,7 +54,7 @@
     --font-prompt: 'Prompt', sans-serif;
     
     /* 
-      THEME: UNIFIED "Teal-Cyan Enterprise"
+      THEME: UNIFIED "Navy Blue Professional"
       Used for: ALL PORTALS (Public, Partner, Admin)
     */
     /* Deep Navy Black */
@@ -62,13 +62,13 @@
     /* Card / Panel */
     --color-bg-elevated: #0b1220; 
     
-    /* Deep Teal (Brand) */
-    --color-primary: #0f766e;
-    /* Soft Teal (Hover/Active) */
-    --color-primary-soft: #14b8a6;
+    /* Navy Blue (Brand) */
+    --color-primary: #1e3a8a;
+    /* Lighter Blue (Hover/Active) */
+    --color-primary-soft: #3b82f6;
     
-    /* Cyan (AI Highlight) */
-    --color-accent: #22d3ee; 
+    /* Sky Blue (Accent/Highlight) */
+    --color-accent: #60a5fa; 
     
     /* Semantic Colors */
     --color-danger: #ef4444;
@@ -86,7 +86,7 @@
 
   /* 
     Partner & Admin themes now inherit the main theme to ensure consistency 
-    as requested ("Teal-Cyan Enterprise" everywhere).
+    as requested ("Navy Blue" everywhere).
     We can override specific semantic actions if needed, but for now, UNIFY.
   */
   .theme-partner, .theme-admin {

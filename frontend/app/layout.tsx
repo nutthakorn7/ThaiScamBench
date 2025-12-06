@@ -5,7 +5,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
-import { Toaster } from "sonner";
+import dynamic from 'next/dynamic';
+
+const Toaster = dynamic(() => import('sonner').then(mod => mod.Toaster), {
+  ssr: false
+});
 
 const inter = Inter({ subsets: ["latin"] });
 

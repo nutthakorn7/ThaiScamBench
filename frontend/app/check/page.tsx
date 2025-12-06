@@ -10,7 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { detectScam, type DetectionResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { FeedbackDialog } from "@/components/FeedbackDialog";
+import dynamic from 'next/dynamic';
+// ... other imports
+
+const FeedbackDialog = dynamic(() => import('@/components/FeedbackDialog').then(mod => mod.FeedbackDialog), {
+  loading: () => null,
+  ssr: false
+});
 
 export default function CheckPage() {
   const [input, setInput] = useState("");

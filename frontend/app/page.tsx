@@ -32,7 +32,7 @@ export default function Home() {
             พัฒนาโดยทีม AI Research
           </Badge>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-slate-900 dark:text-white">
             รู้ทันมิจฉาชีพออนไลน์
             <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600">ด้วยพลัง AI อัจฉริยะ</span>
@@ -92,7 +92,7 @@ export default function Home() {
       <section className="py-24 md:py-32">
         <div className="container px-4 mx-auto">
           <div className="text-center mb-24">
-            <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight">ทำไมต้อง Thai Scam Detector?</h2>
+            <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight text-slate-900 dark:text-white">ทำไมต้อง Thai Scam Detector?</h2>
             <p className="text-muted-foreground text-2xl max-w-3xl mx-auto leading-relaxed">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
           </div>
 

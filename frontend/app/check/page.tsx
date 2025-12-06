@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { detectScam, type DetectionResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
+import { AnimatedProgress } from "@/components/ui/animated-progress";
 import dynamic from 'next/dynamic';
 // ... other imports
 
@@ -136,10 +138,7 @@ Request ID: ${result.request_id}`;
                 disabled={loading || input.trim().length < 5}
               >
                 {loading ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span className="text-sm">{loadingMessage}</span>
-                  </div>
+                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <>
                     <Search className="mr-2 h-5 w-5" /> ตรวจสอบ
@@ -147,6 +146,19 @@ Request ID: ${result.request_id}`;
                 )}
               </Button>
             </div>
+            
+            <AnimatePresence>
+              {loading && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="pt-2"
+                >
+                  <AnimatedProgress />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
         </CardContent>
       </Card>
@@ -160,12 +172,19 @@ Request ID: ${result.request_id}`;
       )}
 
       {result && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
         <Card className={cn(
-          "overflow-hidden border-2 animate-in fade-in slide-in-from-bottom-8 duration-500",
+          "overflow-hidden border-2 duration-500",
           result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
           result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
           "border-green-500/50 bg-green-500/5"
         )}>
+
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl flex items-center gap-2">
@@ -253,6 +272,7 @@ Request ID: ${result.request_id}`;
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       )}
 
       {/* Feedback Dialog */}

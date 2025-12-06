@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ShieldAlert, ShieldCheck, Activity } from "lucide-react";
 
 interface ActivityItem {
@@ -21,6 +21,8 @@ const activities: ActivityItem[] = [
 ];
 
 export function RecentActivityTicker() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
       <div className="bg-background/80 backdrop-blur-md border-t border-border/50 py-2.5 overflow-hidden pointer-events-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
@@ -31,7 +33,7 @@ export function RecentActivityTicker() {
 
           <motion.div
             className="flex gap-12 whitespace-nowrap pl-8"
-            animate={{ x: [0, -1000] }}
+            animate={shouldReduceMotion ? { x: 0 } : { x: [0, -1000] }}
             transition={{
               repeat: Infinity,
               ease: "linear",

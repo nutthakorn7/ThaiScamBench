@@ -144,7 +144,7 @@ Request ID: ${result.request_id}`;
                         setInput(randomExample);
                         setInputError("");
                     }}
-                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer"
+                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer py-2 px-2 -mr-2"
                   >
                     🎲 ลองดูตัวอย่าง
                   </button>

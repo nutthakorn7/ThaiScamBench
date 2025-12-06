@@ -29,38 +29,34 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      // Save token
-      setAdminToken(token.trim());
-      
-      // Test token by making a simple API call
-      const response = await fetch('https://api.thaiscam.zcr.ai/admin/stats/summary?days=7', {
-      // Simple bypass - accept specific password immediately
+      // 1. Simple bypass - check this FIRST
       if (token === "admin123" || token === "thaiscam2024") {
-        setAdminToken(token); // Use existing setAdminToken
+        setAdminToken(token);
         toast.success("Login สำเร็จ!", {
-          description: "กำลังเข้าสู่ระบบ Admin"
+          description: "เข้าสู่ระบบด้วยรหัสสำรอง"
         });
         router.push('/admin');
         return;
       }
 
-      // Otherwise try backend validation
+      // 2. Normal backend validation
       const response = await fetch('/api/admin/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token.trim() }), // Ensure token is trimmed
+        body: JSON.stringify({ token: token.trim() }),
       });
 
       if (response.ok) {
-        setAdminToken(token.trim()); // Use existing setAdminToken
+        setAdminToken(token.trim());
         toast.success("Login สำเร็จ!", {
           description: "กำลังเข้าสู่ระบบ Admin"
         });
         router.push('/admin');
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Invalid token');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Token ไม่ถูกต้อง');
       }
+    } catch (err: any) {
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || "Token ไม่ถูกต้อง กรุณาลองใหม่");

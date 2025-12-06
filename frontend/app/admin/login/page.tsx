@@ -57,7 +57,6 @@ export default function AdminLoginPage() {
         throw new Error(errorData.message || 'Token ไม่ถูกต้อง');
       }
     } catch (err: any) {
-    } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || "Token ไม่ถูกต้อง กรุณาลองใหม่");
       setAdminToken(""); // Clear invalid token

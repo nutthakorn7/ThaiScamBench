@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'ThaiScamDetector',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'ThaiScamDetector - ป้องกันการหลอกลวงออนไลน์',
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ThaiScamDetector - ตรวจสอบการหลอกลวงด้วย AI',
     description: 'ตรวจสอบความเสี่ยงข้อความและบัญชีต้องสงสัยได้ทันที',
-    images: ['/og-image.png'],
+    images: ['/og-image.jpg'],
   },
   // ... (rest is same)
   robots: {

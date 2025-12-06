@@ -9,7 +9,8 @@ import {
   BarChart3, 
   AlertTriangle,
   LogOut,
-  Shield
+  Shield,
+  MessageSquare
 } from "lucide-react";
 import { removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
@@ -23,6 +24,16 @@ const navigation = [
     name: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Detection Logs",
+    href: "/admin/detections",
+    icon: Shield,
+  },
+  {
+    name: "User Feedback",
+    href: "/admin/feedback",
+    icon: MessageSquare,
   },
   {
     name: "Partners",

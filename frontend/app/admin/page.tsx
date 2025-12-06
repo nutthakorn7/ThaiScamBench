@@ -52,68 +52,98 @@ export default function AdminDashboard() {
   }, [router]);
 
   const handleLogout = () => {
-    removeAdminToken();
-    toast.success("Logout สำเร็จ");
+    localStorage.removeItem('adminToken');
+    toast.success('Logged out successfully');
     router.push('/admin/login');
   };
 
   const Content = () => (
     <div className="space-y-8 relative z-10 w-full">
-         <div className="flex justify-between items-center bg-card/40 backdrop-blur-md p-6 rounded-2xl border border-border/50 shadow-sm">
-            <div>
-              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground">สถิติการใช้งานระบบ (7 วันล่าสุด)</p>
-            </div>
-            <Button variant="ghost" onClick={handleLogout} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+      {/* Header - World-Class */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-5xl md:text-6xl font-black mb-3 text-slate-900 dark:text-white">
+              Admin Dashboard
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              สถิติการใช้งานและการวิเคราะห์ระบบ
+            </p>
           </div>
+          <Button variant="ghost" onClick={handleLogout} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+            <LogOut className="h-5 w-5 mr-2" />
+            Logout
+          </Button>
+        </div>
+      </div>
 
+          {/* Stats Grid - World-Class */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-                <BarChart3 className="h-4 w-4 text-blue-500" />
+            {/* Total Requests - Blue */}
+            <Card className="bg-card/95 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-400">Total Requests</CardTitle>
+                <BarChart3 className="h-6 w-6 text-blue-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{stats?.total_requests?.toLocaleString() || 0}</div>
-                <p className="text-xs text-muted-foreground mt-1">การตรวจสอบทั้งหมด</p>
+                {/* HUGE Number */}
+                <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-400 mb-2">
+                  {stats?.total_requests?.toLocaleString() || 0}
+                </div>
+                <p className="text-sm text-blue-700/70 dark:text-blue-300/70">
+                  การตรวจสอบทั้งหมด
+                </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Scam Detected</CardTitle>
-                <ShieldAlert className="h-4 w-4 text-red-500" />
+            {/* Scam Detected - Red */}
+            <Card className="bg-card/95 backdrop-blur-xl border-2 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-400">Scam Detected</CardTitle>
+                <ShieldAlert className="h-6 w-6 text-red-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-red-500">{stats?.scam_requests?.toLocaleString() || 0}</div>
-                <p className="text-xs text-muted-foreground mt-1">{stats?.scam_percentage?.toFixed(1) || 0}% ของทั้งหมด</p>
+                {/* HUGE Number */}
+                <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-400 mb-2">
+                  {stats?.scam_requests?.toLocaleString() || 0}
+                </div>
+                <p className="text-sm text-red-700/70 dark:text-red-300/70">
+                  {stats?.scam_percentage?.toFixed(1) || 0}% ของทั้งหมด
+                </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Safe Messages</CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
+            {/* Safe Messages - Green */}
+            <Card className="bg-card/95 backdrop-blur-xl border-2 border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-400">Safe Messages</CardTitle>
+                <CheckCircle2 className="h-6 w-6 text-green-600" />
               </CardHeader>
               <CardContent>
-                 <div className="text-3xl font-bold text-green-500">{stats?.safe_requests?.toLocaleString() || 0}</div>
-                 <p className="text-xs text-muted-foreground mt-1">{stats ? (100 - stats.scam_percentage).toFixed(1) : 0}% ของทั้งหมด</p>
+                {/* HUGE Number */}
+                <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-400 mb-2">
+                  {stats?.safe_requests?.toLocaleString() || 0}
+                </div>
+                <p className="text-sm text-green-700/70 dark:text-green-300/70">
+                  {stats ? (100 - stats.scam_percentage).toFixed(1) : 0}% ของทั้งหมด
+                </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                 <CardTitle className="text-sm font-medium">Detection Rate</CardTitle>
-                 <TrendingUp className="h-4 w-4 text-purple-500" />
+            {/* Detection Rate - Purple */}
+            <Card className="bg-card/95 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                 <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-400">Detection Rate</CardTitle>
+                 <TrendingUp className="h-6 w-6 text-purple-600" />
                </CardHeader>
                <CardContent>
-                 <div className="text-3xl font-bold text-purple-500">{stats?.scam_percentage?.toFixed(1) || 0}%</div>
-                 <p className="text-xs text-muted-foreground mt-1">Scam detection percentage</p>
+                 {/* HUGE Number */}
+                 <div className="text-6xl md:text-8xl font-black text-purple-600 dark:text-purple-400 mb-2">
+                   {stats?.scam_percentage?.toFixed(1) || 0}%
+                 </div>
+                 <p className="text-sm text-purple-700/70 dark:text-purple-300/70">
+                   Scam detection percentage
+                 </p>
                </CardContent>
             </Card>
           </div>

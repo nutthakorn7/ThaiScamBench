@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { submitReport } from "@/lib/api";
 
 export default function ReportPage() {
   const [formData, setFormData] = useState({
@@ -25,9 +26,11 @@ export default function ReportPage() {
     setSuccess(false);
 
     try {
-      // TODO: Implement proper report API endpoint
-      // For now, just show success (report feature coming soon)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await submitReport({
+        text: formData.text,
+        is_scam: formData.is_scam_actual === "true",
+        additional_info: formData.comments
+      });
       
       setSuccess(true);
       setFormData({ text: "", is_scam_actual: "true", comments: "" });

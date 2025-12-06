@@ -11,12 +11,33 @@ export default function Footer() {
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">เมนูลัด</h3>
-              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><a href="/" className="hover:text-blue-700">หน้าแรก</a></li>
-                <li><a href="/check" className="hover:text-blue-700">ตรวจสอบข้อความ</a></li>
-                <li><a href="/report" className="hover:text-blue-700">แจ้งเบาะแส</a></li>
-                <li><a href="/privacy" className="hover:text-blue-700">นโยบายความเป็นส่วนตัว</a></li>
+              <h3 className="font-bold text-lg mb-4">เมนูลัด</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/check" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    ตรวจสอบความเสี่ยง
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/stats" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    สถิติ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/report" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    รายงานเบาะแส
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    คำถามที่พบบ่อย
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    เงื่อนไขการใช้งาน
+                  </Link>
+                </li>
                 <li><a href="/partner/login" className="hover:text-amber-600 font-medium">Partner Portal</a></li>
               </ul>
             </div>

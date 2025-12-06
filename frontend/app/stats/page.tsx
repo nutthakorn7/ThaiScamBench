@@ -3,8 +3,21 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Shield, AlertTriangle, BarChart3, Users } from "lucide-react";
+import { Users, AlertTriangle, Shield, TrendingUp, BarChart3, PieChart as PieIcon } from "lucide-react";
 import { getStats } from "@/lib/api";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from 'recharts';
 
 interface StatsData {
   total_detections: number;
@@ -16,6 +29,9 @@ interface StatsData {
   }>;
   period: string;
 }
+
+const COLORS = ['#ef4444', '#22c55e']; // Red for Scam, Green for Safe
+const CATEGORY_COLORS = ['#3b82f6', '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e'];
 
 export default function StatsPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -60,126 +76,155 @@ export default function StatsPage() {
     );
   }
 
+  // Optimize data for charts
+  const pieData = [
+    { name: 'Scam', value: stats.scam_percentage },
+    { name: 'Safe', value: 100 - stats.scam_percentage }
+  ];
+
+  const barData = stats.top_categories.map(cat => ({
+    name: cat.category.replace(/_/g, ' '),
+    count: cat.count
+  }));
+
   return (
-    <div className="container mx-auto px-4 py-16">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          สถิติการตรวจสอบ
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          ข้อมูลการใช้งานระบบตรวจสอบกลโกงออนไลน์
-        </p>
-      </div>
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            สถิติภัยไซเบอร์ Real-time
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            เกาะติดสถานการณ์กลโกงออนไลน์ล่าสุด วิเคราะห์จากข้อมูลการตรวจสอบจริงด้วย AI
+          </p>
+        </div>
 
-      {/* Key Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        {/* Total Detections */}
-        <Card className="border-blue-500/20 hover:shadow-lg transition-shadow">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-blue-600">
-              <Users className="h-5 w-5" />
-              ตรวจสอบทั้งหมด
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold mb-2">
-              {stats.total_detections.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">ข้อความที่ผ่านการตรวจสอบ</p>
-          </CardContent>
-        </Card>
+        {/* Top KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-blue-500/10 bg-blue-500/5 backdrop-blur-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-blue-600">
+                <Users className="h-4 w-4" /> ตรวจสอบทั้งหมด
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold">{stats.total_detections.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">รายการ</p>
+            </CardContent>
+          </Card>
 
-        {/* Scam Percentage */}
-        <Card className="border-red-500/20 hover:shadow-lg transition-shadow">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
-              พบการหลอกลวง
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold mb-2 text-red-600">
-              {stats.scam_percentage.toFixed(1)}%
-            </div>
-            <p className="text-sm text-muted-foreground">ของการตรวจสอบทั้งหมด</p>
-          </CardContent>
-        </Card>
+          <Card className="border-red-500/10 bg-red-500/5 backdrop-blur-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-red-600">
+                <AlertTriangle className="h-4 w-4" /> พบความเสี่ยงสูง
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-red-600">{stats.scam_percentage.toFixed(1)}%</div>
+              <p className="text-xs text-muted-foreground mt-1">ของข้อความทั้งหมด</p>
+            </CardContent>
+          </Card>
 
-        {/* Safe Percentage */}
-        <Card className="border-green-500/20 hover:shadow-lg transition-shadow">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <Shield className="h-5 w-5" />
-              ปลอดภัย
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold mb-2 text-green-600">
-              {(100 - stats.scam_percentage).toFixed(1)}%
-            </div>
-            <p className="text-sm text-muted-foreground">ข้อความปกติ</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card className="border-green-500/10 bg-green-500/5 backdrop-blur-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-medium text-green-600">
+                <Shield className="h-4 w-4" /> ปลอดภัย
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-green-600">{(100 - stats.scam_percentage).toFixed(1)}%</div>
+              <p className="text-xs text-muted-foreground mt-1">ตรวจสอบแล้วปกติ</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Top Categories */}
-      <Card className="border-purple-500/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            ประเภทการหลอกลวงยอดนิยม
-          </CardTitle>
-          <CardDescription>
-            รูปแบบการหลอกลวงที่พบบ่อยที่สุด
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {stats.top_categories && stats.top_categories.length > 0 ? (
-              stats.top_categories.map((cat, index) => (
-                <div key={cat.category} className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium capitalize">
-                        {cat.category.replace(/_/g, " ")}
-                      </span>
-                      <Badge variant="secondary">
-                        {cat.count.toLocaleString()} ครั้ง
-                      </Badge>
-                    </div>
-                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all"
-                        style={{ width: `${cat.percentage}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {cat.percentage.toFixed(1)}% ของการตรวจสอบที่เป็นกลโกง
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-muted-foreground py-8">
-                ไม่มีข้อมูลประเภทการหลอกลวง
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {/* Pie Chart: Scam vs Safe */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <PieIcon className="h-5 w-5 text-blue-500" />
+                อัตราส่วนความเสี่ยง
+              </CardTitle>
+              <CardDescription>สัดส่วนข้อความอันตราย vs ปลอดภัย</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number) => `${value.toFixed(1)}%`}
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Period Info */}
-      <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>ข้อมูล ณ วันที่ {new Date().toLocaleDateString("th-TH", {
-          year: "numeric",
-          month: "long",
-          day: "numeric"
-        })}</p>
-        {stats.period && <p className="mt-1">ช่วงเวลา: {stats.period}</p>}
+          {/* Bar Chart: Categories */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-purple-500" />
+                ประเภทภัยคุกคามยอดนิยม
+              </CardTitle>
+              <CardDescription>5 อันดับ Scam ที่พบบ่อยที่สุด</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={barData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" hide />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      width={100} 
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Bar dataKey="count" fill="#8884d8" radius={[0, 4, 4, 0]}>
+                      {barData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Footer Info */}
+        <div className="text-center text-sm text-muted-foreground bg-slate-50 py-4 rounded-lg">
+          <p>ข้อมูลล่าสุด ณ วันที่ {new Date().toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}</p>
+          {stats.period && <p>ช่วงเวลาที่เก็บข้อมูล: {stats.period}</p>}
+        </div>
       </div>
     </div>
   );

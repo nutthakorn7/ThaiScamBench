@@ -54,7 +54,8 @@
     --font-prompt: 'Prompt', sans-serif;
     
     /* 
-      THEME: "Navy Blue Professional"
+      THEME: "Cybersecurity Professional"
+      Optimized for: Trust, Security, High Contrast
       Supports: Light Mode (Default) + Dark Mode (.dark)
     */
     
@@ -62,41 +63,39 @@
     
     /* Background */
     --color-bg: #ffffff;              /* Pure White */
-    --color-bg-elevated: #f8fafc;     /* Slate 50 */
+    --color-bg-elevated: #f8fafc;     /* Slate 50 - Subtle elevation */
     
-    /* Brand Colors (FIXED - Don't change with mode) */
-    --color-primary: #1e3a8a;         /* Navy Blue */
-    --color-primary-soft: #3b82f6;    /* Lighter Blue */
-    --color-accent: #60a5fa;          /* Sky Blue */
+    /* Brand Colors (FIXED - Professional Security Theme) */
+    --color-primary: #1e40af;         /* Deep Blue 700 - Trust & Authority */
+    --color-primary-soft: #3b82f6;    /* Blue 500 - Lighter variant */
+    --color-accent: #0d9488;          /* Teal 600 - Verified/Safe signal */
     
-    /* Semantic Colors (FIXED - Don't change with mode) */
-    --color-danger: #ef4444;          /* Red */
-    --color-warning: #facc15;         /* Yellow */
-    --color-success: #22c55e;         /* Green */
+    /* Semantic Colors (FIXED - Clear meaning) */
+    --color-danger: #dc2626;          /* Red 600 - Clear danger signal */
+    --color-warning: #ea580c;         /* Orange 600 - Alert (more serious than yellow) */
+    --color-success: #16a34a;         /* Green 600 - Safe/Verified */
     
-    /* Text (ADAPTIVE - Changes with mode) */
-    --color-text: #0f172a;            /* Slate 900 - Dark Text for Light BG */
+    /* Text (ADAPTIVE - High contrast) */
+    --color-text: #0f172a;            /* Slate 900 - Maximum readability */
     --color-text-inverse: #ffffff;    /* White */
-    --color-text-soft: #64748b;       /* Slate 500 */
+    --color-text-soft: #64748b;       /* Slate 500 - Secondary text */
     
     /* Border (ADAPTIVE) */
-    --color-border: rgba(15, 23, 42, 0.1);  /* Dark border for Light mode */
+    --color-border: rgba(15, 23, 42, 0.12);  /* Subtle borders in light */
   }
 
   /* === DARK MODE === */
   .dark {
     /* Background */
-    --color-bg: #020617;              /* Deep Navy Black */
-    --color-bg-elevated: #0b1220;     /* Elevated Panel */
+    --color-bg: #0f172a;              /* Slate 900 - Professional dark */
+    --color-bg-elevated: #1e293b;     /* Slate 800 - Elevated surfaces */
     
-    /* Brand & Semantic Colors remain the same (not redefined) */
-    
-    /* Text (ADAPTIVE - Inverted for Dark BG) */
-    --color-text: #e5e7eb;            /* Light Gray Text for Dark BG */
-    --color-text-soft: #94a3b8;       /* Muted Light Gray */
+    /* Text (ADAPTIVE - High contrast for dark) */
+    --color-text: #f1f5f9;            /* Slate 100 - Clear on dark */
+    --color-text-soft: #94a3b8;       /* Slate 400 - Muted text */
     
     /* Border (ADAPTIVE) */
-    --color-border: rgba(148, 163, 184, 0.25);  /* Light border for Dark mode */
+    --color-border: rgba(148, 163, 184, 0.2);  /* Visible but not harsh */
   }
 
   /* 

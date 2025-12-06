@@ -11,6 +11,7 @@ import { Loader2, Shield, Activity, LogOut, FileCode, Copy, Download } from "luc
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import Footer from "@/components/Footer";
 
 export default function PartnerDashboard() {
   const [data, setData] = useState<PartnerDashboardStats | null>(null);
@@ -274,13 +275,7 @@ export default function PartnerDashboard() {
         </main>
 
         {/* Footer */}
-        <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md mt-auto">
-          <div className="container mx-auto px-4 py-6">
-            <p className="text-center text-sm text-muted-foreground">
-              © 2025 Thai Scam Detector. All rights reserved.
-            </p>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </AuroraBackground>
   );

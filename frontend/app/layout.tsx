@@ -19,6 +19,8 @@ const ibmThai = IBM_Plex_Sans_Thai({
   variable: '--font-ibm'
 });
 
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://thaiscam.zcr.ai'),
   title: {
@@ -44,7 +46,7 @@ export const metadata: Metadata = {
     siteName: 'ThaiScamDetector',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'ThaiScamDetector - ป้องกันการหลอกลวงออนไลน์',
@@ -55,8 +57,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ThaiScamDetector - ตรวจสอบการหลอกลวงด้วย AI',
     description: 'ตรวจสอบความเสี่ยงข้อความและบัญชีต้องสงสัยได้ทันที',
-    images: ['/og-image.jpg'],
+    images: ['/og-image.png'],
   },
+  // ... (rest is same)
   robots: {
     index: true,
     follow: true,
@@ -85,6 +88,7 @@ export default function RootLayout({
   return (
     <html lang="th" suppressHydrationWarning>
       <body className={`${inter.variable} ${prompt.variable} ${ibmThai.variable} font-prompt antialiased`}>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
         <StructuredData data={[webApplicationSchema, organizationSchema]} />
         <ThemeProvider
           attribute="class"

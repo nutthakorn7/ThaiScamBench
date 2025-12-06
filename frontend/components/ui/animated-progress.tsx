@@ -28,7 +28,7 @@ export function AnimatedProgress({ className }: AnimatedProgressProps) {
     <div className={cn("w-full space-y-2", className)}>
       <div className="h-2 w-full overflow-hidden rounded-full bg-secondary/50">
         <motion.div
-          className="h-full bg-gradient-to-r from-blue-500 to-cyan-500"
+          className="h-full bg-gradient-to-r from-primary to-accent"
           initial={{ width: "0%" }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5 }}

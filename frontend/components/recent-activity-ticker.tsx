@@ -46,7 +46,7 @@ export function RecentActivityTicker() {
                 {item.type === "report" && <ShieldAlert className="w-4 h-4 text-red-500" />}
                 {item.type === "check" && item.risk === "high" && <ShieldAlert className="w-4 h-4 text-orange-500" />}
                 {item.type === "check" && item.risk === "safe" && <ShieldCheck className="w-4 h-4 text-green-500" />}
-                {item.type === "stat" && <Activity className="w-4 h-4 text-blue-500" />}
+                {item.type === "stat" && <Activity className="w-4 h-4 text-primary" />}
                 
                 <span className={`font-medium ${
                     item.risk === "high" ? "text-red-500 dark:text-red-400" : 

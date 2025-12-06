@@ -127,7 +127,7 @@ export default function CategoriesPage() {
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden max-w-xs">
                             <div
-                              className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                              className="h-full bg-gradient-to-r from-primary to-accent rounded-full"
                               style={{ width: `${Math.min(cat.percentage, 100)}%` }}
                             />
                           </div>

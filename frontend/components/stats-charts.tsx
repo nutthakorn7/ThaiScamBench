@@ -31,7 +31,7 @@ export function StatsCharts({ pieData, barData }: StatsChartsProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <PieIcon className="h-5 w-5 text-blue-500" />
+            <PieIcon className="h-5 w-5 text-primary" />
             อัตราส่วนความเสี่ยง
           </CardTitle>
           <CardDescription>สัดส่วนข้อความอันตราย vs ปลอดภัย</CardDescription>

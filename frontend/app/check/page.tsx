@@ -105,11 +105,11 @@ Request ID: ${result.request_id}`;
 
   return (
     <div className="container px-4 py-8 md:py-12 mx-auto max-w-4xl">
-      <div className="text-center mb-8 md:mb-12">
-        <h1 className="text-3xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+      <div className="text-center mb-12 md:mb-16">
+        <h1 className="text-5xl md:text-6xl font-black mb-6 text-slate-900 dark:text-white">
           ตรวจสอบความเสี่ยง
         </h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
           ใส่ข้อความ SMS, ลิงก์, หรือเลขบัญชีที่น่าสงสัย เพื่อให้ AI ช่วยวิเคราะห์ความปลอดภัย
         </p>
       </div>
@@ -123,17 +123,19 @@ Request ID: ${result.request_id}`;
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
                   <Textarea
-                    placeholder="วางข้อความที่ต้องการตรวจสอบที่นี่..."
+                    placeholder="วางข้อความ SMS, ลิงก์เว็บพนัน, หรือเลขบัญชีที่ต้องการตรวจสอบ..."
                     value={input}
                     onChange={(e) => {
                        setInput(e.target.value);
                        setInputError("");
                     }}
                     className={cn(
-                      "relative flex min-h-[150px] w-full resize-none rounded-lg border border-input bg-background/80 px-4 py-3 text-base md:text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-300 shadow-sm",
-                      "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 focus-visible:border-primary",
-                      inputError && "border-red-500 focus-visible:ring-red-500"
+                      "relative flex min-h-48 w-full resize-none rounded-2xl border-2 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-200 shadow-sm",
+                      "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600",
+                      inputError && "border-red-500 focus-visible:ring-red-500/20",
+                      !inputError && "border-gray-200 dark:border-gray-700"
                     )}
+                    rows={8}
                   />
                 </div>
                 {inputError && (
@@ -165,7 +167,7 @@ Request ID: ${result.request_id}`;
                 <Button 
                   type="submit" 
                   size="lg" 
-                  className="w-full h-12 text-lg font-medium rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/40 transition-all" 
+                  className="w-full px-10 py-6 text-xl font-semibold rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed" 
                   disabled={loading || input.trim().length < 5}
                 >
                   {loading ? (

@@ -26,13 +26,14 @@ export default function Home() {
           }}
           className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
         >
-          <Badge variant="outline" className="mb-6 py-1.5 px-4 text-sm font-medium border-blue-500/30 bg-blue-500/10 text-blue-400 backdrop-blur-sm rounded-full">
-            ✨ AI-Powered Scam Detection System
+          <Badge variant="outline" className="mb-6 py-1.5 px-4 text-sm font-medium border-primary/30 bg-primary/10 text-primary backdrop-blur-sm rounded-full">
+            🚀 พัฒนาโดยทีม AI Research
           </Badge>
           
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-center bg-clip-text text-transparent bg-gradient-to-b from-black to-black/60 dark:from-white dark:to-white/60">
-            รู้ทันทุกกลโกง<br />
-            <span className="text-blue-500">ด้วยพลัง AI อัจฉริยะ</span>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            รู้ทันมิจฉาชีพออนไลน์
+            <br />
+            <span className="text-primary">ด้วยพลัง AI อัจฉริยะ</span>
           </h1>
           
           <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
@@ -63,7 +64,8 @@ export default function Home() {
              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
              className="absolute top-1/4 left-[10%] opacity-20 dark:opacity-40"
           >
-             <ShieldCheck className="w-24 h-24 text-blue-500" />
+             <ShieldCheck className="w-24 h-24 text-primary" />
+             <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl"></div>
           </motion.div>
           
            <motion.div
@@ -95,8 +97,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
               <CardContent className="pt-6">
-                <div className="mb-4 h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                  <ShieldCheck className="h-6 w-6 text-blue-500" />
+                <div className="mb-4 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ShieldCheck className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">แม่นยำด้วย AI</h3>
                 <p className="text-muted-foreground leading-relaxed">
@@ -135,24 +137,24 @@ export default function Home() {
       {/* Stats Preview (Mock for now, will connect API later) */}
       <section className="py-20 md:py-32 border-t border-border/40">
         <div className="container px-4 mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12 rounded-3xl bg-gradient-to-r from-blue-900/20 to-cyan-900/20 p-8 md:p-12 border border-blue-500/20">
-            <div className="space-y-4 max-w-xl">
-              <h2 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-                ร่วมเป็นส่วนหนึ่งในการหยุดยั้งมิจฉาชีพ
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12 rounded-3xl bg-gradient-to-r from-primary/20 to-accent/20 p-8 md:p-12 border border-primary/20">
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                พร้อมเริ่มต้นแล้วหรือยัง?
               </h2>
-              <p className="text-lg text-muted-foreground">
-                การแจ้งเบาะแสของคุณเพียง 1 ครั้ง อาจช่วยป้องกันคนไทยได้นับพันคน
+              <p className="text-lg text-muted-foreground mb-6">
+                ใช้ฟรีไม่จำกัด ไม่ต้องสมัครสมาชิก
               </p>
-              <Link href="/stats">
-                <Button variant="ghost" className="group mt-4 text-blue-400 hover:text-blue-300 hover:bg-transparent p-0">
-                  ดูสถิติทั้งหมด <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <Link href="/check">
+                <Button variant="ghost" className="group mt-4 text-primary hover:text-primary/80 hover:bg-transparent p-0">
+                  เริ่มตรวจสอบเลย
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
-            
-            <div className="grid grid-cols-2 gap-8 text-center">
-              <div>
-                <div className="text-3xl md:text-5xl font-bold text-white mb-2">12.5k+</div>
+            <div className="relative">
+              <div className="flex flex-col gap-4 text-center">
+                <div className="text-3xl md:text-5xl font-bold text-primary mb-2">98.5%</div>
                 <div className="text-sm text-muted-foreground">เคสที่ตรวจสอบแล้ว</div>
               </div>
               <div>

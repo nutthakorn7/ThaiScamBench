@@ -155,13 +155,19 @@ export default function Home() {
               </Link>
             </div>
             <div className="relative">
-              <div className="flex flex-col gap-4 text-center">
-                <div className="text-3xl md:text-5xl font-bold text-primary mb-2">98.5%</div>
-                <div className="text-sm text-muted-foreground">เคสที่ตรวจสอบแล้ว</div>
-              </div>
-              <div>
-                <div className="text-3xl md:text-5xl font-bold text-blue-400 mb-2">98.5%</div>
-                <div className="text-sm text-muted-foreground">ความแม่นยำ AI</div>
+              <div className="flex flex-col gap-8 text-center">
+                <div>
+                  <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 mb-4">
+                    98.5%
+                  </div>
+                  <div className="text-lg md:text-xl text-muted-foreground font-semibold">เคสที่ตรวจสอบแล้ว</div>
+                </div>
+                <div>
+                  <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 mb-4">
+                    98.5%
+                  </div>
+                  <div className="text-lg md:text-xl text-muted-foreground font-semibold">ความแม่นยำ AI</div>
+                </div>
               </div>
             </div>
           </div>

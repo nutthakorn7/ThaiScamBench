@@ -187,9 +187,26 @@ Request ID: ${result.request_id}`;
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="pt-2"
+                className="mt-6"
               >
-                <AnimatedProgress />
+                <Card className="border-2 border-blue-600/20 bg-blue-50/50 dark:bg-blue-900/10">
+                  <CardContent className="pt-8 pb-8">
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="relative w-20 h-20">
+                        <div className="absolute inset-0 border-4 border-blue-200 dark:border-blue-800 border-t-blue-600 rounded-full animate-spin"></div>
+                      </div>
+                      <div className="text-center">
+                        <h3 className="text-2xl font-black text-blue-700 dark:text-blue-400 mb-2">
+                          AI กำลังวิเคราะห์...
+                        </h3>
+                        <p className="text-base text-muted-foreground">
+                          กรุณารอสักครู่
+                        </p>
+                      </div>
+                      <AnimatedProgress />
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             )}
           </AnimatePresence>
@@ -208,30 +225,70 @@ Request ID: ${result.request_id}`;
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
+              className="mt-8"
             >
             <Card className={cn(
-          "overflow-hidden border-2 duration-500",
-          result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
-          result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
-          "border-green-500/50 bg-green-500/5"
+          "overflow-hidden border-4 duration-500 shadow-2xl",
+          result.risk_score >= 0.7 ? "border-red-500 bg-red-50 dark:bg-red-900/20" :
+          result.risk_score >= 0.4 ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20" :
+          "border-green-500 bg-green-50 dark:bg-green-900/20"
         )}>
 
-          <CardHeader className="pb-2">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
-                {result.risk_score >= 0.7 ? <ShieldAlert className="text-red-500 h-6 w-6" /> :
-                 result.risk_score >= 0.4 ? <AlertTriangle className="text-orange-500 h-6 w-6" /> :
-                 <CheckCircle2 className="text-green-500 h-6 w-6" />}
-                ผลการวิเคราะห์: 
-                <span className={cn(
-                  "font-bold",
-                  result.risk_score >= 0.7 ? "text-red-500" :
-                  result.risk_score >= 0.4 ? "text-orange-500" :
-                  "text-green-500"
+          <CardHeader className="pb-8 pt-10">
+            <div className="flex flex-col items-center gap-6 text-center">
+              {/* HUGE Icon */}
+              <div className={cn(
+                "text-9xl font-black",
+                result.risk_score >= 0.7 ? "text-red-600" :
+                result.risk_score >= 0.4 ? "text-orange-600" :
+                "text-green-600"
+              )}>
+                {result.risk_score >= 0.7 ? "⚠️" : result.risk_score >= 0.4 ? "⚠" : "✓"}
+              </div>
+              
+              {/* Big Status */}
+              <div>
+                <h2 className={cn(
+                  "text-5xl md:text-6xl font-black mb-4",
+                  result.risk_score >= 0.7 ? "text-red-600" :
+                  result.risk_score >= 0.4 ? "text-orange-600" :
+                  "text-green-600"
                 )}>
-                  {result.risk_level}
-                </span>
-              </CardTitle>
+                  {result.risk_score >= 0.7 ? "ระวัง! ความเสี่ยงสูง" :
+                   result.risk_score >= 0.4 ? "ควรระวัง" :
+                   "ปลอดภัย"}
+                </h2>
+                <div className="flex items-center justify-center gap-4">
+                  <div className={cn(
+                    "text-7xl md:text-8xl font-black",
+                    result.risk_score >= 0.7 ? "text-red-600" :
+                    result.risk_score >= 0.4 ? "text-orange-600" :
+                    "text-green-600"
+                  )}>
+                    {(result.risk_score * 100).toFixed(0)}%
+                  </div>
+                  <div className="text-left">
+                    <p className="text-xl font-semibold text-muted-foreground">ความเสี่ยง</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* Detection Details */}
+            <div className="space-y-6">
+              <div className="p-6 rounded-lg bg-background/50 border border-border/50">
+                <h4 className="font-semibold mb-3 text-lg text-muted-foreground flex items-center gap-2">
+                  {result.risk_score >= 0.7 ? <ShieldAlert className="h-5 w-5" /> :
+                   result.risk_score >= 0.4 ? <AlertTriangle className="h-5 w-5" /> :
+                   <CheckCircle2 className="h-5 w-5" />}
+                  เหตุผลการวิเคราะห์:
+                </h4>
+                <p className="leading-relaxed text-base">
+                  {result.reason || result.reasoning || "ระบบตรวจพบรูปแบบข้อความที่สอดคล้องกับฐานข้อมูล Scam"}
+                </p>
+              </div>
               
               <div className="flex items-center gap-2">
                 <Badge variant={result.risk_score >= 0.7 ? "destructive" : "outline"} className={cn(
@@ -252,8 +309,6 @@ Request ID: ${result.request_id}`;
               <span>ผลการวิเคราะห์โดย AI (เวอร์ชันทดสอบ)</span>
               <span className="font-mono opacity-50">Ref: {result.request_id}</span>
             </CardDescription>
-          </CardHeader>
-          <CardContent>
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-background/50 border border-border/50">
                 <h4 className="font-medium mb-2 text-sm text-muted-foreground">เหตุผลการวิเคราะห์:</h4>
@@ -263,13 +318,13 @@ Request ID: ${result.request_id}`;
               </div>
               
               {result.risk_score >= 0.4 && (
-                <div className="bg-background/50 border border-border/50 p-4 rounded-lg">
-                   <h4 className="font-medium mb-2 text-sm text-muted-foreground">คำแนะนำ:</h4>
-                   <ul className="list-disc list-inside space-y-1 text-sm">
+                <div className="bg-background/50 border border-border/50 p-6 rounded-lg">
+                   <h4 className="font-semibold mb-3 text-lg text-muted-foreground">คำแนะนำ:</h4>
+                   <ul className="list-disc list-inside space-y-2 text-base">
                      <li>ห้ามโอนเงินเด็ดขาด</li>
                      <li>ห้ามกดลิงก์ใดๆ ที่แนบมา</li>
                      <li>บล็อกเบอร์โทรหรือบัญชีผู้ใช้นั้นทันที</li>
-                     <li>หากหลงเชื่อโอนเงินไปแล้ว ให้รีบแจ้งธนาคารและแจ้งความออนไลน์ที่ <a href="https://thaipoliceonline.com" target="_blank" className="text-blue-500 hover:underline">thaipoliceonline.com</a></li>
+                     <li>หากหลงเชื่อโอนเงินไปแล้ว ให้รีบแจ้งธนาคารและแจ้งความออนไลน์ที่ <a href="https://thaipoliceonline.com" target="_blank" className="text-blue-600 hover:underline font-medium">thaipoliceonline.com</a></li>
                    </ul>
                 </div>
               )}

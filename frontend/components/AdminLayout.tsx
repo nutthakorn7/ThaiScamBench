@@ -68,38 +68,36 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold">Admin Panel</h1>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)] sticky top-[73px]">
-          <nav className="p-4 space-y-1">
+        <aside className="w-64 bg-card border-r border-border flex flex-col">
+          {/* Logo / Header */}
+          <div className="p-6 border-b border-border">
+            <div className="flex items-center space-x-2">
+              <Shield className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold">Admin Panel</span>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              const Icon = item.icon;
+              const isActive = pathname === item.href || 
+                              (item.href !== "/admin" && pathname.startsWith(item.href));
+              
               return (
                 <Button
-                  key={item.href}
+                  key={item.name}
                   variant={isActive ? "default" : "ghost"}
                   className={cn(
                     "w-full justify-start",
-                    !isActive && "hover:bg-gray-100"
+                    isActive && "bg-primary text-primary-foreground"
                   )}
                   onClick={() => router.push(item.href)}
                 >
-                  <item.icon className="h-4 w-4 mr-2" />
+                  <Icon className="mr-2 h-4 w-4" />
                   {item.name}
                 </Button>
               );
@@ -108,8 +106,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
-          {children}
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950">
+          <div className="h-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>

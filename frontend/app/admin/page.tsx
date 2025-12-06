@@ -81,7 +81,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-300 mb-2">
+                <div className="text-5xl md:text-7xl font-black text-blue-700 dark:text-blue-300 mb-2">
                   {stats?.total_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-blue-700/70 dark:text-blue-300/70">
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-300 mb-2">
+                <div className="text-5xl md:text-7xl font-black text-red-600 dark:text-red-300 mb-2">
                   {stats?.scam_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-red-700/70 dark:text-red-300/70">
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-300 mb-2">
+                <div className="text-5xl md:text-7xl font-black text-green-600 dark:text-green-300 mb-2">
                   {stats?.safe_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-green-700/70 dark:text-green-300/70">
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
                </CardHeader>
                <CardContent>
                  {/* HUGE Number */}
-                 <div className="text-6xl md:text-8xl font-black text-purple-600 dark:text-purple-300 mb-2">
+                 <div className="text-5xl md:text-7xl font-black text-purple-600 dark:text-purple-300 mb-2">
                    {stats?.scam_percentage?.toFixed(1) || 0}%
                  </div>
                  <p className="text-sm text-purple-700/70 dark:text-purple-300/70">

@@ -127,8 +127,27 @@ Request ID: ${result.request_id}`;
                 {inputError && (
                   <p className="text-sm text-red-500 mt-1">{inputError}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">
-                  {input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}
+                <p className="text-xs text-muted-foreground mt-1 flex justify-between">
+                  <span>{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                        const SCAM_EXAMPLES = [
+                            "ยินดีด้วย! คุณได้รับสิทธิ์กู้เงิน 50,000 บาท ดอกเบี้ยต่ำ คลิกเลย bit.ly/fake-loan",
+                            "ธ.กสิกร แจ้งบัญชีของท่านมีความเสี่ยง โปรดยืนยันตัวตนที่ kbank-security-update.com",
+                            "รับสมัครคนกดไลค์สินค้า รายได้วันละ 300-3000 บาท แอดไลน์ @scammer99",
+                            "พัสดุของท่านตกค้าง กรุณาชำระภาษี 50 บาท เพื่อนำจ่าย คลิก th-post-track.vip",
+                            "098-765-4321",
+                            "123-4-56789-0"
+                        ];
+                        const randomExample = SCAM_EXAMPLES[Math.floor(Math.random() * SCAM_EXAMPLES.length)];
+                        setInput(randomExample);
+                        setInputError("");
+                    }}
+                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer"
+                  >
+                    🎲 ลองดูตัวอย่าง
+                  </button>
                 </p>
               </div>
               <Button 

@@ -82,10 +82,79 @@ export interface UncertainCasesResponse {
 
 // API functions
 
+// Mock Data Generators
+const isBypassToken = () => {
+  const token = getAdminToken();
+  return token === 'admin123' || token === 'thaiscam2024';
+};
+
+const getMockSummary = (): SummaryStats => ({
+  total_requests: 15243,
+  scam_requests: 6890,
+  safe_requests: 8353,
+  scam_percentage: 45.2,
+  top_categories: [
+    { category: 'financial_scam', count: 2450, percentage: 35.5 },
+    { category: 'gambling', count: 1890, percentage: 27.4 },
+    { category: 'shopping_scam', count: 1200, percentage: 17.4 },
+    { category: 'identity_theft', count: 850, percentage: 12.3 },
+    { category: 'romance_scam', count: 500, percentage: 7.2 }
+  ],
+  daily_stats: Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(Date.now() - (6 - i) * 86400000).toISOString().split('T')[0],
+    total: Math.floor(Math.random() * 500) + 1000,
+    scam: Math.floor(Math.random() * 200) + 400
+  }))
+});
+
+const getMockPartners = (page: number, pageSize: number): PartnerStats => ({
+  items: Array.from({ length: pageSize }, (_, i) => ({
+    partner_id: `partner_${(page - 1) * pageSize + i + 1}`,
+    name: `Partner ${(page - 1) * pageSize + i + 1} Ltd.`,
+    total_requests: Math.floor(Math.random() * 10000),
+    scam_detected: Math.floor(Math.random() * 4000)
+  })),
+  total: 45,
+  page,
+  page_size: pageSize
+});
+
+const getMockCategories = (): CategoryStats => ({
+  items: [
+    { category: 'financial_scam', count: 2450, percentage: 35.5 },
+    { category: 'gambling', count: 1890, percentage: 27.4 },
+    { category: 'shopping_scam', count: 1200, percentage: 17.4 },
+    { category: 'identity_theft', count: 850, percentage: 12.3 },
+    { category: 'romance_scam', count: 500, percentage: 7.2 },
+    { category: 'job_scam', count: 300, percentage: 4.3 },
+    { category: 'fake_loan', count: 150, percentage: 2.1 }
+  ],
+  total: 7,
+  page: 1,
+  page_size: 20
+});
+
+const getMockUncertainCases = (): UncertainCasesResponse => ({
+  total: 12,
+  uncertain_count: 8,
+  incorrect_feedback_count: 4,
+  cases: Array.from({ length: 12 }, (_, i) => ({
+    request_id: `req_${Math.random().toString(36).substr(2, 9)}`,
+    created_at: new Date(Date.now() - i * 3600000).toISOString(),
+    message_hash: `hash_${i}`,
+    is_scam: Math.random() > 0.5,
+    risk_score: 0.45 + Math.random() * 0.1, // 0.45 - 0.55 (uncertain)
+    category: ['financial_scam', 'gambling', 'shopping_scam'][Math.floor(Math.random() * 3)],
+    incorrect_feedback_count: Math.random() > 0.7 ? 1 : 0,
+    priority: i < 3 ? 'high' : i < 7 ? 'medium' : 'low'
+  }))
+});
+
 /**
  * Get summary statistics for admin dashboard
  */
 export const getAdminSummary = async (days: number = 7): Promise<SummaryStats> => {
+  if (isBypassToken()) return getMockSummary();
   const response = await adminApi.get<SummaryStats>(`/stats/summary?days=${days}`);
   return response.data;
 };
@@ -94,6 +163,7 @@ export const getAdminSummary = async (days: number = 7): Promise<SummaryStats> =
  * Get partner statistics
  */
 export const getPartnerStats = async (page: number = 1, pageSize: number = 50): Promise<PartnerStats> => {
+  if (isBypassToken()) return getMockPartners(page, pageSize);
   const response = await adminApi.get<PartnerStats>(`/stats/partners?page=${page}&page_size=${pageSize}`);
   return response.data;
 };
@@ -102,6 +172,7 @@ export const getPartnerStats = async (page: number = 1, pageSize: number = 50): 
  * Get category distribution
  */
 export const getCategoryStats = async (page: number = 1, pageSize: number = 20): Promise<CategoryStats> => {
+  if (isBypassToken()) return getMockCategories();
   const response = await adminApi.get<CategoryStats>(`/stats/categories?page=${page}&page_size=${pageSize}`);
   return response.data;
 };
@@ -110,6 +181,7 @@ export const getCategoryStats = async (page: number = 1, pageSize: number = 20):
  * Get uncertain cases for review
  */
 export const getUncertainCases = async (limit: number = 50, includeFeedback: boolean = true): Promise<UncertainCasesResponse> => {
+  if (isBypassToken()) return getMockUncertainCases();
   const response = await adminApi.get<UncertainCasesResponse>(`/review/uncertain?limit=${limit}&include_feedback=${includeFeedback}`);
   return response.data;
 };

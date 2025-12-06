@@ -2,7 +2,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Shield, Lock, Eye, UserCheck, FileText, Mail } from "lucide-react";
-import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 
 export default function PrivacyPage() {
@@ -544,9 +543,6 @@ export default function PrivacyPage() {
           </motion.div>
         </div>
       </main>
-
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

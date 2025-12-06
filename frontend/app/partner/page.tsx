@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, Shield, Activity, LogOut, FileCode } from "lucide-react";
+import { Loader2, Shield, Activity, LogOut, FileCode, Copy, Download } from "lucide-react";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function PartnerDashboard() {
   const [data, setData] = useState<PartnerDashboardStats | null>(null);
@@ -34,6 +35,47 @@ export default function PartnerDashboard() {
   const handleLogout = () => {
     removePartnerKey();
     router.push("/partner/login");
+  };
+
+  const handleCopyCode = () => {
+    const code = `curl -X POST https://api.thaiscam.zcr.ai/partner/detect \\
+  -H "X-API-Key: YOUR_KEY" \\
+  -d '{"text": "suspicious message"}'`;
+    navigator.clipboard.writeText(code);
+    toast.success("Code copied to clipboard!", {
+      description: "Paste it in your terminal to test the API",
+    });
+  };
+
+  const handleExportCSV = () => {
+    if (!data) return;
+    
+    // Create CSV content
+    const headers = ["Timestamp", "Endpoint", "Status", "Latency"];
+    const rows = data.recent_logs.map(log => [
+      new Date(log.timestamp).toLocaleString(),
+      log.endpoint,
+      `${log.status} OK`,
+      log.latency
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+    
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `api-logs-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    toast.success("CSV exported successfully!", {
+      description: "Check your downloads folder",
+    });
   };
 
   if (loading) {
@@ -141,50 +183,77 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Integration Info */}
-            <Card className="bg-slate-950/80 backdrop-blur-xl border-border/50 text-white overflow-hidden relative group">
+            <Card className="bg-slate-950/80 backdrop-blur-xl border-2 border-border shadow-2xl text-white overflow-hidden relative group">
                <div className="absolute inset-0 bg-grid-white/[0.05] -z-10" />
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="bg-primary/20 p-3 rounded-lg ring-1 ring-primary/50">
-                    <FileCode className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      Integration Guide <Badge variant="outline" className="text-primary border-primary/30">REST API</Badge>
-                    </h3>
-                    <p className="text-slate-400 text-sm max-w-2xl">
-                      Connect your application using our secure REST API. Include your unique API Key in the header of every request.
-                    </p>
-                    <div className="mt-4 p-4 bg-black/50 rounded-lg border border-white/10 font-mono text-sm overflow-x-auto">
-                      <div className="flex justify-between items-center mb-2 text-xs text-slate-500">
-                        <span>Terminal</span>
-                        <span>bash</span>
-                      </div>
-                      <code className="text-green-400">
-                        curl -X POST https://api.thaiscam.zcr.ai/partner/detect \<br/>
-                        &nbsp;&nbsp;-H "X-API-Key: YOUR_KEY" \<br/>
-                        &nbsp;&nbsp;-d '&#123;"text": "suspicious message"&#125;'
-                      </code>
+              <CardContent className="pt-8 pb-8">
+                <div className="flex items-start justify-between gap-4 mb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="bg-blue-600/20 p-4 rounded-xl ring-2 ring-blue-600/50">
+                      <FileCode className="h-8 w-8 text-blue-400" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-2xl md:text-3xl font-black flex items-center gap-3">
+                        Integration Guide 
+                        <Badge variant="outline" className="text-blue-400 border-blue-400/50 text-base">REST API</Badge>
+                      </h3>
+                      <p className="text-slate-300 text-base max-w-2xl">
+                        Connect your application using our secure REST API. Include your unique API Key in the header of every request.
+                      </p>
                     </div>
                   </div>
+                  {/* Copy Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyCode}
+                    className="bg-white/10 hover:bg-white/20 border-white/20 text-white shrink-0"
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy
+                  </Button>
+                </div>
+                <div className="mt-4 p-4 bg-black/50 rounded-xl border-2 border-white/10 font-mono text-sm overflow-x-auto">
+                  <div className="flex justify-between items-center mb-3 text-xs text-slate-400">
+                    <span className="font-semibold">Terminal</span>
+                    <span>bash</span>
+                  </div>
+                  <code className="text-green-400">
+                    curl -X POST https://api.thaiscam.zcr.ai/partner/detect \<br/>
+                    &nbsp;&nbsp;-H "X-API-Key: YOUR_KEY" \<br/>
+                    &nbsp;&nbsp;-d '&#123;"text": "suspicious message"&#125;'
+                  </code>
                 </div>
               </CardContent>
             </Card>
 
             {/* Recent Logs Table */}
-            <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
+            <Card className="bg-card/95 backdrop-blur-xl border-2 border-border shadow-2xl">
               <CardHeader>
-                <CardTitle>Recent API Logs</CardTitle>
-                <CardDescription>Real-time transaction history</CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl font-black">Recent API Logs</CardTitle>
+                    <CardDescription className="text-base mt-1">Real-time transaction history</CardDescription>
+                  </div>
+                  {/* Export CSV Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleExportCSV}
+                    className="h-10"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="hover:bg-transparent border-border/50">
-                      <TableHead>Timestamp</TableHead>
-                      <TableHead>Endpoint</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Latency</TableHead>
+                    <TableRow className="hover:bg-transparent border-b-2 border-border">
+                      <TableHead className="font-bold text-base">Timestamp</TableHead>
+                      <TableHead className="font-bold text-base">Endpoint</TableHead>
+                      <TableHead className="font-bold text-base">Status</TableHead>
+                      <TableHead className="font-bold text-base">Latency</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

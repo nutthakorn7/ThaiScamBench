@@ -27,7 +27,7 @@ export default function Home() {
           }}
           className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
         >
-          <Badge variant="outline" className="mb-8 py-2 px-5 text-sm font-semibold border-primary/20 bg-primary/10 text-primary backdrop-blur-sm rounded-full inline-flex items-center gap-2">
+          <Badge variant="outline" className="mb-8 py-2 px-5 text-sm font-semibold border-blue-700/20 bg-blue-700/10 text-blue-700 dark:text-blue-400 dark:border-blue-400/30 backdrop-blur-sm rounded-full inline-flex items-center gap-2">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             พัฒนาโดยทีม AI Research
           </Badge>
@@ -45,14 +45,14 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto">
             <Link href="/check" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-primary hover:bg-primary-hover shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
                 <Search className="mr-2 h-5 w-5" />
                 ตรวจสอบเลย
               </Button>
             </Link>
-            <Link href="/report" className="w-full">
-              <Button variant="outline" size="lg" className="w-full h-12 text-base font-semibold bg-orange-500 hover:bg-orange-600 border-4 border-orange-300 hover:border-orange-200 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm transition-all duration-300">
-                <AlertTriangle className="mr-2 h-5 w-5 text-white" />
+            <Link href="/report" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+                <AlertTriangle className="mr-2 h-5 w-5" />
                 แจ้งเบาะแสใหม่
               </Button>
             </Link>

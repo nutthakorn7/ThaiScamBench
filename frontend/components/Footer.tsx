@@ -4,14 +4,14 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">เกี่ยวกับเรา</h3>
+              <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">เกี่ยวกับเรา</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 ThaiScamDetector เป็นระบบ AI อัจฉริยะที่ช่วยปกป้องคุณจากการถูกหลอกลวงออนไลน์ 
                 โดยการวิเคราะห์ข้อความและลิงก์ที่น่าสงสัยได้อย่างแม่นยำ
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">เมนูลัด</h3>
+              <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">เมนูลัด</h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li><a href="/" className="hover:text-blue-700">หน้าแรก</a></li>
                 <li><a href="/check" className="hover:text-blue-700">ตรวจสอบข้อความ</a></li>
@@ -21,7 +21,7 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">ติดต่อเรา</h3>
+              <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">ติดต่อเรา</h3>
               <p className="text-sm text-gray-600">
                 มีข้อสงสัยหรือต้องการความช่วยเหลือ?
                 <br />

@@ -1,20 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Textarea } from "@/components/ui/textarea";
+import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Loader2, Copy, CheckCircle2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { detectScam, type DetectionResponse } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { Loader2, Copy, CheckCircle2, AlertTriangle, Info } from "lucide-react";
-import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { StructuredData } from "@/components/StructuredData";
 import { checkBreadcrumb } from "@/lib/structured-data";
-import { detectScam, type DetectionResponse } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedProgress } from "@/components/ui/animated-progress";
 import dynamic from 'next/dynamic';
+
 // ... other imports
 
 const FeedbackDialog = dynamic(() => import('@/components/FeedbackDialog').then(mod => mod.FeedbackDialog), {

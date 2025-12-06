@@ -130,7 +130,7 @@ Request ID: ${result.request_id}`;
                        setInputError("");
                     }}
                     className={cn(
-                      "relative flex min-h-96 w-full resize-none rounded-2xl border-2 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-200 shadow-sm",
+                      "relative flex min-h-48 w-full resize-none rounded-2xl border-2 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-200 shadow-sm",
                       "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600",
                       inputError && "border-red-500 focus-visible:ring-red-500/20",
                       !inputError && "border-gray-200 dark:border-gray-700"

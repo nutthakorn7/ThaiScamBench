@@ -114,10 +114,10 @@ Request ID: ${result.request_id}`;
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Input Form */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="border-primary/20 shadow-lg shadow-primary/5 backdrop-blur-sm bg-card/60">
+      <div className="grid grid-cols-1 gap-8">
+        {/* Centered Input Form - Full Width */}
+        <div className="max-w-5xl mx-auto w-full">
+          <Card className="border-2 border-border shadow-2xl backdrop-blur-sm bg-card">
             <CardContent className="pt-6">
               <form onSubmit={handleCheck} className="space-y-4">
                 <div className="relative group">
@@ -130,19 +130,19 @@ Request ID: ${result.request_id}`;
                        setInputError("");
                     }}
                     className={cn(
-                      "relative flex min-h-48 w-full resize-none rounded-2xl border-2 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-200 shadow-sm",
+                      "relative flex min-h-96 w-full resize-none rounded-2xl border-2 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground transition-all duration-200 shadow-sm",
                       "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600",
                       inputError && "border-red-500 focus-visible:ring-red-500/20",
                       !inputError && "border-gray-200 dark:border-gray-700"
                     )}
-                    rows={8}
+                    rows={16}
                   />
                 </div>
                 {inputError && (
                   <p className="text-sm text-red-500 mt-1">{inputError}</p>
                 )}
-                 <p className="text-xs text-muted-foreground mt-2 flex justify-between items-center">
-                   <span>{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
+                 <p className="text-base text-muted-foreground mt-3 flex justify-between items-center">
+                   <span className="font-medium">{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
                    <button
                      type="button"
                      onClick={() => {
@@ -158,7 +158,7 @@ Request ID: ${result.request_id}`;
                         setInput(randomExample);
                         setInputError("");
                      }}
-                     className="text-primary hover:text-primary/80 hover:underline cursor-pointer py-1 px-2 rounded hover:bg-primary/10 transition-colors"
+                     className="text-blue-600 hover:text-blue-700 font-medium px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                    >
                      🎲 ลองดูตัวอย่าง
                    </button>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Prompt, IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,7 +7,17 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const prompt = Prompt({ 
+  weight: ['300', '400', '500', '600', '700'],
+  subsets: ["latin", "thai"],
+  variable: '--font-prompt'
+});
+const ibmThai = IBM_Plex_Sans_Thai({
+  weight: ['300', '400', '500', '600', '700'],
+  subsets: ["latin", "thai"],
+  variable: '--font-ibm'
+});
 
 export const metadata: Metadata = {
   title: {
@@ -52,7 +62,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={inter.className}>
+      <body className={`${prompt.variable} ${inter.variable} font-sans`}>
         <Toaster position="top-center" richColors expand={true} />
         <div className="flex min-h-screen flex-col">
           <Navbar />

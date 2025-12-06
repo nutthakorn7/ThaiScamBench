@@ -25,7 +25,7 @@ export default function Footer() {
               <p className="text-sm text-gray-600">
                 มีข้อสงสัยหรือต้องการความช่วยเหลือ?
                 <br />
-                Email: support@scamdetect.th
+                Email: cloud@monsterconnect.co.th
               </p>
             </div>
           </div>

@@ -17,6 +17,7 @@ import { ChevronLeft, ChevronRight, Users, TrendingUp } from "lucide-react";
 import { getPartnerStats, type PartnerStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function PartnersPage() {
   const router = useRouter();
@@ -56,11 +57,8 @@ export default function PartnersPage() {
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AdminLayout>
       <div className="mb-8">
-        <Button variant="ghost" onClick={() => router.push('/admin')} className="mb-4">
-          ← กลับหน้าแรก
-        </Button>
         <h1 className="text-3xl font-bold">Partner Statistics</h1>
         <p className="text-muted-foreground">การใช้งานของ Partners แต่ละราย</p>
       </div>
@@ -162,6 +160,6 @@ export default function PartnersPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </AdminLayout>
   );
 }

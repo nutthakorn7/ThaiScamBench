@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight, BarChart3 } from "lucide-react";
 import { getCategoryStats, type CategoryStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function CategoriesPage() {
   const router = useRouter();

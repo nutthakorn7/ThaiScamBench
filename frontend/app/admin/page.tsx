@@ -1,3 +1,4 @@
+```
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,6 +18,7 @@ import {
 import { getAdminSummary, type SummaryStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -60,37 +62,38 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <AdminLayout>
         <div className="flex justify-between items-center mb-8">
           <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-24" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-32" />
           ))}
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold mb-2">เกิดข้อผิดพลาด</h2>
-        <p className="text-muted-foreground mb-4">{error}</p>
-        <Button onClick={() => window.location.reload()}>ลองใหม่</Button>
-      </div>
+      <AdminLayout>
+        <div className="text-center py-16">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">เกิดข้อผิดพลาด</h2>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>ลองใหม่</Button>
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AdminLayout>
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">สถิติการใช้งานระบบ (7 วันล่าสุด)</p>
         </div>
         <Button variant="outline" onClick={handleLogout}>
@@ -200,6 +203,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </AdminLayout>
   );
 }

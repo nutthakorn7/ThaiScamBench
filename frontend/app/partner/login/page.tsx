@@ -55,32 +55,34 @@ export default function PartnerLoginPage() {
         }}
         className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4"
       >
-        <Card className="w-full max-w-md shadow-xl bg-card/60 backdrop-blur-xl border-border/50">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit mb-2 ring-1 ring-primary/20">
-              <Shield className="h-8 w-8 text-primary" />
+        <Card className="w-full max-w-lg shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border">          <CardHeader className="text-center space-y-6 pb-8 pt-10">
+            {/* Large Icon Container */}
+            <div className="mx-auto bg-blue-600/10 dark:bg-blue-600/20 p-5 rounded-2xl w-fit mb-2 ring-2 ring-blue-600/20">
+              <Shield className="h-10 w-10 text-blue-600" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+              {/* HUGE Heading */}
+              <CardTitle className="text-5xl md:text-6xl font-black mb-4 text-slate-900 dark:text-white">
                 Partner Portal
               </CardTitle>
-              <CardDescription className="mt-2 text-base">
+              <CardDescription className="mt-3 text-xl md:text-2xl text-muted-foreground">
                 ระบบจัดการสำหรับพาร์ทเนอร์และหน่วยงาน
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-10 pb-10">
             <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-1">API Key Access</label>
+              <div className="space-y-3">
+                <label className="text-lg font-semibold">API Key Access</label>
                 <div className="relative">
-                  <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Key className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     placeholder="pk_live_xxxxxxxxxxxxx"
-                    className="pl-9 h-11 bg-background/50 border-input/60 focus:bg-background transition-colors"
+                    className="h-16 pl-12 pr-4 text-lg rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 transition-all"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     type="password"
+                    aria-label="API Key สำหรับเข้าสู่ระบบ"
                   />
                 </div>
               </div>
@@ -88,16 +90,19 @@ export default function PartnerLoginPage() {
               <div className="space-y-4">
                 <Button 
                   type="submit" 
-                  className="w-full h-11 text-base font-medium rounded-full bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary/90 hover:shadow-primary/40 transition-all" 
+                  className="w-full h-16 text-xl font-bold rounded-2xl bg-blue-700 hover:bg-blue-800 text-white shadow-2xl hover:scale-105 transition-all duration-200" 
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="animate-spin h-4 w-4 mr-2" />
-                      Authenticating...
+                      <Loader2 className="animate-spin h-6 w-6 mr-2" />
+                      กำลังตรวจสอบ...
                     </>
                   ) : (
-                    "เข้าสู่ระบบ"
+                    <>
+                      <Shield className="mr-2 h-6 w-6" />
+                      เข้าสู่ระบบ
+                    </>
                   )}
                 </Button>
 

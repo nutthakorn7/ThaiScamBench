@@ -44,10 +44,12 @@ export default function ReportPage() {
 
   return (
     <div className="container px-4 py-12 mx-auto max-w-2xl">
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">แจ้งเบาะแส / รายงานผล</h1>
-        <p className="text-muted-foreground">
-          ช่วยกันสร้างสังคมออนไลน์ที่ปลอดภัย รายงานข้อความหรือลิงก์น่าสงสัยให้เรารู้
+      <div className="text-center mb-12 md:mb-16">
+        <h1 className="text-5xl md:text-6xl font-black mb-6 text-slate-900 dark:text-white">
+          แจ้งเบาะแสการหลอกลวง
+        </h1>
+        <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          ช่วยเราป้องกันการหลอกลวงออนไลน์ ข้อมูลของคุณจะช่วยคนอื่นไม่ให้ตกเป็นเหยื่อ
         </p>
       </div>
 

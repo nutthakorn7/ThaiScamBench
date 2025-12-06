@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { ShieldCheck, Search, AlertTriangle, TrendingUp, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { AuroraBackground } from "@/components/ui/aurora-background";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,18 +11,28 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32 md:pt-32 md:pb-48">
-        <div className="container px-4 mx-auto relative z-10 text-center">
+      {/* Hero Section */}
+      <AuroraBackground className="h-auto min-h-[60vh] py-20 px-4">
+        <motion.div
+          initial={{ opacity: 0.0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
+        >
           <Badge variant="outline" className="mb-6 py-1.5 px-4 text-sm font-medium border-blue-500/30 bg-blue-500/10 text-blue-400 backdrop-blur-sm rounded-full">
             ✨ AI-Powered Scam Detection System
           </Badge>
           
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 text-center bg-clip-text text-transparent bg-gradient-to-b from-black to-black/60 dark:from-white dark:to-white/60">
             รู้ทันทุกกลโกง<br />
             <span className="text-blue-500">ด้วยพลัง AI อัจฉริยะ</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
             ตรวจสอบข้อความ SMS, ลิงก์เว็บพนัน หรือเลขบัญชีต้องสงสัยได้ทันที 
             ด้วยระบบประมวลผลภาษาธรรมชาติ (NLP) ที่แม่นยำที่สุดสำหรับภาษาไทย
           </p>
@@ -33,20 +45,41 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/report" className="w-full">
-              <Button variant="outline" size="lg" className="w-full h-12 text-base font-medium bg-secondary/50 border-secondary hover:bg-secondary/70">
+              <Button variant="outline" size="lg" className="w-full h-12 text-base font-medium bg-background/50 border-input hover:bg-accent hover:text-accent-foreground backdrop-blur-sm">
                 <AlertTriangle className="mr-2 h-5 w-5" />
                 แจ้งเบาะแสใหม่
               </Button>
             </Link>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Background Gradients */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl opacity-20 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/30 rounded-full blur-[128px]" />
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[128px]" />
+        {/* Floating Icons */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div
+             animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
+             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+             className="absolute top-1/4 left-[10%] opacity-20 dark:opacity-40"
+          >
+             <ShieldCheck className="w-24 h-24 text-blue-500" />
+          </motion.div>
+          
+           <motion.div
+             animate={{ y: [0, 20, 0], rotate: [0, -10, 0] }}
+             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+             className="absolute top-1/3 right-[10%] opacity-20 dark:opacity-40"
+          >
+             <AlertTriangle className="w-32 h-32 text-orange-500" />
+          </motion.div>
+
+          <motion.div
+             animate={{ y: [0, -15, 0], scale: [1, 1.1, 1] }}
+             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+             className="absolute bottom-1/4 left-[20%] opacity-10 dark:opacity-20"
+          >
+             <Search className="w-16 h-16 text-cyan-500" />
+          </motion.div>
         </div>
-      </section>
+      </AuroraBackground>
 
       {/* Features Section */}
       <section className="py-20 md:py-32 bg-secondary/20">

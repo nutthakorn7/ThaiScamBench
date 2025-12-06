@@ -36,10 +36,35 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
   return response.data;
 };
 
-export const getStats = async () => {
+// Define response type
+interface StatsData {
+  total_detections: number;
+  scam_percentage: number;
+  top_categories: Array<{
+    category: string;
+    count: number;
+    percentage: number;
+  }>;
+  period: string;
+}
+
+export const getStats = async (): Promise<StatsData> => {
+    // Determine API URL (Server-side compatible)
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+    
     try {
-        const response = await api.get('/public/stats');
-        return response.data;
+        const res = await fetch(`${baseUrl}/public/stats`, {
+            next: { revalidate: 60 }, // Cache for 60 seconds
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to fetch stats');
+        }
+
+        return await res.json();
     } catch (error) {
         console.warn("API Error, returning mock stats:", error);
         // Mock data for fallback

@@ -74,14 +74,14 @@ export default function AdminDashboard() {
           {/* Stats Grid - World-Class */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Total Requests - Blue */}
-            <Card className="bg-card/95 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <Card className="bg-blue-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-400">Total Requests</CardTitle>
-                <BarChart3 className="h-6 w-6 text-blue-600" />
+                <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-300">Total Requests</CardTitle>
+                <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-400 mb-2">
+                <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-300 mb-2">
                   {stats?.total_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-blue-700/70 dark:text-blue-300/70">
@@ -91,14 +91,14 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Scam Detected - Red */}
-            <Card className="bg-card/95 backdrop-blur-xl border-2 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <Card className="bg-red-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-red-200 dark:border-red-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-400">Scam Detected</CardTitle>
-                <ShieldAlert className="h-6 w-6 text-red-600" />
+                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-300">Scam Detected</CardTitle>
+                <ShieldAlert className="h-6 w-6 text-red-600 dark:text-red-400" />
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-400 mb-2">
+                <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-300 mb-2">
                   {stats?.scam_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-red-700/70 dark:text-red-300/70">
@@ -108,14 +108,14 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Safe Messages - Green */}
-            <Card className="bg-card/95 backdrop-blur-xl border-2 border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <Card className="bg-green-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-green-200 dark:border-green-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-400">Safe Messages</CardTitle>
-                <CheckCircle2 className="h-6 w-6 text-green-600" />
+                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-300">Safe Messages</CardTitle>
+                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
                 {/* HUGE Number */}
-                <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-400 mb-2">
+                <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-300 mb-2">
                   {stats?.safe_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-green-700/70 dark:text-green-300/70">
@@ -125,14 +125,14 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Detection Rate - Purple */}
-            <Card className="bg-card/95 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <Card className="bg-purple-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                 <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-400">Detection Rate</CardTitle>
-                 <TrendingUp className="h-6 w-6 text-purple-600" />
+                 <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-300">Detection Rate</CardTitle>
+                 <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                </CardHeader>
                <CardContent>
                  {/* HUGE Number */}
-                 <div className="text-6xl md:text-8xl font-black text-purple-600 dark:text-purple-400 mb-2">
+                 <div className="text-6xl md:text-8xl font-black text-purple-600 dark:text-purple-300 mb-2">
                    {stats?.scam_percentage?.toFixed(1) || 0}%
                  </div>
                  <p className="text-sm text-purple-700/70 dark:text-purple-300/70">

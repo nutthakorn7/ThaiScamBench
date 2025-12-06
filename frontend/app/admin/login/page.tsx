@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield, AlertCircle } from "lucide-react";
+import { Shield, AlertCircle, Lock } from "lucide-react";
 import { setAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { AuroraBackground } from "@/components/ui/aurora-background";
+import { motion } from "framer-motion";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -66,54 +68,75 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-            <Shield className="h-6 w-6 text-blue-600" />
-          </div>
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            ใส่ Admin Token เพื่อเข้าสู่ระบบ
-          </p>
-        </CardHeader>
-
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="token">Admin Token</Label>
-              <Input
-                id="token"
-                type="password"
-                placeholder="Bearer token จาก backend"
-                value={token}
-                onChange={(e) => {
-                  setToken(e.target.value);
-                  setError("");
-                }}
-                disabled={loading}
-                className="font-mono"
-              />
+    <AuroraBackground>
+      <motion.div
+        initial={{ opacity: 0.0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: "easeInOut",
+        }}
+        className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4"
+      >
+        <Card className="w-full max-w-md shadow-xl bg-card/60 backdrop-blur-xl border-border/50">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto bg-red-500/10 p-4 rounded-full w-fit mb-2 ring-1 ring-red-500/20">
+              <Lock className="h-8 w-8 text-red-500" />
             </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button type="submit" className="w-full h-11 font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" disabled={loading || !token.trim()}>
-              {loading ? "กำลังตรวจสอบ..." : "เข้าสู่ระบบ"}
-            </Button>
-
-            <div className="text-xs text-center text-muted-foreground">
-              <p>Token ถูกเก็บไว้ใน browser localStorage</p>
-              <p className="mt-1">สำหรับผู้ดูแลระบบเท่านั้น</p>
+            <div>
+              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">
+                Admin Portal
+              </CardTitle>
+              <CardDescription className="mt-2 text-base">
+                ระบบจัดการส่วนกลางสำหรับผู้ดูแลระบบ
+              </CardDescription>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="token" className="text-sm font-medium ml-1">Secret Token Access</Label>
+                <div className="relative">
+                  <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="token"
+                    type="password"
+                    placeholder="Bearer token..."
+                    value={token}
+                    onChange={(e) => {
+                      setToken(e.target.value);
+                      setError("");
+                    }}
+                    disabled={loading}
+                    className="pl-9 h-11 bg-background/50 border-input/60 focus:bg-background transition-colors font-mono"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button 
+                type="submit" 
+                className="w-full h-11 font-medium rounded-full bg-red-600 text-white shadow-lg shadow-red-600/20 hover:bg-red-700 hover:shadow-red-600/40 transition-all" 
+                disabled={loading || !token.trim()}
+              >
+                {loading ? "กำลังตรวจสอบ..." : "เข้าสู่ระบบ Admin"}
+              </Button>
+
+              <div className="text-xs text-center text-muted-foreground pt-2">
+                <p>Protected Area • Unauthorized Access Prohibited</p>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </AuroraBackground>
   );
 }

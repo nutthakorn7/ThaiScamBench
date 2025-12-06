@@ -88,7 +88,7 @@ export default function PartnerLoginPage() {
               <div className="space-y-4">
                 <Button 
                   type="submit" 
-                  className="w-full h-11 text-base shadow-lg shadow-blue-500/20" 
+                  className="w-full h-11 text-base font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" 
                   disabled={loading}
                 >
                   {loading ? (

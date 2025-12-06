@@ -155,7 +155,7 @@ Request ID: ${result.request_id}`;
               <Button 
                 type="submit" 
                 size="lg" 
-                className="w-full h-12 text-lg shadow-lg shadow-blue-500/20" 
+                className="w-full h-12 text-lg font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" 
                 disabled={loading || input.trim().length < 5}
               >
                 {loading ? (

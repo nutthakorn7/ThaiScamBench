@@ -115,7 +115,7 @@ export default function ReportPage() {
                 />
             </div>
 
-            <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+            <Button type="submit" className="w-full h-12 text-base font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" disabled={loading}>
               {loading ? "กำลังส่งข้อมูล..." : "ส่งรายงาน"} <Send className="ml-2 h-4 w-4" />
             </Button>
           </form>

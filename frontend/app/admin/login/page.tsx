@@ -103,7 +103,7 @@ export default function AdminLoginPage() {
               </Alert>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading || !token.trim()}>
+            <Button type="submit" className="w-full h-11 font-medium rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/20 hover:bg-blue-700 hover:shadow-blue-600/40 transition-all" disabled={loading || !token.trim()}>
               {loading ? "กำลังตรวจสอบ..." : "เข้าสู่ระบบ"}
             </Button>
 

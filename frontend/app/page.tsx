@@ -48,8 +48,8 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/report" className="w-full">
-              <Button variant="outline" size="lg" className="w-full h-12 text-base font-semibold bg-zinc-950/40 dark:bg-zinc-900/60 hover:bg-zinc-950/60 border-2 border-orange-500/50 hover:border-orange-500 text-white shadow-lg backdrop-blur-md transition-all duration-300">
-                <AlertTriangle className="mr-2 h-5 w-5 text-orange-500" />
+              <Button variant="outline" size="lg" className="w-full h-12 text-base font-semibold bg-orange-500 hover:bg-orange-600 border-2 border-orange-500 text-white shadow-lg shadow-orange-500/20 backdrop-blur-sm transition-all duration-300">
+                <AlertTriangle className="mr-2 h-5 w-5 text-white" />
                 แจ้งเบาะแสใหม่
               </Button>
             </Link>

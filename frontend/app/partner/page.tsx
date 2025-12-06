@@ -102,9 +102,6 @@ export default function PartnerDashboard() {
               <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary border-primary/20">{data.plan_tier}</Badge>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-muted-foreground hidden md:inline">
-                {data.company_name}
-              </span>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
                 <LogOut className="h-4 w-4 mr-2" /> Logout
               </Button>

@@ -20,38 +20,56 @@ const ibmThai = IBM_Plex_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://thaiscam.zcr.ai'),
   title: {
-    template: '%s | Thai Scam Detector',
-    default: 'Thai Scam Detector | ตรวจสอบกลโกงออนไลน์',
+    template: '%s | ThaiScamDetector',
+    default: 'ThaiScamDetector - ตรวจสอบการหลอกลวงด้วย AI',
   },
   description: "ระบบ AI อัจฉริยะสำหรับตรวจสอบข้อความ SMS, ลิงก์เว็บพนัน, บัญชีม้า และภัยออนไลน์ต่างๆ ปกป้องคุณจากมิจฉาชีพด้วยความแม่นยำสูง",
-  keywords: ["ตรวจสอบมิจฉาชีพ", "เช็คบัญชีคนโกง", "SMS หลอกลวง", "เว็บพนัน", "AI ตรวจสอบ", "Scam Detector", "Cyber Security"],
-  authors: [{ name: "Thai Scam Bench Team" }],
+  keywords: ["ตรวจสอบมิจฉาชีพ", "เช็คบัญชีคนโกง", "SMS หลอกลวง", "เว็บพนัน", "AI ตรวจสอบ", "Scam Detector", "Cyber Security", "การหลอกลวงออนไลน์", "Thai scam detection"],
+  authors: [{ name: "ThaiScamDetector Team" }],
+  creator: 'ThaiScamDetector',
+  publisher: 'ThaiScamDetector',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
     type: 'website',
     locale: 'th_TH',
     url: 'https://thaiscam.zcr.ai',
-    title: 'Thai Scam Detector | รู้ทันกลโกงด้วย AI',
+    title: 'ThaiScamDetector - รู้ทันกลโกงด้วย AI',
     description: 'ตรวจสอบความเสี่ยงข้อความและบัญชีต้องสงสัยได้ทันที ป้องกันภัยจากมิจฉาชีพ',
-    siteName: 'Thai Scam Detector',
+    siteName: 'ThaiScamDetector',
     images: [
       {
-        url: '/og-image.jpg', // We will need to ensure this image exists or use a default
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Thai Scam Detector Preview',
+        alt: 'ThaiScamDetector - ป้องกันการหลอกลวงออนไลน์',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Thai Scam Detector',
+    title: 'ThaiScamDetector - ตรวจสอบการหลอกลวงด้วย AI',
     description: 'ตรวจสอบความเสี่ยงข้อความและบัญชีต้องสงสัยได้ทันที',
     images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Add when ready: google: 'your-google-site-verification',
   },
 };
 

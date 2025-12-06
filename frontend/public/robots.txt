@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and partner areas from search engines
+User-agent: *
+Disallow: /admin/
+Disallow: /partner/dashboard
+
+# Sitemap location
+Sitemap: https://thaiscam.zcr.ai/sitemap.xml

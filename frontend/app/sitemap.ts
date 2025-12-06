@@ -1,38 +1,51 @@
-import { MetadataRoute } from 'next'
- 
+import { MetadataRoute } from 'next';
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://thaiscam.zcr.ai'
-  
+  const baseUrl = 'https://thaiscam.zcr.ai';
+  const currentDate = new Date();
+
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/check`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/report`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
+      url: `${baseUrl}/stats`,
+      lastModified: currentDate,
+      changeFrequency: 'daily',
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/stats`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly',
+      url: `${baseUrl}/report`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
-  ]
+    {
+      url: `${baseUrl}/partner/login`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/admin/login`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+  ];
 }

@@ -35,7 +35,7 @@ export default function Home() {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
             รู้ทันมิจฉาชีพออนไลน์
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%] animate-gradient">ด้วยพลัง AI อัจฉริยะ</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-teal-500 to-blue-700 animate-gradient">ด้วยพลัง AI อัจฉริยะ</span>
           </h1>
           
           <p className="text-lg md:text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-14 leading-relaxed">

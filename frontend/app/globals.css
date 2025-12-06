@@ -54,43 +54,57 @@
     --font-prompt: 'Prompt', sans-serif;
     
     /* 
-      THEME: UNIFIED "Navy Blue Professional"
-      Used for: ALL PORTALS (Public, Partner, Admin)
+      THEME: "Navy Blue Professional"
+      Supports: Light Mode (Default) + Dark Mode (.dark)
     */
-    /* Deep Navy Black */
-    --color-bg: #020617;
-    /* Card / Panel */
-    --color-bg-elevated: #0b1220; 
     
-    /* Navy Blue (Brand) */
-    --color-primary: #1e3a8a;
-    /* Lighter Blue (Hover/Active) */
-    --color-primary-soft: #3b82f6;
+    /* === LIGHT MODE (DEFAULT) === */
     
-    /* Sky Blue (Accent/Highlight) */
-    --color-accent: #60a5fa; 
+    /* Background */
+    --color-bg: #ffffff;              /* Pure White */
+    --color-bg-elevated: #f8fafc;     /* Slate 50 */
     
-    /* Semantic Colors */
-    --color-danger: #ef4444;
-    --color-warning: #facc15;
-    --color-success: #22c55e;
+    /* Brand Colors (FIXED - Don't change with mode) */
+    --color-primary: #1e3a8a;         /* Navy Blue */
+    --color-primary-soft: #3b82f6;    /* Lighter Blue */
+    --color-accent: #60a5fa;          /* Sky Blue */
     
-    /* Typography */
-    --color-text: #e5e7eb;
-    --color-text-inverse: #ffffff;
-    --color-text-soft: #94a3b8;
+    /* Semantic Colors (FIXED - Don't change with mode) */
+    --color-danger: #ef4444;          /* Red */
+    --color-warning: #facc15;         /* Yellow */
+    --color-success: #22c55e;         /* Green */
     
-    /* Border */
-    --color-border: rgba(148,163,184,0.25);
+    /* Text (ADAPTIVE - Changes with mode) */
+    --color-text: #0f172a;            /* Slate 900 - Dark Text for Light BG */
+    --color-text-inverse: #ffffff;    /* White */
+    --color-text-soft: #64748b;       /* Slate 500 */
+    
+    /* Border (ADAPTIVE) */
+    --color-border: rgba(15, 23, 42, 0.1);  /* Dark border for Light mode */
+  }
+
+  /* === DARK MODE === */
+  .dark {
+    /* Background */
+    --color-bg: #020617;              /* Deep Navy Black */
+    --color-bg-elevated: #0b1220;     /* Elevated Panel */
+    
+    /* Brand & Semantic Colors remain the same (not redefined) */
+    
+    /* Text (ADAPTIVE - Inverted for Dark BG) */
+    --color-text: #e5e7eb;            /* Light Gray Text for Dark BG */
+    --color-text-soft: #94a3b8;       /* Muted Light Gray */
+    
+    /* Border (ADAPTIVE) */
+    --color-border: rgba(148, 163, 184, 0.25);  /* Light border for Dark mode */
   }
 
   /* 
-    Partner & Admin themes now inherit the main theme to ensure consistency 
-    as requested ("Navy Blue" everywhere).
-    We can override specific semantic actions if needed, but for now, UNIFY.
+    Partner & Admin themes inherit from root/dark.
+    No overrides needed since we want unified Navy Blue everywhere.
   */
   .theme-partner, .theme-admin {
-    /* Inherit from root */
+    /* Inherit from root or .dark */
   }
 
   body {

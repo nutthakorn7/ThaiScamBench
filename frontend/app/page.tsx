@@ -97,37 +97,37 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border border-border bg-card">
-              <CardContent className="pt-8 pb-8 px-8">
-                <div className="mb-6 h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="h-8 w-8 text-primary" />
+            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
+              <CardContent className="pt-10 pb-10 px-10">
+                <div className="mb-8 h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-700/10 to-teal-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="h-10 w-10 text-blue-700" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">แม่นยำด้วย AI</h3>
-                <p className="text-muted-foreground leading-relaxed text-lg">
+                <h3 className="text-3xl font-black mb-6">แม่นยำด้วย AI</h3>
+                <p className="text-muted-foreground leading-relaxed text-xl">
                   โมเดล AI ของเราถูกเทรนด้วยข้อมูล Scam ภาษาไทยกว่า 100,000 รายการ เข้าใจบริบทและคำทับศัพท์
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="mb-4 h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-orange-500" />
+            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
+              <CardContent className="pt-10 pb-10 px-10">
+                <div className="mb-8 h-20 w-20 rounded-2xl bg-orange-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <AlertTriangle className="h-10 w-10 text-orange-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">รู้ทันทุกรูปแบบ</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-3xl font-black mb-6">รู้ทันทุกรูปแบบ</h3>
+                <p className="text-muted-foreground leading-relaxed text-xl">
                   ไม่ว่าจะเป็น SMS หลอกกู้เงิน, แก๊งคอลเซ็นเตอร์, เว็บพนัน หรือหลอกขายของออนไลน์
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="mb-4 h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-500" />
+            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
+              <CardContent className="pt-10 pb-10 px-10">
+                <div className="mb-8 h-20 w-20 rounded-2xl bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <TrendingUp className="h-10 w-10 text-green-500" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">อัปเดตตลอดเวลา</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-3xl font-black mb-6">อัปเดตตลอดเวลา</h3>
+                <p className="text-muted-foreground leading-relaxed text-xl">
                   ฐานข้อมูลของเราอัปเดตแบบ Real-time จากการแจ้งเบาะแสของผู้ใช้งานจริง
                 </p>
               </CardContent>

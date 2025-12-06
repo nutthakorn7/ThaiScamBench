@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Add when ready: google: 'your-google-site-verification',
+    google: '45767fffe95d9be5',
   },
 };
 

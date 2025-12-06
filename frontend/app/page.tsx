@@ -26,24 +26,25 @@ export default function Home() {
           }}
           className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
         >
-          <Badge variant="outline" className="mb-6 py-1.5 px-4 text-sm font-medium border-primary/30 bg-primary/10 text-primary backdrop-blur-sm rounded-full">
-            🚀 พัฒนาโดยทีม AI Research
+          <Badge variant="outline" className="mb-8 py-2 px-5 text-sm font-semibold border-primary/20 bg-primary/10 text-primary backdrop-blur-sm rounded-full inline-flex items-center gap-2">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+            พัฒนาโดยทีม AI Research
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
             รู้ทันมิจฉาชีพออนไลน์
             <br />
-            <span className="text-primary">ด้วยพลัง AI อัจฉริยะ</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%] animate-gradient">ด้วยพลัง AI อัจฉริยะ</span>
           </h1>
           
-          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
-            ตรวจสอบข้อความ SMS, ลิงก์เว็บพนัน หรือเลขบัญชีต้องสงสัยได้ทันที 
+          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-14 leading-relaxed">
+            ตรวจสอบข้อความ SMS, ลิงก์เว็บพนัน หรือเลขบัญชีต้องสงสัยได้ทันที<br className="hidden md:block" /> 
             ด้วยระบบประมวลผลภาษาธรรมชาติ (NLP) ที่แม่นยำที่สุดสำหรับภาษาไทย
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mx-auto">
-            <Link href="/check" className="w-full">
-              <Button size="lg" className="w-full h-12 text-base font-medium shadow-[0_0_30px_-10px_rgba(59,130,246,0.5)] hover:shadow-[0_0_30px_-5px_rgba(59,130,246,0.6)] transition-shadow">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto">
+            <Link href="/check" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-primary hover:bg-primary-hover shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
                 <Search className="mr-2 h-5 w-5" />
                 ตรวจสอบเลย
               </Button>
@@ -87,21 +88,21 @@ export default function Home() {
       </AuroraBackground>
 
       {/* Features Section */}
-      <section className="py-20 md:py-32 bg-secondary/20">
+      <section className="py-24 md:py-32">
         <div className="container px-4 mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">ทำไมต้อง Thai Scam Detector?</h2>
-            <p className="text-muted-foreground text-lg">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">ทำไมต้อง Thai Scam Detector?</h2>
+            <p className="text-muted-foreground text-xl max-w-2xl mx-auto leading-relaxed">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-              <CardContent className="pt-6">
-                <div className="mb-4 h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <ShieldCheck className="h-6 w-6 text-primary" />
+            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border border-border bg-card">
+              <CardContent className="pt-8 pb-8 px-8">
+                <div className="mb-6 h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ShieldCheck className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">แม่นยำด้วย AI</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-2xl font-bold mb-4">แม่นยำด้วย AI</h3>
+                <p className="text-muted-foreground leading-relaxed text-lg">
                   โมเดล AI ของเราถูกเทรนด้วยข้อมูล Scam ภาษาไทยกว่า 100,000 รายการ เข้าใจบริบทและคำทับศัพท์
                 </p>
               </CardContent>

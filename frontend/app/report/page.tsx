@@ -65,55 +65,57 @@ export default function ReportPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="text">1. ข้อความ / ลิงก์ / เลขบัญชี ที่ต้องการรายงาน</Label>
+            <div className="space-y-3">
+              <Label htmlFor="text" className="text-lg font-semibold">1. ข้อความ / ลิงก์ / เลขบัญชี ที่ต้องการรายงาน</Label>
               <div className="relative">
                 <textarea
                    id="text"
-                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                   placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน..."
+                   className="flex min-h-64 w-full rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
+                   placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน, เลขบัญชีที่น่าสงสัย..."
                    value={formData.text}
                    onChange={(e) => setFormData({...formData, text: e.target.value})}
                    required
+                   rows={10}
                 />
               </div>
             </div>
 
             <div className="space-y-4">
-              <Label>2. สิ่งนี้คือ Scam (มิจฉาชีพ) ใช่หรือไม่?</Label>
+              <Label className="text-lg font-semibold">2. สิ่งนี้คือ Scam (มิจฉาชีพ) ใช่หรือไม่?</Label>
               <div className="flex gap-4">
-                 <label className="flex items-center space-x-2 border p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors flex-1">
+                 <label className="flex items-center space-x-3 border-2 p-4 rounded-xl cursor-pointer hover:bg-accent transition-colors flex-1 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-600">
                     <input 
                         type="radio" 
                         name="is_scam" 
                         value="true" 
                         checked={formData.is_scam_actual === "true"}
                         onChange={(e) => setFormData({...formData, is_scam_actual: e.target.value})}
-                        className="h-4 w-4"
+                        className="h-5 w-5"
                     />
-                    <span>ใช่ (เป็น Scam)</span>
+                    <span className="text-base font-medium">ใช่ (เป็น Scam)</span>
                  </label>
-                 <label className="flex items-center space-x-2 border p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors flex-1">
+                 <label className="flex items-center space-x-3 border-2 p-4 rounded-xl cursor-pointer hover:bg-accent transition-colors flex-1 border-gray-200 dark:border-gray-700 hover:border-blue-600 dark:hover:border-blue-600">
                     <input 
                         type="radio" 
                         name="is_scam" 
                         value="false" 
                         checked={formData.is_scam_actual === "false"}
                         onChange={(e) => setFormData({...formData, is_scam_actual: e.target.value})}
-                        className="h-4 w-4"
+                        className="h-5 w-5"
                     />
-                    <span>ไม่ใช่ (ปลอดภัย)</span>
+                    <span className="text-base font-medium">ไม่ใช่ (ปลอดภัย)</span>
                  </label>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="comments">3. รายละเอียดเพิ่มเติม (ถ้ามี)</Label>
+            <div className="space-y-3">
+              <Label htmlFor="comments" className="text-lg font-semibold">3. รายละเอียดเพิ่มเติม (ถ้ามี)</Label>
                <Input
                   id="comments"
-                  placeholder="เช่น เบอร์โทรที่ส่งมา, ชื่อธนาคาร..."
+                  placeholder="เช่น เบอร์โทรที่ส่งมา, ชื่อธนาคาร, วิธีการติดต่อ..."
                   value={formData.comments}
                   onChange={(e) => setFormData({...formData, comments: e.target.value})}
+                  className="h-14 px-6 text-lg rounded-xl border-2 border-gray-200 dark:border-gray-700 focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 transition-all"
                 />
             </div>
 

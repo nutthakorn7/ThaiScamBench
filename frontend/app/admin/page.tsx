@@ -208,10 +208,14 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-       <div className="relative min-h-[calc(100vh-100px)]">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-red-500/5 via-transparent to-orange-500/5" />
-          <Content />
-       </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-4 py-8 max-w-7xl"
+      >
+        <Content />
+      </motion.div>
     </AdminLayout>
   );
 }

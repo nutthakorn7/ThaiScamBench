@@ -5,20 +5,14 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  ShieldAlert, 
-  LogOut,
-  AlertTriangle,
-  CheckCircle2
-} from "lucide-react";
+import { Loader2, Shield, ShieldAlert, CheckCircle2, Users, FileText, BarChart3, TrendingUp, LogOut, AlertTriangle } from "lucide-react";
 import { getAdminSummary, type SummaryStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import Footer from "@/components/Footer";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -148,32 +142,33 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
+          {/* Top Categories - Enhanced */}
           <div className="grid grid-cols-1 gap-6">
-             {/* Top Categories */}
             {stats?.top_categories && stats.top_categories.length > 0 && (
-              <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-border shadow-2xl">
                 <CardHeader>
-                  <CardTitle>Top Scam Categories</CardTitle>
-                  <CardDescription>ประเภทการหลอกลวงที่พบบ่อยที่สุด</CardDescription>
+                  <CardTitle className="text-2xl font-black">Top Scam Categories</CardTitle>
+                  <CardDescription className="text-base mt-1">ประเภทการหลอกลวงที่พบบ่อยที่สุด</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {stats.top_categories.map((cat, index) => (
-                      <div key={cat.category} className="flex items-center gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                          {index + 1}
+                      <div key={cat.category} className="group">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 font-bold text-base shadow-sm">
+                              {index + 1}
+                            </div>
+                            <span className="font-semibold text-base capitalize text-foreground">{cat.category.replace(/_/g, " ")}</span>
+                          </div>
+                          <span className="text-base font-bold text-muted-foreground">{cat.count.toLocaleString()} cases</span>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="font-medium capitalize text-foreground">{cat.category.replace(/_/g, " ")}</span>
-                            <span className="text-sm text-muted-foreground">{cat.count.toLocaleString()} cases</span>
-                          </div>
-                          <div className="relative h-2 bg-secondary/50 rounded-full overflow-hidden">
-                            <div
-                              className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-500 to-orange-500 rounded-full"
-                              style={{ width: `${cat.percentage}%` }}
-                            />
-                          </div>
+                        {/* Premium Progress Bar */}
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-red-600 to-orange-500 transition-all duration-500 group-hover:scale-x-105 origin-left"
+                            style={{ width: `${cat.percentage}%` }}
+                          />
                         </div>
                       </div>
                     ))}

@@ -60,6 +60,11 @@ export default function CheckPage() {
       console.log('[DEBUG] API response:', data);
       setResult(data);
       
+      // Add Haptic Feedback for Mobile (vibration pattern)
+      if (data.is_scam && typeof navigator !== "undefined" && navigator.vibrate) {
+        navigator.vibrate([100, 50, 100]);
+      }
+
       // Success toast
       if (data.risk_score >= 0.7) {
         toast.error("พบความเสี่ยงสูง!", { description: "โปรดระวังข้อความนี้" });
@@ -121,6 +126,7 @@ Request ID: ${result.request_id}`;
                   }}
                   className={cn(
                     "min-h-[150px] text-base md:text-lg resize-none p-4",
+                    "focus-visible:ring-blue-500/50 focus-visible:shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-shadow duration-300",
                     inputError && "border-red-500 focus-visible:ring-red-500"
                   )}
                   disabled={loading}

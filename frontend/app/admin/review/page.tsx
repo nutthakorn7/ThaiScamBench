@@ -23,6 +23,7 @@ import {
 import { getUncertainCases, type UncertainCasesResponse, type UncertainCase } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
+import { AdminLayout } from "@/components/AdminLayout";
 
 export default function ReviewPage() {
   const router = useRouter();
@@ -75,11 +76,8 @@ export default function ReviewPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AdminLayout>
       <div className="mb-8">
-        <Button variant="ghost" onClick={() => router.push('/admin')} className="mb-4">
-          ← กลับหน้าแรก
-        </Button>
         <h1 className="text-3xl font-bold">Cases for Review</h1>
         <p className="text-muted-foreground">กรณีที่ต้องตรวจสอบเพื่อปรับปรุง Model</p>
       </div>
@@ -174,7 +172,7 @@ export default function ReviewPage() {
                 {data.cases.map((case_: UncertainCase) => (
                   <TableRow key={case_.request_id}>
                     <TableCell>
-                      <Badge variant={getPriorityColor(case_.priority)} className="gap-1">
+                      <Badge variant={getPriorityColor(case_.priority) as any} className="gap-1">
                         {getPriorityIcon(case_.priority)}
                         {case_.priority}
                       </Badge>
@@ -218,6 +216,6 @@ export default function ReviewPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </AdminLayout>
   );
 }

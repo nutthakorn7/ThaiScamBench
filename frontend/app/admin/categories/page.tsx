@@ -58,11 +58,8 @@ export default function CategoriesPage() {
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AdminLayout>
       <div className="mb-8">
-        <Button variant="ghost" onClick={() => router.push('/admin')} className="mb-4">
-          ← กลับหน้าแรก
-        </Button>
         <h1 className="text-3xl font-bold">Category Distribution</h1>
         <p className="text-muted-foreground">การกระจายตัวของประเภท Scam</p>
       </div>
@@ -175,6 +172,6 @@ export default function CategoriesPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </AdminLayout>
   );
 }

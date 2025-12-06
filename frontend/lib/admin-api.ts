@@ -272,3 +272,41 @@ export const getFeedbackList = async (page: number = 1, pageSize: number = 50): 
   const response = await adminApi.get<FeedbackListResponse>(`/feedback?page=${page}&page_size=${pageSize}`);
   return response.data;
 };
+
+// -- User Management --
+
+export interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'user';
+  status: 'active' | 'banned';
+  last_login: string;
+  created_at: string;
+}
+
+export interface UserListResponse {
+  items: User[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+const getMockUsers = (page: number, pageSize: number): UserListResponse => ({
+  items: Array.from({ length: pageSize }, (_, i) => ({
+    id: `usr_${Date.now()}_${i}`,
+    email: `user${(page - 1) * pageSize + i + 1}@example.com`,
+    role: i === 0 ? 'admin' : 'user',
+    status: Math.random() > 0.9 ? 'banned' : 'active',
+    last_login: new Date(Date.now() - Math.random() * 864000000).toISOString(),
+    created_at: new Date(Date.now() - Math.random() * 31536000000).toISOString()
+  })),
+  total: 1240,
+  page,
+  page_size: pageSize
+});
+
+export const getUsers = async (page: number = 1, pageSize: number = 50): Promise<UserListResponse> => {
+  if (isBypassToken()) return getMockUsers(page, pageSize);
+  const response = await adminApi.get<UserListResponse>(`/users?page=${page}&page_size=${pageSize}`);
+  return response.data;
+};

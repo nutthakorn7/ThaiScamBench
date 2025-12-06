@@ -78,3 +78,25 @@ export const submitFeedback = async (data: FeedbackRequest) => {
         };
     }
 };
+
+export interface ReportRequest {
+    text: string;
+    is_scam: boolean;
+    additional_info?: string;
+    contact_info?: string;
+}
+
+export const submitReport = async (data: ReportRequest) => {
+    try {
+        const response = await api.post('/public/report', data);
+        return response.data;
+    } catch (error) {
+        console.warn("API Report Error, functioning in mock mode:", error);
+        // Mock success response
+        return {
+            status: "success",
+            message: "Report received (Mock)",
+            id: `rep_${Date.now()}`
+        };
+    }
+};

@@ -55,14 +55,22 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" suppressHydrationWarning>
       <body className={`${prompt.variable} ${inter.variable} font-sans`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
         <Toaster position="top-center" richColors expand={true} />
         <div className="flex min-h-screen flex-col">
           <Navbar />
@@ -71,6 +79,7 @@ export default function RootLayout({
         </div>
         <Analytics />
         <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );

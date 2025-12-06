@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ShieldAlert, Menu } from 'lucide-react';
+import { Menu, ShieldAlert } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Navbar() {
   return (
@@ -28,6 +29,7 @@ export default function Navbar() {
           <Link href="/partner/login" className="transition-colors hover:text-blue-600">
             สำหรับพาร์ทเนอร์
           </Link>
+          <ModeToggle />
           <Link 
             href="/check" 
             className="inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"

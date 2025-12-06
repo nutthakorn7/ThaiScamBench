@@ -55,23 +55,23 @@ export default function PartnerLoginPage() {
         }}
         className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4"
       >
-        <Card className="w-full max-w-lg shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border">          <CardHeader className="text-center space-y-6 pb-8 pt-10">
-            {/* Large Icon Container */}
-            <div className="mx-auto bg-blue-600/10 dark:bg-blue-600/20 p-5 rounded-2xl w-fit mb-2 ring-2 ring-blue-600/20">
-              <Shield className="h-10 w-10 text-blue-600" />
+        <Card className="w-full max-w-4xl shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border">          <CardHeader className="text-center space-y-4 pb-5 pt-6">
+            {/* Icon Container - Smaller */}
+            <div className="mx-auto bg-blue-600/10 dark:bg-blue-600/20 p-3 rounded-xl w-fit mb-1 ring-2 ring-blue-600/20">
+              <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <div>
               {/* HUGE Heading */}
-              <CardTitle className="text-5xl md:text-6xl font-black mb-4 text-slate-900 dark:text-white">
+              <CardTitle className="text-5xl md:text-6xl font-black mb-3 text-slate-900 dark:text-white">
                 Partner Portal
               </CardTitle>
-              <CardDescription className="mt-3 text-xl md:text-2xl text-muted-foreground">
+              <CardDescription className="mt-2 text-xl md:text-2xl text-muted-foreground">
                 ระบบจัดการสำหรับพาร์ทเนอร์และหน่วยงาน
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="px-10 pb-10">
-            <form onSubmit={handleLogin} className="space-y-6">
+          <CardContent className="px-10 pb-6">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-3">
                 <label className="text-lg font-semibold">API Key Access</label>
                 <div className="relative">

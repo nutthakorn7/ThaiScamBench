@@ -35,7 +35,7 @@ export default function Home() {
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight">
             รู้ทันมิจฉาชีพออนไลน์
             <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-teal-500 to-blue-700 animate-gradient">ด้วยพลัง AI อัจฉริยะ</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600">ด้วยพลัง AI อัจฉริยะ</span>
           </h1>
           
           <p className="text-lg md:text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-14 leading-relaxed">
@@ -91,9 +91,9 @@ export default function Home() {
       {/* Features Section */}
       <section className="py-24 md:py-32">
         <div className="container px-4 mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">ทำไมต้อง Thai Scam Detector?</h2>
-            <p className="text-muted-foreground text-xl max-w-2xl mx-auto leading-relaxed">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
+          <div className="text-center mb-24">
+            <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight">ทำไมต้อง Thai Scam Detector?</h2>
+            <p className="text-muted-foreground text-2xl max-w-3xl mx-auto leading-relaxed">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

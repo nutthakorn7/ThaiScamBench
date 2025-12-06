@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Loader2, Copy, CheckCircle2, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { detectScam, type DetectionResponse } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Loader2, Copy, CheckCircle2, AlertTriangle, Info } from "lucide-react";
+import confetti from "canvas-confetti";
 import { toast } from "sonner";
+import { StructuredData } from "@/components/StructuredData";
+import { checkBreadcrumb } from "@/lib/structured-data";
+import { detectScam, type DetectionResponse } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { AnimatedProgress } from "@/components/ui/animated-progress";
 import dynamic from 'next/dynamic';
@@ -104,7 +105,9 @@ Request ID: ${result.request_id}`;
   };
 
   return (
-    <div className="container px-4 py-8 md:py-12 mx-auto max-w-4xl">
+    <>
+      <StructuredData data={checkBreadcrumb} />
+      <div className="container px-4 py-8 md:py-12 mx-auto max-w-4xl">
       <div className="text-center mb-12 md:mb-16">
         <h1 className="text-5xl md:text-6xl font-black mb-6 text-slate-900 dark:text-white">
           ตรวจสอบความเสี่ยง
@@ -345,5 +348,6 @@ Request ID: ${result.request_id}`;
       </div>
       </div>
     </div>
+    </>
   );
 }

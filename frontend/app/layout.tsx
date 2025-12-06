@@ -74,6 +74,8 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { StructuredData } from "@/components/StructuredData";
+import { webApplicationSchema, organizationSchema } from "@/lib/structured-data";
 
 export default function RootLayout({
   children,
@@ -82,21 +84,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" suppressHydrationWarning>
-      <body className={`${prompt.variable} ${inter.variable} font-sans`}>
+      <body className={`${inter.variable} ${prompt.variable} ${ibmThai.variable} font-prompt antialiased`}>
+        <StructuredData data={[webApplicationSchema, organizationSchema]} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-        <Toaster position="top-center" richColors expand={true} />
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        <Analytics />
-        <SpeedInsights />
+          <div className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
+          <Toaster position="top-right" richColors />
+          <SpeedInsights />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

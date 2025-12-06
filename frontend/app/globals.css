@@ -69,36 +69,37 @@
   }
 
   /* 
-    THEME: PARTNER (Professional Blue/Clean)
+    THEME: PARTNER (Unified Cyberpunk Blue)
     Used for: /partner
   */
   .theme-partner {
-    --color-bg: oklch(1 0 0);              /* White */
-    --color-bg-elevated: oklch(0.985 0 0); /* Slate 50 */
-    --color-primary: oklch(0.5 0.15 260);  /* Blue 600 */
-    --color-accent: oklch(0.4 0.15 280);   /* Indigo 600 */
+    --color-bg: oklch(0.05 0 0);           /* Zinc 950 (Unified) */
+    --color-bg-elevated: oklch(0.1 0 0);   /* Zinc 900 */
+    --color-primary: oklch(0.6 0.15 250);  /* Blue 600 */
+    --color-accent: oklch(0.5 0.2 260);    /* Indigo 600 */
     --color-danger: oklch(0.5 0.2 25);     /* Red 600 */
-    --color-text: oklch(0.15 0.02 260);    /* Slate 900 */
-    --color-text-inverse: oklch(1 0 0);    /* White */
-    --color-text-soft: oklch(0.5 0.05 260);/* Slate 500 */
-    --color-border: oklch(0.9 0.02 260);   /* Slate 200 */
+    --color-text: oklch(0.985 0 0);        /* White */
+    --color-text-inverse: oklch(1 1 1);    /* White */
+    --color-text-soft: oklch(0.7 0.05 260);/* Zinc 400 */
+    --color-border: oklch(0.25 0.05 250);  /* Zinc 800 */
   }
 
   /* 
-    THEME: ADMIN (Security Red/Dark)
+    THEME: ADMIN (Unified Cyberpunk Red)
     Used for: /admin
   */
   .theme-admin {
-    --color-bg: oklch(0.08 0 0);           /* Neutral 950 */
-    --color-bg-elevated: oklch(0.12 0 0);  /* Neutral 900 */
-    --color-primary: oklch(0.5 0.2 25);    /* Red 600 (Admin Primary) */
-    --color-accent: oklch(0.6 0.15 40);    /* Orange 500 */
+    --color-bg: oklch(0.05 0 0);           /* Zinc 950 (Unified) */
+    --color-bg-elevated: oklch(0.1 0 0);   /* Zinc 900 */
+    --color-primary: oklch(0.5 0.2 25);    /* Red 600 */
+    --color-accent: oklch(0.65 0.2 40);    /* Orange 500 */
     --color-danger: oklch(0.4 0.2 25);     /* Darker Red */
-    --color-text: oklch(0.95 0 0);         /* Neutral 100 */
-    --color-text-inverse: oklch(1 0 0);    /* White */
-    --color-text-soft: oklch(0.6 0 0);     /* Neutral 500 */
-    --color-border: oklch(0.2 0 0);        /* Neutral 800 */
+    --color-text: oklch(0.985 0 0);        /* White */
+    --color-text-inverse: oklch(1 1 1);    /* White */
+    --color-text-soft: oklch(0.7 0.05 260);/* Zinc 400 */
+    --color-border: oklch(0.25 0.05 250);  /* Zinc 800 */
   }
+
 
   body {
     background-color: var(--color-bg);

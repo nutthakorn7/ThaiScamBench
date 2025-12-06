@@ -215,7 +215,7 @@ Request ID: ${result.request_id}`;
         )}>
 
           <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
                 {result.risk_score >= 0.7 ? <ShieldAlert className="text-red-500 h-6 w-6" /> :
                  result.risk_score >= 0.4 ? <AlertTriangle className="text-orange-500 h-6 w-6" /> :
@@ -227,19 +227,28 @@ Request ID: ${result.request_id}`;
                   result.risk_score >= 0.4 ? "text-orange-500" :
                   "text-green-500"
                 )}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFeedbackOpen(true)}
-                  className="gap-2"
-                >
+                  {result.risk_level}
+                </span>
+              </CardTitle>
+              
+              <div className="flex items-center gap-2">
+                <Badge variant={result.risk_score >= 0.7 ? "destructive" : "outline"} className={cn(
+                  "text-base px-3 py-1",
+                   result.risk_score < 0.7 && result.risk_score >= 0.4 ? "border-orange-500 text-orange-500 bg-orange-500/10" :
+                   result.risk_score < 0.4 ? "border-green-500 text-green-500 bg-green-500/10" : ""
+                )}>
+                  Score: {Math.round(result.risk_score * 100)}%
+                </Badge>
+                
+                <Button variant="outline" size="sm" onClick={() => setFeedbackOpen(true)} className="gap-2">
                   <MessageSquare className="h-4 w-4" />
-                  รายงานผล
+                  <span className="hidden sm:inline">แจ้งเบาะแส/รายงาน</span>
                 </Button>
               </div>
             </div>
-            <CardDescription>
-              ผลการวิเคราะห์โดย AI (Request ID: <span className="font-mono text-xs">{result.request_id}</span>)
+            <CardDescription className="mt-2 text-xs text-muted-foreground flex items-center justify-between">
+              <span>ผลการวิเคราะห์โดย AI (เวอร์ชันทดสอบ)</span>
+              <span className="font-mono opacity-50">Ref: {result.request_id}</span>
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { submitFeedback } from "@/lib/api";
 
 export default function ReportPage() {
   const [formData, setFormData] = useState({
@@ -26,16 +25,14 @@ export default function ReportPage() {
     setSuccess(false);
 
     try {
-      await submitFeedback({
-        text: formData.text,
-        is_scam_actual: formData.is_scam_actual === "true",
-        feedback_type: 'general', // Defaulting to general for new reports
-        comments: formData.comments
-      });
+      // TODO: Implement proper report API endpoint
+      // For now, just show success (report feature coming soon)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       setSuccess(true);
       setFormData({ text: "", is_scam_actual: "true", comments: "" });
     } catch (err) {
-      setError("ไม่สามารถส่งข้อมูลได้ กรุณาลongใหม่ภายหลัง");
+      setError("ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่ภายหลัง");
       console.error(err);
     } finally {
       setLoading(false);

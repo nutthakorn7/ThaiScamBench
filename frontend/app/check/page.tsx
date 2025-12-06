@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, ShieldCheck, ShieldAlert, AlertTriangle, Loader2, Copy, CheckCircle2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -109,17 +110,17 @@ Request ID: ${result.request_id}`;
       <Card className="border-blue-500/20 shadow-lg shadow-blue-500/5 mb-8">
         <CardContent className="pt-6">
           <form onSubmit={handleCheck} className="space-y-3">
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4">
               <div className="flex-1">
-                <Input
-                  placeholder="วางข้อความ, ลิงก์ หรือเลขบัญชีที่นี่..."
+                <Textarea
+                  placeholder="วางข้อความ SMS, ลิงก์ หรือเลขบัญชีที่ต้องการตรวจสอบที่นี่..."
                   value={input}
                   onChange={(e) => {
                     setInput(e.target.value);
                     setInputError("");
                   }}
                   className={cn(
-                    "h-12 text-lg",
+                    "min-h-[150px] text-base md:text-lg resize-none p-4",
                     inputError && "border-red-500 focus-visible:ring-red-500"
                   )}
                   disabled={loading}
@@ -127,7 +128,7 @@ Request ID: ${result.request_id}`;
                 {inputError && (
                   <p className="text-sm text-red-500 mt-1">{inputError}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1 flex justify-between">
+                <p className="text-xs text-muted-foreground mt-2 flex justify-between items-center">
                   <span>{input.length} ตัวอักษร {input.length >= 5 ? "✓" : "(อย่างน้อย 5)"}</span>
                   <button
                     type="button"
@@ -144,25 +145,25 @@ Request ID: ${result.request_id}`;
                         setInput(randomExample);
                         setInputError("");
                     }}
-                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer py-2 px-2 -mr-2"
+                    className="text-blue-500 hover:text-blue-600 hover:underline cursor-pointer py-1 px-2 rounded hover:bg-blue-50/50 transition-colors"
                   >
                     🎲 ลองดูตัวอย่าง
                   </button>
                 </p>
               </div>
+              
               <Button 
                 type="submit" 
                 size="lg" 
-                className="h-12 px-8" 
+                className="w-full h-12 text-lg shadow-lg shadow-blue-500/20" 
                 disabled={loading || input.trim().length < 5}
               >
                 {loading ? (
-                   <Loader2 className="h-5 w-5 animate-spin" />
+                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
                 ) : (
-                  <>
-                    <Search className="mr-2 h-5 w-5" /> ตรวจสอบ
-                  </>
+                  <Search className="mr-2 h-5 w-5" />
                 )}
+                {loading ? "กำลังตรวจสอบ..." : "ตรวจสอบความเสี่ยง"}
               </Button>
             </div>
             

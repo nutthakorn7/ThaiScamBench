@@ -78,46 +78,62 @@ export default function PartnerDashboard() {
           >
             {/* Stats Grid */}
             <div className="grid gap-6 md:grid-cols-3">
-              <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-                  <Activity className="h-4 w-4 text-primary" />
+              {/* Total Requests - Blue */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-400">Total Requests</CardTitle>
+                  <Activity className="h-6 w-6 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{data.total_requests.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {/* HUGE Number */}
+                  <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-400 mb-2">
+                    {data.total_requests.toLocaleString()}
+                  </div>
+                  <p className="text-sm text-blue-700/70 dark:text-blue-300/70 mb-3">
                     Limit: {data.requests_limit.toLocaleString()} / month
                   </p>
-                  <div className="mt-3 h-2 w-full bg-secondary/50 rounded-full overflow-hidden">
+                  {/* Gradient Progress Bar */}
+                  <div className="mt-4 h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-primary to-accent" 
+                      className="h-full bg-gradient-to-r from-blue-600 to-blue-400" 
                       style={{ width: `${Math.min((data.total_requests / data.requests_limit) * 100, 100)}%` }} 
                     />
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Scam Detected</CardTitle>
-                  <Shield className="h-4 w-4 text-red-500" />
+              {/* Scam Detected - Red */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-400">Scam Detected</CardTitle>
+                  <Shield className="h-6 w-6 text-red-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-red-500">{data.scam_detected.toLocaleString()}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {/* HUGE Number */}
+                  <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-400 mb-2">
+                    {data.scam_detected.toLocaleString()}
+                  </div>
+                  <p className="text-sm text-red-700/70 dark:text-red-300/70">
                      {(data.total_requests > 0 ? (data.scam_detected / data.total_requests * 100) : 0).toFixed(1)}% of total traffic
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-card/60 backdrop-blur-xl border-border/50 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">API Status</CardTitle>
-                  <div className="h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]" />
+              {/* API Status - Green */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-400">API Status</CardTitle>
+                  <div className="h-4 w-4 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] animate-pulse" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-500">Operational</div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {/* HUGE Text */}
+                  <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-400 mb-2">
+                    ✓
+                  </div>
+                  <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-1">
+                    Operational
+                  </div>
+                  <p className="text-sm text-green-700/70 dark:text-green-300/70">
                     Latency: 45ms (avg)
                   </p>
                 </CardContent>
@@ -190,6 +206,15 @@ export default function PartnerDashboard() {
             </Card>
           </motion.div>
         </main>
+
+        {/* Footer */}
+        <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md mt-auto">
+          <div className="container mx-auto px-4 py-6">
+            <p className="text-center text-sm text-muted-foreground">
+              © 2025 Thai Scam Detector. All rights reserved.
+            </p>
+          </div>
+        </footer>
       </div>
     </AuroraBackground>
   );

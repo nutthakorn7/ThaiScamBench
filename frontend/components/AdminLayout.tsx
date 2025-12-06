@@ -73,7 +73,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-blue-600" />
+            <Shield className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold">Admin Panel</h1>
           </div>
           <Button variant="outline" size="sm" onClick={handleLogout}>

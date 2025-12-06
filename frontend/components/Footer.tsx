@@ -13,10 +13,10 @@ export default function Footer() {
             <div>
               <h3 className="text-lg font-semibold mb-4">เมนูลัด</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="/" className="hover:text-primary">หน้าแรก</a></li>
-                <li><a href="/check" className="hover:text-primary">ตรวจสอบข้อความ</a></li>
-                <li><a href="/report" className="hover:text-primary">แจ้งเบาะแส</a></li>
-                <li><a href="/privacy" className="hover:text-primary">นโยบายความเป็นส่วนตัว</a></li>
+                <li><a href="/" className="hover:text-blue-700">หน้าแรก</a></li>
+                <li><a href="/check" className="hover:text-blue-700">ตรวจสอบข้อความ</a></li>
+                <li><a href="/report" className="hover:text-blue-700">แจ้งเบาะแส</a></li>
+                <li><a href="/privacy" className="hover:text-blue-700">นโยบายความเป็นส่วนตัว</a></li>
                 <li><a href="/partner/login" className="hover:text-amber-600 font-medium">Partner Portal</a></li>
               </ul>
             </div>

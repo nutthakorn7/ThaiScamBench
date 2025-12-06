@@ -208,61 +208,25 @@ Request ID: ${result.request_id}`;
               transition={{ duration: 0.5 }}
             >
             <Card className={cn(
-              "overflow-hidden border-2 duration-500",
-              result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
-              result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
-              "border-green-500/50 bg-green-500/5"
-            )}>
+          "overflow-hidden border-2 duration-500",
+          result.risk_score >= 0.7 ? "border-red-500/50 bg-red-500/5" :
+          result.risk_score >= 0.4 ? "border-orange-500/50 bg-orange-500/5" :
+          "border-green-500/50 bg-green-500/5"
+        )}>
 
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl flex items-center gap-2">
-                {result.risk_score >= 0.7 ? (
-                  <>
-                    <ShieldAlert className="h-6 w-6 text-red-500" />
-                    <span className="text-red-500">อันตราย! พบความเสี่ยงสูง</span>
-                  </>
-                ) : result.risk_score >= 0.4 ? (
-                  <>
-                    <AlertTriangle className="h-6 w-6 text-orange-500" />
-                    <span className="text-orange-500">น่าสงสัย! โปรดระวัง</span>
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-6 w-6 text-green-500" />
-                    <span className="text-green-500">ปลอดภัย</span>
-                  </>
-                )}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <Badge variant={
-                  result.risk_score >= 0.7 ? "destructive" :
-                  result.risk_score >= 0.4 ? "secondary" : 
-                  "default"
-                } className={cn(
-                  "text-sm px-3 py-1",
-                  result.risk_score < 0.4 && "bg-green-500 hover:bg-green-600 border-transparent text-white"
+              <CardTitle className="text-xl md:text-2xl flex items-center gap-2">
+                {result.risk_score >= 0.7 ? <ShieldAlert className="text-red-500 h-6 w-6" /> :
+                 result.risk_score >= 0.4 ? <AlertTriangle className="text-orange-500 h-6 w-6" /> :
+                 <CheckCircle2 className="text-green-500 h-6 w-6" />}
+                ผลการวิเคราะห์: 
+                <span className={cn(
+                  "font-bold",
+                  result.risk_score >= 0.7 ? "text-red-500" :
+                  result.risk_score >= 0.4 ? "text-orange-500" :
+                  "text-green-500"
                 )}>
-                  Risk Score: {(result.risk_score * 100).toFixed(1)}%
-                </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="gap-2"
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      คัดลอกแล้ว
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      คัดลอก
-                    </>
-                  )}
-                </Button>
                 <Button
                   variant="outline"
                   size="sm"

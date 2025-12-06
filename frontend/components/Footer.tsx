@@ -29,8 +29,14 @@ export default function Footer() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t text-center text-sm text-gray-500">
-            <p>&copy; {new Date().getFullYear()} Thai Scam Detector. All rights reserved.</p>
-          </div>
+          <p>
+            &copy; {new Date().getFullYear()} Thai Scam Detector. All rights reserved.
+            <span className="mx-2">|</span>
+            <a href="/admin/login" className="text-gray-300 hover:text-gray-500 transition-colors text-xs">
+              Staff Login
+            </a>
+          </p>
+        </div>
         </div>
       </footer>
     );

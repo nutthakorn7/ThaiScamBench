@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.middleware.admin_auth import verify_admin_token
+from app.middleware.auth import verify_admin_token
 from app.services.stats_service import get_summary_stats, get_partner_stats, get_category_distribution, get_recent_activity
 from app.models.pagination import PaginationParams, PaginatedResponse
 from typing import Optional

@@ -9,6 +9,9 @@ export interface BlogPost {
   category: string;
   readTime: string;
   coverImage: string;
+  keywords: string[];
+  description: string;
+  dateISO: string;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -38,7 +41,10 @@ export const blogPosts: BlogPost[] = [
     author: "ThaiScamDetector Team",
     category: "ความรู้ทั่วไป",
     readTime: "3 นาที",
-    coverImage: "/images/blog/sms-scam.png"
+    coverImage: "/images/blog/sms-scam.png",
+    keywords: ["SMS หลอกลวง", "Smishing", "มิจฉาชีพ", "หลอกกดลิงก์", "เตือนภัยไซเบอร์"],
+    description: "รู้ทันกลโกง SMS ปลอม (Smishing) ที่แอบอ้างเป็นธนาคารหรือหน่วยงานรัฐ พร้อม 5 จุดสังเกตง่ายๆ เพื่อป้องกันตัวเองจากมิจฉาชีพ",
+    dateISO: "2025-12-07T09:00:00+07:00"
   },
   {
     id: "2",
@@ -65,7 +71,10 @@ export const blogPosts: BlogPost[] = [
     author: "Legal Team",
     category: "กฎหมายควรรู้",
     readTime: "4 นาที",
-    coverImage: "/images/blog/mule-account.png"
+    coverImage: "/images/blog/mule-account.png",
+    keywords: ["บัญชีม้า", "รับจ้างเปิดบัญชี", "กฎหมายไซเบอร์", "ฟอกเงิน", "โทษจำคุก"],
+    description: "บัญชีม้าคืออะไร? ทำไมการรับจ้างเปิดบัญชีถึงมีโทษหนักถึงจำคุก เปิดข้อกฎหมายใหม่และวิธีป้องกันตัวเองไม่ให้ตกเป็นเหยื่อ",
+    dateISO: "2025-12-06T09:00:00+07:00"
   },
   {
     id: "3",
@@ -90,7 +99,10 @@ export const blogPosts: BlogPost[] = [
     author: "ThaiScamDetector Team",
     category: "วิธีป้องกันตัว",
     readTime: "3 นาที",
-    coverImage: "/images/blog/online-shopping.png"
+    coverImage: "/images/blog/online-shopping.png",
+    keywords: ["ซื้อของออนไลน์", "โกงออนไลน์", "เช็คเครดิตคนขาย", "โอนแล้วหนี", "มิจฉาชีพ"],
+    description: "รวมเทคนิคซื้อของออนไลน์ให้ปลอดภัย วิธีเช็คประวัติคนโกง และ Checklist สำคัญก่อนโอนเงิน เพื่อไม่ให้ตกเป็นเหยื่อร้านค้าปลอม",
+    dateISO: "2025-12-05T09:00:00+07:00"
   },
   {
     id: "4",
@@ -115,6 +127,9 @@ export const blogPosts: BlogPost[] = [
     author: "Security Analyst",
     category: "เตือนภัย",
     readTime: "5 นาที",
-    coverImage: "/images/blog/romance-scam.png"
-  }
+    coverImage: "/images/blog/romance-scam.png",
+    keywords: ["Romance Scam", "หลอกให้รัก", "หลอกโอนเงิน", "แอปหาคู่", "ฝรั่งหลอกโอนเงิน"],
+    description: "เจาะลึก Romance Scam กลลวงหลอกให้รักแล้วโอนเงิน รู้ทันพฤติกรรมมิจฉาชีพในแอปหาคู่ และวิธีป้องกันตัวเองจากความรักจอมปลอม",
+    dateISO: "2025-12-04T09:00:00+07:00"
+  },
 ];

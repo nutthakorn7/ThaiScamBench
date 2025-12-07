@@ -1,19 +1,52 @@
-"use client";
-
-import { use, useEffect, useState } from "react";
+import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, Clock, User, Facebook, Twitter, Linkedin, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, User, Share2 } from "lucide-react";
 import { blogPosts } from "@/lib/blog-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import ShareButtons from "@/components/Blog/ShareButtons";
 
-// This is correct for Next.js 16/15 using React.use() for params
-export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Unwrap params using React.use()
-  const { slug } = use(params);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((p) => p.slug === slug);
+
+  if (!post) {
+    return {
+      title: "Blog Post Not Found | ThaiScamDetector",
+    };
+  }
+
+  return {
+    title: `${post.title} | ThaiScamDetector`,
+    description: post.description,
+    keywords: post.keywords,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      url: `https://thaiscam.zcr.ai/blog/${post.slug}`,
+      images: [
+        {
+          url: post.coverImage,
+          width: 800,
+          height: 600,
+          alt: post.title,
+        },
+      ],
+      publishedTime: post.dateISO,
+      authors: [post.author],
+    },
+    alternates: {
+      canonical: `https://thaiscam.zcr.ai/blog/${post.slug}`,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   
   const post = blogPosts.find((p) => p.slug === slug);
 
@@ -26,8 +59,29 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
     .filter(p => p.category === post.category && p.id !== post.id)
     .slice(0, 2);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.description,
+    "image": [
+      `https://thaiscamdetector.com${post.coverImage}`
+    ],
+    "datePublished": post.dateISO,
+    "author": [{
+        "@type": "Organization",
+        "name": post.author,
+        "url": "https://thaiscamdetector.com"
+      }]
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
       {/* Header Image */}
       <div className="relative h-[400px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
@@ -85,17 +139,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
             <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Share2 className="h-5 w-5" /> แบ่งปันบทความนี้:
             </span>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" className="rounded-full hover:text-blue-600 hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                <Facebook className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full hover:text-sky-500 hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/20">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full hover:text-blue-700 hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20">
-                <Linkedin className="h-4 w-4" />
-              </Button>
-            </div>
+            <ShareButtons slug={post.slug} title={post.title} />
           </div>
         </article>
 

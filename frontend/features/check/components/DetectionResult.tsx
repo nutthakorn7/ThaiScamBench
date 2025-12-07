@@ -213,7 +213,32 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
                 className="gap-2 rounded-full hover:bg-muted/50"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">แจ้งเบาะแสเพิ่มเติม</span>
+                <span className="hidden sm:inline">แจ้งเบาะแส</span>
+              </Button>
+
+              <Button
+                variant="default" // Primary action
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await navigator.share({
+                      title: 'Warning - ThaiScamBench',
+                      text: `⚠️ เตือนภัย! ฉันเพิ่งตรวจสอบข้อความนี้: "${result.risk_score >= 0.7 ? 'เสี่ยงสูง 🚨' : 'ปลอดภัย ✅'}" เช็คข้อความของคุณที่นี่:`,
+                      url: `https://thaiscam.zcr.ai?title=${encodeURIComponent(result.risk_score >= 0.7 ? 'เตือนภัยมิจฉาชีพ! 🚨' : 'ปลอดภัย ✅')}&variant=${result.risk_score >= 0.7 ? 'scam' : 'safe'}`,
+                    });
+                  } catch (err) {
+                    console.error("Share failed", err);
+                  }
+                }}
+                className={cn(
+                  "gap-2 rounded-full text-white shadow-lg transition-all hover:scale-105",
+                  result.risk_score >= 0.7 
+                    ? "bg-red-600 hover:bg-red-700 shadow-red-500/20" 
+                    : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20"
+                )}
+              >
+                <span className="text-lg">📢</span>
+                <span className="font-bold">เตือนเพื่อน</span>
               </Button>
             </div>
           </motion.div>

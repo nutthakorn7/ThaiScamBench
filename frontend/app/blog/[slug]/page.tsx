@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, User, Facebook, Twitter, Linkedin, Share2 } from "lucide-react";
 import { blogPosts } from "@/lib/blog-data";
@@ -30,10 +31,12 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
       {/* Header Image */}
       <div className="relative h-[400px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-slate-900/40 z-10" />
-        <img 
+        <Image 
           src={post.coverImage} 
           alt={post.title}
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
+          priority
         />
         <div className="absolute inset-0 z-20 flex flex-col justify-end container mx-auto px-4 pb-12">
           <Link href="/blog">
@@ -105,11 +108,13 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
               <div className="space-y-6">
                 {relatedPosts.map((related) => (
                   <Link key={related.id} href={`/blog/${related.slug}`} className="group block">
-                    <div className="aspect-video rounded-lg overflow-hidden mb-3">
-                      <img 
+                    <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
+                      <Image 
                         src={related.coverImage} 
                         alt={related.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        sizes="(max-width: 768px) 100vw, 33vw"
                       />
                     </div>
                     <h4 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-2">

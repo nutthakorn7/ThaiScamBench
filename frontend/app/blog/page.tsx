@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Clock, Calendar, ChevronRight, BookOpen } from "lucide-react";
 import { useState } from "react";
 
@@ -114,12 +115,14 @@ export default function BlogIndexPage() {
               <div className="group relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl transition-all hover:shadow-2xl">
                 <div className="grid md:grid-cols-2">
                   <div className="relative h-64 md:h-auto overflow-hidden">
-                    <img 
+                    <Image 
                       src={featuredPost.coverImage} 
                       alt={featuredPost.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      priority
                     />
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 z-10">
                       <Badge className="bg-blue-600/90 text-white backdrop-blur-sm border-none">
                         Featured
                       </Badge>
@@ -163,12 +166,14 @@ export default function BlogIndexPage() {
               <Link href={`/blog/${post.slug}`}>
                 <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 group bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                   <div className="relative h-48 overflow-hidden">
-                    <img 
+                    <Image
                       src={post.coverImage} 
                       alt={post.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div className="absolute top-3 left-3">
+                    <div className="absolute top-3 left-3 z-10">
                       <Badge variant="secondary" className="backdrop-blur-md bg-white/80 dark:bg-black/60">
                         {post.category}
                       </Badge>

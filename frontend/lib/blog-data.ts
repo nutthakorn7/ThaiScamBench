@@ -38,7 +38,7 @@ export const blogPosts: BlogPost[] = [
     author: "ThaiScamDetector Team",
     category: "ความรู้ทั่วไป",
     readTime: "3 นาที",
-    coverImage: "https://images.unsplash.com/photo-1596526131083-ab97e6417724?auto=format&fit=crop&q=80&w=800"
+    coverImage: "/images/blog/sms-scam.png"
   },
   {
     id: "2",
@@ -65,7 +65,7 @@ export const blogPosts: BlogPost[] = [
     author: "Legal Team",
     category: "กฎหมายควรรู้",
     readTime: "4 นาที",
-    coverImage: "https://images.unsplash.com/photo-1579621970563-ebec7560eb3e?auto=format&fit=crop&q=80&w=800"
+    coverImage: "/images/blog/mule-account.png"
   },
   {
     id: "3",
@@ -90,7 +90,7 @@ export const blogPosts: BlogPost[] = [
     author: "ThaiScamDetector Team",
     category: "วิธีป้องกันตัว",
     readTime: "3 นาที",
-    coverImage: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&q=80&w=800"
+    coverImage: "/images/blog/online-shopping.png"
   },
   {
     id: "4",
@@ -115,6 +115,6 @@ export const blogPosts: BlogPost[] = [
     author: "Security Analyst",
     category: "เตือนภัย",
     readTime: "5 นาที",
-    coverImage: "https://images.unsplash.com/photo-1516575334481-f85287c2c81d?auto=format&fit=crop&q=80&w=800"
+    coverImage: "/images/blog/romance-scam.png"
   }
 ];

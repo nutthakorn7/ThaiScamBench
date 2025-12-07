@@ -104,6 +104,63 @@ Content-Type: application/json
 
 ---
 
+## 📂 Project Structure
+
+```
+ThaiScamBench/
+├── app/                    # Backend API (FastAPI)
+│   ├── api/               # API route handlers
+│   ├── core/              # Core utilities and exceptions
+│   ├── middleware/        # Authentication, security, rate limiting
+│   ├── models/            # Database models and schemas
+│   ├── services/          # Business logic
+│   └── utils/             # Helper functions
+│
+├── frontend/              # Next.js 14 Frontend
+│   ├── app/              # App Router pages
+│   ├── components/       # Reusable React components
+│   ├── features/         # Feature-specific components
+│   └── lib/              # Client utilities
+│
+├── scripts/              # Utility scripts (see scripts/README.md)
+│   ├── deployment/      # Deployment and provisioning
+│   ├── migrations/      # Database migrations
+│   ├── utils/           # Helper scripts
+│   └── maintenance/     # Cleanup and testing
+│
+├── docs/                 # Documentation
+├── data/                 # Database files (local dev)
+├── datasets/             # Training and test datasets
+├── tests/                # Test suites
+│   ├── unit/
+│   ├── integration/
+│   └── load/
+│
+└── docker-compose.yml    # Production deployment config
+```
+
+---
+
+## 🛠️ Scripts
+
+We have organized utility scripts into logical categories. For detailed documentation:
+
+👉 **See [scripts/README.md](scripts/README.md)** for all available scripts and usage examples.
+
+Quick examples:
+```bash
+# Create a new partner API account
+python scripts/utils/create_partner.py
+
+# Run production tests
+python scripts/maintenance/production_test.py
+
+# Deploy to production
+./scripts/deployment/deploy.sh
+```
+
+---
+
 ## 📄 License
 MIT License © 2024 ThaiScamBench Team
 

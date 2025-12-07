@@ -8,12 +8,12 @@ const nextConfig: NextConfig = {
         source: '/api/:path*',
         destination: process.env.NEXT_PUBLIC_API_URL 
           ? `${process.env.NEXT_PUBLIC_API_URL}/:path*`
-          : 'http://172.104.171.16:8000/api/:path*',
+          : 'https://api.thaiscam.zcr.ai/v1/:path*',
       },
   // Admin API fallback if needed
       {
          source: '/admin-api/:path*',
-         destination: 'http://172.104.171.16:8000/api/v1/admin/:path*'
+         destination: 'https://api.thaiscam.zcr.ai/v1/admin/:path*'
       }
     ]
   },

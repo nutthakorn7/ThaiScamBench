@@ -174,6 +174,12 @@ if os.path.exists(frontend_dir):
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 
 
+from apscheduler.schedulers.background import BackgroundScheduler
+from app.tasks.adaptive_security import run_promote_threats_task
+
+# Initialize Scheduler
+scheduler = BackgroundScheduler()
+
 @app.on_event("startup")
 async def startup_event():
     """Application startup event"""
@@ -188,11 +194,20 @@ async def startup_event():
     init_db()
     logger.info("✅ Database initialized")
 
+    # Start Scheduler (Adaptive Security)
+    if settings.environment == "dev" or settings.environment == "prod":  # Run in both for now
+        scheduler.add_job(run_promote_threats_task, 'interval', minutes=60)
+        scheduler.start()
+        logger.info("⏰ Adaptive Security Scheduler started (Every 60 mins)")
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Application shutdown event"""
     logger.info("👋 Shutting down Thai Scam Detection API")
+    if scheduler.running:
+        scheduler.shutdown()
+        logger.info("⏰ Scheduler shut down")
 
 
 # Root endpoint

@@ -335,6 +335,74 @@ class DetectionService:
         except Exception as e:
             logger.warning(f"Failed to cache result: {e}")
 
+    async def submit_manual_report(
+        self,
+        message: str,
+        is_scam: bool,
+        details: Optional[str] = None
+    ) -> DetectionResponse:
+        """
+        Submit a manual report (Crowd Wisdom Source)
+        """
+        try:
+            if not message or not message.strip():
+                raise ValidationError("Message cannot be empty")
+            
+            clean_message = sanitize_message(message)
+            message_hash = hash_message(clean_message)
+            
+            # Construct standard fields based on user report
+            final_risk_score = 1.0 if is_scam else 0.0
+            category = "start_form_report" if is_scam else "safe_report"
+            reason = f"User Reported: {details if details else 'No details'}"
+            advice = "Beware! This was reported by a community member." if is_scam else "Marked as safe by community."
+            
+            # Create Detection Record
+            detection = self.detection_repo.create_detection(
+                message_hash=message_hash,
+                category=category,
+                risk_score=final_risk_score,
+                is_scam=is_scam,
+                reason=reason,
+                advice=advice,
+                model_version="crowd-v1.0",
+                source="report",
+                partner_id=None,
+                metadata={
+                    "details": details,
+                    "manual_report": True
+                }
+            )
+            
+            # Save Raw for training
+            if settings.collect_training_data:
+                 dataset_entry = Dataset(
+                    request_id=detection.request_id,
+                    source="report",
+                    content=clean_message,
+                    labeled_category=category,
+                    is_scam=is_scam
+                )
+                 self.db.add(dataset_entry)
+                 self.db.commit()
+            
+            logger.info(f"📝 Manual Report Saved: {message[:20]}... is_scam={is_scam}")
+            
+            return DetectionResponse(
+                is_scam=is_scam,
+                risk_score=final_risk_score,
+                category=category,
+                reason=reason,
+                advice=advice,
+                model_version="crowd-v1.0",
+                llm_version="manual",
+                request_id=detection.request_id
+            )
+            
+        except Exception as e:
+            logger.error(f"Manual report error: {e}", exc_info=True)
+            raise ServiceError(f"Report failed: {str(e)}")
+
     def _build_response_from_detection(self, detection) -> DetectionResponse:
         """Build response from cached detection record"""
         return DetectionResponse(

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.schemas import PublicDetectRequest, PublicDetectResponse
+from app.models.schemas import PublicDetectRequest, PublicDetectResponse, PublicReportRequest
 from app.services.detection_service import DetectionService, DetectionRequest
 from app.dependencies import get_detection_service
 from app.config import settings
@@ -106,3 +106,56 @@ async def get_wiki_data(
         "is_safe": result.risk_score < 0.5,
         "last_updated": "Today" 
     }
+
+
+@router.post(
+    "/report",
+    summary="แจ้งเบาะแส (Report)",
+    description="รับแจ้งเบาะแสจากผู้ใช้ (Crowd Reporting)"
+)
+@limiter.limit("10/minute")
+async def report_scam(
+    request: Request,
+    body: PublicReportRequest,
+    service: DetectionService = Depends(get_detection_service)
+):
+    """
+    Endpoint for users to manually report scams.
+    These reports act as 'Crowd Wisdom' feeding into Layer 3.
+    """
+    try:
+        # We process this as a 'detection' but force the result based on user input
+        # This allows us to use the same pipeline and storage
+        
+        # 1. Create a pseudo-request
+        detect_request = DetectionRequest(
+            message=body.text,
+            channel="web_report",
+            user_ref=None
+        )
+        
+        # 2. Use service to hash and save, but we need to override the result.
+        # Since 'detect_scam' usually runs analysis, we might want a simpler method 
+        # specifically for saving 'raw reports'.
+        # However, to be consistent with 'get_scam_count', we need it in the Detection table.
+        
+        # Hack: We use the repo directly via service to save a 'forced' record?
+        # Better: Implementation usage of 'service.report_scam_manual' (if it existed)
+        # For now, we reuse detect pipeline but add specific extra data?
+        # NO, that's slow and expensive (AI call).
+        
+        # Let's add a dedicated method to DetectionService or just do it here.
+        # Ideally logic belongs in Service.
+        
+        return await service.submit_manual_report(
+            message=body.text,
+            is_scam=body.is_scam,
+            details=body.additional_info
+        )
+        
+    except Exception as e:
+        logger.error(f"Report submission error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"ไม่สามารถบันทึกข้อมูลได้: {str(e)}"
+        )

@@ -174,3 +174,12 @@ class HealthCheckResponse(BaseModel):
                 "environment": "dev"
             }
         }
+
+
+class PublicReportRequest(BaseModel):
+    """Request model for manual scam reporting"""
+    text: str = Field(..., description="Message text or details")
+    is_scam: bool = Field(..., description="Flag if it is considered a scam")
+    additional_info: Optional[str] = Field(None, description="Additional comments")
+    contact_info: Optional[str] = Field(None, description="Optional contact info")
+

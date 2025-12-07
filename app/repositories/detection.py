@@ -101,6 +101,29 @@ class DetectionRepository(BaseRepository[Detection]):
         except Exception as e:
             raise DatabaseError(f"Failed to query detection by hash: {str(e)}")
     
+    def get_scam_count(self, message_hash: str) -> int:
+        """
+        Count how many times this message was flagged as scam
+        
+        Args:
+            message_hash: Message hash
+            
+        Returns:
+            Number of times flagged as scam
+        """
+        try:
+            return (
+                self.db.query(func.count(Detection.id))
+                .filter(
+                    Detection.message_hash == message_hash,
+                    Detection.is_scam == True
+                )
+                .scalar()
+            ) or 0
+        except Exception as e:
+            logger.error(f"Failed to count scam reports: {e}")
+            return 0
+    
     def get_recent_detections(
         self, 
         limit: int = 100,

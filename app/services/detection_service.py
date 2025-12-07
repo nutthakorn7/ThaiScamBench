@@ -169,7 +169,7 @@ class DetectionService:
                 is_scam=class_result.is_scam
             )
             
-            # 6. Hybrid Logic Override (Layer 2)
+            # 6. Hybrid Logic Override (Layer 2 - AI)
             # If Explainer used LLM, use its judgement for final verdict
             final_risk_score = class_result.risk_score
             final_is_scam = class_result.is_scam
@@ -182,7 +182,24 @@ class DetectionService:
                     logger.info(f"🤖 AI Override: Rule({class_result.risk_score}) -> AI({ai_risk})")
                     final_risk_score = float(ai_risk)
                     final_is_scam = bool(ai_is_scam)
-            
+
+            # 6.5. Crowd Wisdom Override (Layer 3 - Community)
+            # Check if many people reported this same message as scam
+            try:
+                crowd_reports = self.detection_repo.get_scam_count(message_hash)
+                if crowd_reports > 0:
+                    logger.info(f"⚖️ Crowd Wisdom: Found {crowd_reports} previous reports")
+                    
+                    # If confirmed by crowd (> 2 people), boost score
+                    if crowd_reports >= 2:
+                        old_score = final_risk_score
+                        final_risk_score = max(final_risk_score, 0.95)
+                        final_is_scam = True
+                        if final_risk_score > old_score:
+                             logger.info(f"   └── Boosted score {old_score} -> {final_risk_score} (Community Confirmed)")
+            except Exception as e:
+                logger.warning(f"Layer 3 check failed: {e}")
+
             # 7. Save to database
             logger.debug("Saving detection result")
             import uuid

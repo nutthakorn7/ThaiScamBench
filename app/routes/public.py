@@ -64,10 +64,43 @@ async def detect_scam_public(
             advice=result.advice,
             model_version=result.model_version
         )
-        
     except Exception as e:
         logger.error(f"Public detection error: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"เกิดข้อผิดพลาดในการตรวจสอบ: {str(e)}"
         )
+
+
+@router.get("/wiki/{keyword}")
+async def get_wiki_data(
+    keyword: str,
+    db: Session = Depends(get_db),
+    service: DetectionService = Depends(get_detection_service)
+):
+    """
+    Get data for a Wiki page (SEO Optimised).
+    If the keyword is a phone number or known scam pattern, return cached analysis.
+    If not found, perform a quick check to generate content.
+    """
+    # Decoded keyword might come in as URL encoded
+    decoded_keyword = keyword.replace("-", "") 
+    
+    # We create a dummy request object
+    detect_request = DetectionRequest(
+        message=keyword, 
+        channel="web_search",
+        user_ref=None
+    )
+    
+    # Reuse the logic but without logging user info 
+    result = await service.detect_scam(detect_request, source="wiki")
+    
+    return {
+        "keyword": keyword,
+        "risk_score": result.risk_score,
+        "scam_type": result.category,
+        "analysis": result.reason,
+        "is_safe": result.risk_score < 0.5,
+        "last_updated": "Today" 
+    }

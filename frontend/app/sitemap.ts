@@ -1,77 +1,46 @@
+
 import { MetadataRoute } from 'next';
-import { blogPosts } from '@/lib/blog-data';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://thaiscam.zcr.ai';
-  const currentDate = new Date();
+const BASE_URL = 'https://thaiscam.zcr.ai';
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: currentDate,
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/check`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/stats`,
-      lastModified: currentDate,
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/report`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/faq`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    // Add dynamic blog posts
-    ...blogPosts.map((post): MetadataRoute.Sitemap[number] => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    })),
-    {
-      url: `${baseUrl}/partner/login`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/admin/login`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly',
-      priority: 0.3,
-    },
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Static Routes
+  const routes = [
+    '',
+    '/check',
+    '/report',
+    '/stats',
+    '/partner/login',
+  ].map((route) => ({
+    url: `${BASE_URL}${route}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: 'daily' as const,
+    priority: route === '' ? 1.0 : 0.8,
+  }));
+
+  // Dynamic Routes (Wiki)
+  // In a real scenario, we fetch from API: GET /public/wiki-slugs
+  // For MVP, we use the same static list as TrendingScams + some extras
+  const keywords = [
+      '081-234-5678', 
+      'SMS กยศ', 
+      'งานออนไลน์ ได้เงินจริง', 
+      'เว็บพนัน แจกเครดิตฟรี', 
+      'คอลเซ็นเตอร์ อ้างเป็นตำรวจ', 
+      'ธนาคารออมสิน ปล่อยกู้', 
+      'J&T Express พัสดุตกค้าง', 
+      'รับสมัครคนกดออเดอร์',
+      'เบอร์แปลกโทรมา',
+      'กู้เงินออนไลน์',
+      'ลงทุน crypto'
   ];
+
+  const wikiRoutes = keywords.map((keyword) => ({
+    url: `${BASE_URL}/wiki/${encodeURIComponent(keyword)}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }));
+
+  return [...routes, ...wikiRoutes];
 }

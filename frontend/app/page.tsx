@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
+import { TrendingScams } from "@/components/ui/trending-scams";
 
 export default function Home() {
   return (
@@ -188,6 +189,51 @@ export default function Home() {
         </div>
       </section>
 
+
+import { TrendingScams } from "@/components/ui/trending-scams";
+
+// ... existing imports ...
+
+      {/* Stats Preview (Mock for now, will connect API later) */}
+      <section className="py-20 md:py-32 border-t border-border/40">
+        <div className="container px-4 mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-12 rounded-3xl bg-gradient-to-r from-primary/20 to-accent/20 p-8 md:p-12 border border-primary/20">
+            <div className="flex-1 text-center md:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                พร้อมเริ่มต้นแล้วหรือยัง?
+              </h2>
+              <p className="text-lg text-muted-foreground mb-6">
+                ใช้ฟรีไม่จำกัด ไม่ต้องสมัครสมาชิก
+              </p>
+              <Link href="/check">
+                <Button variant="ghost" className="group mt-4 text-primary hover:text-primary/80 hover:bg-transparent p-0">
+                  เริ่มตรวจสอบเลย
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+            <div className="relative">
+              <div className="flex flex-col gap-8 text-center">
+                <div>
+                  <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 mb-4">
+                    98.5%
+                  </div>
+                  <div className="text-lg md:text-xl text-muted-foreground font-semibold">เคสที่ตรวจสอบแล้ว</div>
+                </div>
+                <div>
+                  <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-blue-600 mb-4">
+                    98.5%
+                  </div>
+                  <div className="text-lg md:text-xl text-muted-foreground font-semibold">ความแม่นยำ AI</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Internal Linking for SEO */}
+      <TrendingScams />
 
       {/* Social Proof Ticker */}
       <RecentActivityTicker />

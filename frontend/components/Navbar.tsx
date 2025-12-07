@@ -23,9 +23,7 @@ export default function Navbar() {
           <Link href="/stats" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
             สถิติ
           </Link>
-          <Link href="/blog" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
-            บทความ
-          </Link>
+
           <Link href="/report" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
             แจ้งเบาะแส
           </Link>

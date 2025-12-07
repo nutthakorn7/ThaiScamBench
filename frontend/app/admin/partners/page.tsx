@@ -13,7 +13,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Users, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { getPartnerStats, type PartnerStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
@@ -32,27 +32,28 @@ export default function PartnersPage() {
       return;
     }
 
+    const fetchData = async (pageNum: number) => {
+      setLoading(true);
+      try {
+        const result = await getPartnerStats(pageNum, pageSize);
+        setData(result);
+      } catch (err: unknown) {
+        console.error('Failed to load partner stats:', err);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((err as any).response?.status === 403) {
+          toast.error("Token หมดอายุ", { description: "กรุณา login ใหม่" });
+          removeAdminToken();
+          router.push('/admin/login');
+        } else {
+          toast.error("ไม่สามารถโหลดข้อมูล Partner ได้");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData(page);
   }, [page, router]);
-
-  const fetchData = async (pageNum: number) => {
-    setLoading(true);
-    try {
-      const result = await getPartnerStats(pageNum, pageSize);
-      setData(result);
-    } catch (err: any) {
-      console.error('Failed to load partner stats:', err);
-      if (err.response?.status === 403) {
-        toast.error("Token หมดอายุ", { description: "กรุณา login ใหม่" });
-        removeAdminToken();
-        router.push('/admin/login');
-      } else {
-        toast.error("ไม่สามารถโหลดข้อมูล Partner ได้");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
 

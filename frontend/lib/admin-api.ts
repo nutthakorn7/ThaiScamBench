@@ -13,8 +13,15 @@ export const adminApi = axios.create({
 });
 
 // Add auth interceptor
-adminApi.interceptors.request.use((config) => {
-  const token = getAdminToken();
+import { getSession } from "next-auth/react";
+
+// Add auth interceptor
+adminApi.interceptors.request.use(async (config) => {
+  // Try to get NextAuth session first
+  const session = await getSession();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const token = (session as any)?.accessToken || getAdminToken(); // Fallback to local storage for now
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -36,6 +43,10 @@ export interface SummaryStats {
     date: string;
     total: number;
     scam: number;
+  }>;
+  requests_per_day?: Array<{
+    date: string;
+    count: number;
   }>;
 }
 
@@ -183,6 +194,21 @@ export const getCategoryStats = async (page: number = 1, pageSize: number = 20):
 export const getUncertainCases = async (limit: number = 50, includeFeedback: boolean = true): Promise<UncertainCasesResponse> => {
   if (isBypassToken()) return getMockUncertainCases();
   const response = await adminApi.get<UncertainCasesResponse>(`/review/uncertain?limit=${limit}&include_feedback=${includeFeedback}`);
+  return response.data;
+};
+
+export interface RecentActivityItem {
+  id: string;
+  type: "scam" | "safe";
+  message: string;
+  time: string;
+  location: string;
+  source: string;
+}
+
+export const getRecentActivity = async (limit: number = 10): Promise<RecentActivityItem[]> => {
+  if (isBypassToken()) return []; // Or mock
+  const response = await adminApi.get<RecentActivityItem[]>(`/stats/recent?limit=${limit}`);
   return response.data;
 };
 

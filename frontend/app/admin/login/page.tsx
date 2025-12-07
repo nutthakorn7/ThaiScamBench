@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield, AlertCircle, Lock } from "lucide-react";
-import { setAdminToken } from "@/lib/auth";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
@@ -18,7 +18,6 @@ export default function AdminLoginPage() {
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -31,37 +30,26 @@ export default function AdminLoginPage() {
     setError("");
 
     try {
-      // 1. Simple bypass - check this FIRST
-      if (token === "admin123" || token === "thaiscam2024") {
-        setAdminToken(token);
-        toast.success("Login สำเร็จ!", {
-          description: "เข้าสู่ระบบด้วยรหัสสำรอง"
-        });
-        router.push('/admin');
-        return;
-      }
-
-      // 2. Normal backend validation
-      const response = await fetch('/api/admin/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: token.trim() }),
+      const result = await signIn("credentials", {
+        password: token,
+        redirect: false,
+        callbackUrl: "/admin"
       });
 
-      if (response.ok) {
-        setAdminToken(token.trim());
+      if (result?.error) {
+        throw new Error("Token ไม่ถูกต้อง");
+      }
+
+      if (result?.ok) {
         toast.success("Login สำเร็จ!", {
           description: "กำลังเข้าสู่ระบบ Admin"
         });
         router.push('/admin');
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Token ไม่ถูกต้อง');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Login error:', err);
-      setError(err.message || "Token ไม่ถูกต้อง กรุณาลองใหม่");
-      setAdminToken(""); // Clear invalid token
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setError((err as any).message || "Token ไม่ถูกต้อง กรุณาลองใหม่");
     } finally {
       setLoading(false);
     }

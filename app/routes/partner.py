@@ -1,17 +1,11 @@
 """Partner API endpoints for authenticated partners"""
 from fastapi import APIRouter, HTTPException, Depends, Request
-from sqlalchemy.orm import Session
 from app.models.schemas import PartnerDetectRequest, PartnerDetectResponse
-from app.services.scam_classifier import classify_scam
-from app.services.llm_explainer import explain_with_llm
-from app.services.detection_logger import log_detection
-from app.models.database import Partner, DetectionSource
+from app.models.database import Partner
+from app.services.detection_service import DetectionService, DetectionRequest
+from app.dependencies import get_detection_service
 from app.middleware.auth import verify_partner_token
 from app.middleware.rate_limit import limiter
-from app.database import get_db
-from app.config import settings
-from app.middleware.security import validate_message_content
-from app.cache import redis_client, generate_cache_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,7 +24,7 @@ async def detect_scam_partner(
     request: Request,  # Required for slowapi (must be named 'request')
     body: PartnerDetectRequest,
     partner: Partner = Depends(verify_partner_token),
-    db: Session = Depends(get_db)
+    service: DetectionService = Depends(get_detection_service)
 ) -> PartnerDetectResponse:
     """
     Partner endpoint for scam detection with authentication and logging
@@ -39,7 +33,7 @@ async def detect_scam_partner(
         request: FastAPI Request object (for slowapi)
         body: PartnerDetectRequest with message, channel, user_ref
         partner: Authenticated partner from Bearer token
-        db: Database session
+        service: Injected DetectionService
         
     Returns:
         PartnerDetectResponse with detection results, request_id, and versions
@@ -48,87 +42,31 @@ async def detect_scam_partner(
         HTTPException: If analysis fails
     """
     try:
-        logger.info(
-            f"Partner detection request - "
-            f"partner: {partner.name}, "
-            f"message_length: {len(body.message)}, "
-            f"channel: {body.channel or 'not specified'}, "
-            f"user_ref: {body.user_ref or 'not specified'}"
-        )
-        
-        # Step 0: Validate message content (security)
-        validate_message_content(body.message)
-        
-        # CACHE CHECK: Try to get from cache first
-        cache_key = generate_cache_key(body.message, prefix="partner")
-        cached_result = redis_client.get(cache_key)
-        
-        if cached_result:
-            logger.info(f"✅ Cache HIT for partner detection ({partner.name})")
-            # Still need to log this detection even if cached
-            detection = log_detection(
-                db=db,
-                source=DetectionSource.partner,
-                message=body.message,
-                is_scam=cached_result['is_scam'],
-                category=cached_result['category'],
-                risk_score=cached_result['risk_score'],
-                model_version=settings.model_version,
-                llm_version=settings.llm_version,
-                channel=body.channel,
-                partner_id=partner.id,
-                user_ref=body.user_ref
-            )
-            cached_result['request_id'] = detection.request_id
-            return PartnerDetectResponse(**cached_result)
-        
-        logger.info(f"⚠️  Cache MISS for partner detection ({partner.name}) - processing...")
-        
-        # Step 1: Classify the message with partner threshold (strict)
-        is_scam, risk_score, category = classify_scam(body.message, settings.partner_threshold)
-        
-        # Step 2: Generate explanation with LLM
-        reason, advice = explain_with_llm(body.message, category)
-        
-        # Step 3: Log detection to database
-        detection = log_detection(
-            db=db,
-            source=DetectionSource.partner,
+        # Create service request
+        detect_request = DetectionRequest(
             message=body.message,
-            is_scam=is_scam,
-            category=category,
-            risk_score=risk_score,
-            model_version=settings.model_version,
-            llm_version=settings.llm_version,
             channel=body.channel,
-            partner_id=partner.id,
             user_ref=body.user_ref
         )
         
-        # Step 4: Build response
-        response = PartnerDetectResponse(
-            request_id=detection.request_id,
-            is_scam=is_scam,
-            risk_score=risk_score,
-            category=category,
-            reason=reason,
-            advice=advice,
-            model_version=settings.model_version,
-            llm_version=settings.llm_version
+        # Call service
+        result = await service.detect_scam(
+            request=detect_request,
+            source="partner",
+            partner_id=partner.id
         )
         
-        # CACHE SET: Store result (without request_id)
-        cache_data = response.model_dump()
-        cache_data.pop('request_id', None)  # Don't cache request_id
-        redis_client.set(cache_key, cache_data, ttl=settings.cache_ttl_seconds)
-        
-        logger.info(
-            f"Partner detection completed - "
-            f"request_id: {detection.request_id}, "
-            f"is_scam: {is_scam}, category: {category}"
+        # Map to response model
+        return PartnerDetectResponse(
+            request_id=result.request_id,
+            is_scam=result.is_scam,
+            risk_score=result.risk_score,
+            category=result.category,
+            reason=result.reason,
+            advice=result.advice,
+            model_version=result.model_version,
+            llm_version=result.llm_version
         )
-        
-        return response
         
     except Exception as e:
         logger.error(f"Error in partner detection: {str(e)}", exc_info=True)

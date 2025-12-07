@@ -19,7 +19,7 @@ const Accordion = React.forwardRef<
     value?: string
     onValueChange?: (value: string) => void
   }
->(({ className, type = "single", collapsible = false, defaultValue, value: controlledValue, onValueChange, ...props }, ref) => {
+>(({ className, collapsible = false, defaultValue, value: controlledValue, onValueChange, ...props }, ref) => {
   const [uncontrolledValue, setUncontrolledValue] = React.useState(defaultValue || "")
   const value = controlledValue ?? uncontrolledValue
 
@@ -61,7 +61,7 @@ const AccordionTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
 >(({ className, children, ...props }, ref) => {
-  const { value, onValueChange } = React.useContext(AccordionContext)
+  // const { value, onValueChange } = React.useContext(AccordionContext)
   // Need to find parent Item value. In a real Radix implementation this is done via context.
   // Here we'll rely on the parent Item injecting its value or we simply look it up from data-value of closest parent if we can't context it simple.
   // Actually, to keep it simple and robust without too much context nesting:

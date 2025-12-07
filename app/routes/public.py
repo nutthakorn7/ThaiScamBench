@@ -1,16 +1,10 @@
 """Public API endpoints"""
 from fastapi import APIRouter, Depends, Request, HTTPException
-from sqlalchemy.orm import Session
 from app.models.schemas import PublicDetectRequest, PublicDetectResponse
-from app.services.scam_classifier import classify_scam
-from app.services.llm_explainer import explain_with_llm
-from app.services.detection_logger import log_detection
-from app.models.database import DetectionSource
-from app.database import get_db
+from app.services.detection_service import DetectionService, DetectionRequest
+from app.dependencies import get_detection_service
 from app.config import settings
 from app.middleware.rate_limit import limiter
-from app.middleware.security import validate_message_content
-from app.cache import redis_client, generate_cache_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,7 +22,7 @@ router = APIRouter(prefix="/v1/public", tags=["Public"])
 async def detect_scam_public(
     request: Request,
     body: PublicDetectRequest,
-    db: Session = Depends(get_db)
+    service: DetectionService = Depends(get_detection_service)
 ) -> PublicDetectResponse:
     """
     Public endpoint for scam detection with rate limiting
@@ -36,6 +30,7 @@ async def detect_scam_public(
     Args:
         request: Starlette Request (for rate limiting)
         body: PublicDetectRequest with message and optional channel
+        service: Injected DetectionService
         
     Returns:
         PublicDetectResponse with detection results and model version
@@ -45,68 +40,33 @@ async def detect_scam_public(
         RateLimitExceeded: If rate limit is exceeded (handled by middleware)
     """
     try:
-        logger.info(
-            f"Public detection request - "
-            f"message_length: {len(body.message)}, "
-            f"channel: {body.channel or 'not specified'}"
-        )
-        
-        # Step 0: Validate message content (security)
-        validate_message_content(body.message)
-        
-        # CACHE CHECK: Try to get from cache first
-        cache_key = generate_cache_key(body.message, prefix="public")
-        cached_result = redis_client.get(cache_key)
-        
-        if cached_result:
-            logger.info(f"✅ Cache HIT for public detection")
-            return PublicDetectResponse(**cached_result)
-        
-        logger.info(f"⚠️  Cache MISS for public detection - processing...")
-        
-        # Step 1: Classify the message with public threshold (conservative)
-        is_scam, risk_score, category = classify_scam(body.message, settings.public_threshold)
-        
-        # Step 2: Generate explanation with LLM
-        reason, advice = explain_with_llm(body.message, category)
-        
-        # Step 3: Log detection to database
-        detection = log_detection(
-            db=db,
-            source=DetectionSource.public,
+        # Create service request
+        detect_request = DetectionRequest(
             message=body.message,
-            is_scam=is_scam,
-            category=category,
-            risk_score=risk_score,
-            model_version=settings.model_version,
-            llm_version=settings.llm_version,
-            channel=body.channel
+            channel=body.channel,
+            user_ref=None
         )
         
-        # Step 4: Build response
-        response = PublicDetectResponse(
-            request_id=detection.request_id,
-            is_scam=is_scam,
-            risk_score=risk_score,
-            category=category,
-            reason=reason,
-            advice=advice,
-            model_version=settings.model_version
+        # Call service
+        result = await service.detect_scam(
+            request=detect_request,
+            source="public"
         )
         
-        # CACHE SET: Store result for future requests
-        redis_client.set(cache_key, response.model_dump(), ttl=settings.cache_ttl_seconds)
-        
-        logger.info(
-            f"Detection completed - is_scam: {is_scam}, "
-            f"category: {category}, channel: {body.channel}"
+        # Map to response model
+        # (DetectionResponse fields match PublicDetectResponse mostly)
+        return PublicDetectResponse(
+            request_id=result.request_id,
+            is_scam=result.is_scam,
+            risk_score=result.risk_score,
+            category=result.category,
+            reason=result.reason,
+            advice=result.advice,
+            model_version=result.model_version
         )
         
-        return response
-        
-    except HTTPException:
-        raise
     except Exception as e:
+        logger.error(f"Public detection error: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"เกิดข้อผิดพลาดในการตรวจสอบ: {str(e)}"

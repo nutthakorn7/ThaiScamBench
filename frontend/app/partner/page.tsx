@@ -19,19 +19,19 @@ export default function PartnerDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const loadData = async () => {
+      try {
+        const dashboardData = await getPartnerDashboard();
+        setData(dashboardData);
+      } catch {
+        router.push("/partner/login");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const loadData = async () => {
-    try {
-      const dashboardData = await getPartnerDashboard();
-      setData(dashboardData);
-    } catch (error) {
-      router.push("/partner/login");
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadData();
+  }, [router]);
 
   const handleLogout = () => {
     removePartnerKey();
@@ -217,8 +217,8 @@ export default function PartnerDashboard() {
                   </div>
                   <code className="text-green-400">
                     curl -X POST https://api.thaiscam.zcr.ai/partner/detect \<br/>
-                    &nbsp;&nbsp;-H "X-API-Key: YOUR_KEY" \<br/>
-                    &nbsp;&nbsp;-d '&#123;"text": "suspicious message"&#125;'
+                    &nbsp;&nbsp;-H &quot;X-API-Key: YOUR_KEY&quot; \<br/>
+                    &nbsp;&nbsp;-d &apos;&#123;&quot;text&quot;: &quot;suspicious message&quot;&#125;&apos;
                   </code>
                 </div>
               </CardContent>

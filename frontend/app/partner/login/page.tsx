@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Key, ArrowRight, Loader2 } from "lucide-react";
+import { Shield, Key, Loader2 } from "lucide-react";
 import { setPartnerKey } from "@/lib/partner-api";
 import { toast } from "sonner";
 import { AuroraBackground } from "@/components/ui/aurora-background";
@@ -32,7 +32,7 @@ export default function PartnerLoginPage() {
         toast.success("เข้าสู่ระบบเรียบร้อย");
         router.push("/partner");
         
-    } catch (error) {
+    } catch {
         toast.error("API Key ไม่ถูกต้อง");
     } finally {
         setLoading(false);

@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getFeedbackList, type FeedbackLog } from "@/lib/admin-api";
-import { Loader2, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
+import { Loader2, ThumbsUp, ThumbsDown } from "lucide-react";
 
 export default function FeedbackPage() {
   const [feedback, setFeedback] = useState<FeedbackLog[]>([]);
@@ -22,20 +22,19 @@ export default function FeedbackPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await getFeedbackList(page, 20);
+        setFeedback(data.items);
+      } catch (error) {
+        console.error("Failed to load feedback", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     loadData();
   }, [page]);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await getFeedbackList(page, 20);
-      setFeedback(data.items);
-    } catch (error) {
-      console.error("Failed to load feedback", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <AdminLayout>

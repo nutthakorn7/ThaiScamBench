@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Table,
@@ -27,23 +27,15 @@ export default function CategoriesPage() {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  useEffect(() => {
-    if (!isAdminAuthenticated()) {
-      router.push('/admin/login');
-      return;
-    }
-
-    fetchData(page);
-  }, [page, router]);
-
-  const fetchData = async (pageNum: number) => {
+  const fetchData = useCallback(async (pageNum: number) => {
     setLoading(true);
     try {
       const result = await getCategoryStats(pageNum, pageSize);
       setData(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load category stats:', err);
-      if (err.response?.status === 403) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((err as any).response?.status === 403) {
         toast.error("Token หมดอายุ", { description: "กรุณา login ใหม่" });
         removeAdminToken();
         router.push('/admin/login');
@@ -53,7 +45,16 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      router.push('/admin/login');
+      return;
+    }
+
+    fetchData(page);
+  }, [page, router, fetchData]);
 
   const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
 

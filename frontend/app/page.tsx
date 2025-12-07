@@ -7,9 +7,10 @@ import { motion } from "framer-motion";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { RecentActivityTicker } from "@/components/recent-activity-ticker";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 export default function Home() {
   return (
@@ -27,33 +28,46 @@ export default function Home() {
           }}
           className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
         >
-          <Badge variant="outline" className="mb-8 py-2 px-5 text-sm font-semibold border-blue-700/20 bg-blue-700/10 text-blue-700 dark:text-blue-400 dark:border-blue-400/30 backdrop-blur-sm rounded-full inline-flex items-center gap-2">
-            <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+          <Badge variant="outline" className="mb-6 py-2 px-5 text-sm font-semibold border-blue-700/20 bg-blue-700/10 text-blue-700 dark:text-blue-400 dark:border-blue-400/30 backdrop-blur-md rounded-full inline-flex items-center gap-2">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_theme(colors.blue.500)]" />
             พัฒนาโดยทีม AI Research
           </Badge>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-slate-900 dark:text-white">
-            รู้ทันมิจฉาชีพออนไลน์
-            <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600">ด้วยพลัง AI อัจฉริยะ</span>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 leading-[1.1] tracking-tight text-slate-900 dark:text-white font-heading text-center">
+            รู้ทัน
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600 animate-gradient"> มิจฉาชีพออนไลน์ </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-14 leading-relaxed">
-            ตรวจสอบข้อความ SMS, ลิงก์เว็บพนัน หรือเลขบัญชีต้องสงสัยได้ทันที<br className="hidden md:block" /> 
-            ด้วยระบบประมวลผลภาษาธรรมชาติ (NLP) ที่แม่นยำที่สุดสำหรับภาษาไทย
+          <div className="h-20 md:h-24 flex items-center justify-center w-full">
+             <TypewriterEffectSmooth
+                words={[
+                  { text: "ตรวจ", className: "text-slate-900 dark:text-white" },
+                  { text: "สอบ", className: "text-slate-900 dark:text-white" },
+                  { text: "SMS", className: "text-blue-600 dark:text-blue-500" },
+                  { text: "ได้", className: "text-slate-900 dark:text-white" },
+                  { text: "ทัน", className: "text-slate-900 dark:text-white" },
+                  { text: "ที", className: "text-slate-900 dark:text-white" },
+                ]}
+                className="text-2xl md:text-4xl lg:text-5xl font-bold font-prompt"
+                cursorClassName="bg-blue-500"
+             />
+          </div>
+
+          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            มั่นใจทุกการโอน ปลอดภัยทุกการคลิก ด้วยระบบ AI ภาษาไทยที่แม่นยำที่สุด
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto">
             <Link href="/check" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-bold rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 ring-4 ring-blue-600/20">
                 <Search className="mr-2 h-5 w-5" />
-                ตรวจสอบเลย
+                ตรวจสอบเลย Free
               </Button>
             </Link>
             <Link href="/report" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-semibold rounded-xl bg-orange-500 hover:bg-orange-600 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
-                <AlertTriangle className="mr-2 h-5 w-5" />
-                แจ้งเบาะแสใหม่
+              <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 h-14 text-lg font-bold rounded-2xl border-2 hover:bg-muted/50 transition-all duration-200">
+                <AlertTriangle className="mr-2 h-5 w-5 text-orange-500" />
+                แจ้งเบาะแส
               </Button>
             </Link>
           </div>

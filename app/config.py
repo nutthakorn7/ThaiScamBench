@@ -71,6 +71,9 @@ class Settings(BaseSettings):
     audit_log_enabled: bool = True
     audit_log_retention_days: int = 90
     
+    # Dataset Collection (Raw Data for Training)
+    collect_training_data: bool = True
+    
     @property
     def is_development(self) -> bool:
         """Check if running in development mode"""

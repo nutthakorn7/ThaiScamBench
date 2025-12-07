@@ -31,23 +31,15 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(true);
   const [limit, setLimit] = useState(50);
 
-  useEffect(() => {
-    if (!isAdminAuthenticated()) {
-      router.push('/admin/login');
-      return;
-    }
-
-    fetchData();
-  }, [limit, router]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
       const result = await getUncertainCases(limit, true);
       setData(result);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load uncertain cases:', err);
-      if (err.response?.status === 403) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((err as any).response?.status === 403) {
         toast.error("Token หมดอายุ", { description: "กรุณา login ใหม่" });
         removeAdminToken();
         router.push('/admin/login');
@@ -58,6 +50,16 @@ export default function ReviewPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      router.push('/admin/login');
+      return;
+    }
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit, router]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -172,7 +174,7 @@ export default function ReviewPage() {
                 {data.cases.map((case_: UncertainCase) => (
                   <TableRow key={case_.request_id}>
                     <TableCell>
-                      <Badge variant={getPriorityColor(case_.priority) as any} className="gap-1">
+                      <Badge variant={getPriorityColor(case_.priority) as "default" | "secondary" | "destructive" | "outline"} className="gap-1">
                         {getPriorityIcon(case_.priority)}
                         {case_.priority}
                       </Badge>

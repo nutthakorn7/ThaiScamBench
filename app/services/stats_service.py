@@ -221,3 +221,31 @@ def get_category_distribution(db: Session, pagination: Optional[PaginationParams
                 for row in categories
             ]
         }
+
+
+def get_recent_activity(db: Session, limit: int = 10) -> List[Dict[str, Any]]:
+    """
+    Get recent detection activity
+    
+    Args:
+        db: Database session
+        limit: Number of items to return
+        
+    Returns:
+        List of recent activities
+    """
+    recent_detections = db.query(Detection).order_by(
+        desc(Detection.created_at)
+    ).limit(limit).all()
+    
+    return [
+        {
+            "id": detection.id,
+            "type": "scam" if detection.is_scam else "safe",
+            "message": detection.message[:50] + "..." if len(detection.message) > 50 else detection.message,
+            "time": detection.created_at.isoformat(),
+            "location": "Thailand", # Placeholder until geo-ip is implemented
+            "source": detection.source
+        }
+        for detection in recent_detections
+    ]

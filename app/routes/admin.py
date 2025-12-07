@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Request, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.middleware.admin_auth import verify_admin_token
-from app.services.stats_service import get_summary_stats, get_partner_stats, get_category_distribution
+from app.services.stats_service import get_summary_stats, get_partner_stats, get_category_distribution, get_recent_activity
 from app.models.pagination import PaginationParams, PaginatedResponse
 from typing import Optional
 import logging
@@ -43,7 +43,24 @@ async def stats_summary(
     stats = get_summary_stats(db, days=days)
     return stats
 
+    stats = get_summary_stats(db, days=days)
+    return stats
 
+
+@router.get(
+    "/stats/recent",
+    summary="Get recent activity",
+    description="Get real-time recent detection activity"
+)
+async def stats_recent(
+    limit: int = Query(10, ge=1, le=50),
+    _authenticated: bool = Depends(verify_admin_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Get recent activity for live ticker
+    """
+    return get_recent_activity(db, limit=limit)
 @router.get(
     "/stats/partners",
     summary="Get partner statistics",

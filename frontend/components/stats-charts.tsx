@@ -16,9 +16,21 @@ import {
   Legend
 } from 'recharts';
 
+interface PieData {
+  name: string;
+  value: number;
+  [key: string]: string | number | undefined;
+}
+
+interface BarData {
+  name: string;
+  count: number;
+  [key: string]: string | number | undefined;
+}
+
 interface StatsChartsProps {
-  pieData: any[];
-  barData: any[];
+  pieData: PieData[];
+  barData: BarData[];
 }
 
 // Theme colors: Blue for Scam (danger), Green for Safe

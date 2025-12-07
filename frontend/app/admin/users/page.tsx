@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Table, 
   TableBody, 
@@ -25,21 +25,21 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await getUsers(page, 20);
+        setUsers(data.items);
+      } catch (error) {
+        console.error("Failed to load users", error);
+        toast.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadData();
   }, [page]);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await getUsers(page, 20);
-      setUsers(data.items);
-    } catch (error) {
-      console.error("Failed to load users", error);
-      toast.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <AdminLayout>

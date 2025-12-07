@@ -89,3 +89,22 @@ class Feedback(Base):
     
     def __repr__(self):
         return f"<Feedback(request_id='{self.request_id}', type='{self.feedback_type}')>"
+
+
+class Dataset(Base):
+    """Raw dataset for AI training"""
+    __tablename__ = "datasets"
+    
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    request_id = Column(String(36), ForeignKey("detections.request_id"), nullable=False, unique=True, index=True)
+    source = Column(String(20), nullable=False)
+    content = Column(String, nullable=False)  # Raw content (Text)
+    labeled_category = Column(String(50), nullable=False)
+    is_scam = Column(Boolean, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    
+    # Relationship to detection
+    detection = relationship("Detection", foreign_keys=[request_id], primaryjoin="Detection.request_id == Dataset.request_id", backref="dataset_entry")
+
+    def __repr__(self):
+        return f"<Dataset(id='{self.id}', category='{self.labeled_category}')>"

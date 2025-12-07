@@ -15,7 +15,7 @@ export default function ShareButtons({ slug, title }: ShareButtonsProps) {
 
   const handleShare = (platform: string) => {
     // Implement sharing logic here
-    console.log(`Sharing on ${platform}: ${shareUrl}`);
+    console.log(`Sharing on ${platform}: ${shareUrl} - ${title}`);
   };
 
   return (

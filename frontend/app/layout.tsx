@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Prompt, IBM_Plex_Sans_Thai } from "next/font/google";
+import { Inter, Outfit, Prompt, IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,19 +7,37 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+// Premium Font Pairing: Outfit (Headings) + Inter (Body)
+const outfit = Outfit({ 
+  subsets: ["latin"], 
+  variable: '--font-outfit',
+  display: 'swap',
+});
+
+const inter = Inter({ 
+  subsets: ["latin"], 
+  variable: '--font-inter',
+  display: 'swap',
+});
+
 const prompt = Prompt({ 
   weight: ['300', '400', '500', '600', '700'],
   subsets: ["latin", "thai"],
-  variable: '--font-prompt'
+  variable: '--font-prompt',
+  display: 'swap',
 });
+
 const ibmThai = IBM_Plex_Sans_Thai({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ["latin", "thai"],
-  variable: '--font-ibm'
+  variable: '--font-ibm',
+  display: 'swap',
 });
 
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { ThemeProvider } from "@/components/theme-provider";
+import { StructuredData } from "@/components/StructuredData";
+import { webApplicationSchema, organizationSchema } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thaiscam.zcr.ai'),
@@ -46,7 +64,7 @@ export const metadata: Metadata = {
     siteName: 'ThaiScamDetector',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/api/og?title=ThaiScamDetector',
         width: 1200,
         height: 630,
         alt: 'ThaiScamDetector - ป้องกันการหลอกลวงออนไลน์',
@@ -57,9 +75,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ThaiScamDetector - ตรวจสอบการหลอกลวงด้วย AI',
     description: 'ตรวจสอบความเสี่ยงข้อความและบัญชีต้องสงสัยได้ทันที',
-    images: ['/og-image.jpg'],
+    images: ['/api/og?title=ThaiScamDetector'],
   },
-  // ... (rest is same)
   robots: {
     index: true,
     follow: true,
@@ -76,18 +93,15 @@ export const metadata: Metadata = {
   },
 };
 
-import { ThemeProvider } from "@/components/theme-provider";
-import { StructuredData } from "@/components/StructuredData";
-import { webApplicationSchema, organizationSchema } from "@/lib/structured-data";
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
+  
 }>) {
   return (
     <html lang="th" suppressHydrationWarning>
-      <body className={`${inter.variable} ${prompt.variable} ${ibmThai.variable} font-prompt antialiased`}>
+      <body className={`${outfit.variable} ${inter.variable} ${prompt.variable} ${ibmThai.variable} font-sans antialiased`}>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
         <StructuredData data={[webApplicationSchema, organizationSchema]} />
         <ThemeProvider

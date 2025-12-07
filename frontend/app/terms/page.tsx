@@ -49,7 +49,7 @@ export default function TermsPage() {
                     <h2 className="text-3xl font-black mb-4">1. การยอมรับข้อกำหนด</h2>
                     <p className="text-lg text-muted-foreground leading-relaxed mb-4">
                       ยินดีต้อนรับสู่ ThaiScamDetector การเข้าใช้งานและใช้บริการของเรา ถือว่าคุณได้อ่าน เข้าใจ และยอมรับ
-                      ที่จะปฏิบัติตามเงื่อนไขการให้บริการ ("ข้อกำหนด") ฉบับนี้
+                      ที่จะปฏิบัติตามเงื่อนไขการให้บริการ (&quot;ข้อกำหนด&quot;) ฉบับนี้
                     </p>
                     <p className="text-lg text-muted-foreground leading-relaxed">
                       หากคุณไม่ยอมรับข้อกำหนดเหล่านี้ กรุณาหยุดการใช้บริการทันที
@@ -163,7 +163,7 @@ export default function TermsPage() {
                     <h2 className="text-3xl font-black mb-4">4. ข้อจำกัดความรับผิด</h2>
 
                     <p className="text-lg text-muted-foreground mb-4">
-                      เราให้บริการตามสภาพปัจจุบัน ("AS IS") และไม่รับประกันใดๆ ไม่ว่าโดยชัดแจ้งหรือโดยนัย รวมถึง:
+                      เราให้บริการตามสภาพปัจจุบัน (&quot;AS IS&quot;) และไม่รับประกันใดๆ ไม่ว่าโดยชัดแจ้งหรือโดยนัย รวมถึง:
                     </p>
 
                     <div className="space-y-4">

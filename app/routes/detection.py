@@ -1,8 +1,8 @@
 """Scam detection endpoints"""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.models.schemas import ScamCheckRequest, ScamCheckResponse
-from app.services.scam_classifier import classify_scam
-from app.services.llm_explainer import explain_with_llm
+from app.services.detection_service import DetectionService, DetectionRequest
+from app.dependencies import get_detection_service
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,12 +16,16 @@ router = APIRouter(prefix="/api/v1", tags=["Detection"])
     summary="Detect Scam",
     description="ตรวจสอบข้อความว่ามีลักษณะการหลอกลวงหรือไม่ (Check if a message is a scam)"
 )
-async def detect_scam(request: ScamCheckRequest) -> ScamCheckResponse:
+async def detect_scam(
+    request: ScamCheckRequest,
+    service: DetectionService = Depends(get_detection_service)
+) -> ScamCheckResponse:
     """
     Analyze a message for scam indicators
     
     Args:
         request: ScamCheckRequest containing the message to analyze
+        service: Injected DetectionService
         
     Returns:
         ScamCheckResponse with detection results, risk score, and advice
@@ -32,24 +36,26 @@ async def detect_scam(request: ScamCheckRequest) -> ScamCheckResponse:
     try:
         logger.info(f"Received scam detection request (message length: {len(request.message)})")
         
-        # Step 1: Classify the message
-        is_scam, risk_score, category = classify_scam(request.message)
-        
-        # Step 2: Generate explanation with LLM
-        reason, advice = explain_with_llm(request.message, category)
-        
-        # Step 3: Build response
-        response = ScamCheckResponse(
-            is_scam=is_scam,
-            risk_score=risk_score,
-            category=category,
-            reason=reason,
-            advice=advice
+        # Create service request
+        detect_request = DetectionRequest(
+            message=request.message,
+            channel="legacy_api"
         )
         
-        logger.info(f"Detection completed: is_scam={is_scam}, category={category}")
+        # Call service (source as public-legacy)
+        result = await service.detect_scam(
+            request=detect_request,
+            source="public"
+        )
         
-        return response
+        # Map to response model (ScamCheckResponse)
+        return ScamCheckResponse(
+            is_scam=result.is_scam,
+            risk_score=result.risk_score,
+            category=result.category,
+            reason=result.reason,
+            advice=result.advice
+        )
         
     except Exception as e:
         logger.error(f"Error during scam detection: {str(e)}", exc_info=True)

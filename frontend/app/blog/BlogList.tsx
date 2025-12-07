@@ -213,7 +213,7 @@ export default function BlogList({ initialPosts }: BlogListProps) {
               <BookOpen className="h-8 w-8 text-slate-400" />
             </div>
             <h3 className="text-lg font-medium text-slate-900 dark:text-white">ไม่พบบทความที่ค้นหา</h3>
-            <p className="text-slate-500 dark:text-slate-400">ลองใช้คำค้นหาอื่น หรือเลือกหมวดหมู่ "ทั้งหมด"</p>
+            <p className="text-slate-500 dark:text-slate-400">ลองใช้คำค้นหาอื่น หรือเลือกหมวดหมู่ &quot;ทั้งหมด&quot;</p>
           </div>
         )}
       </div>

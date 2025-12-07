@@ -8,12 +8,9 @@ import {
   Users, 
   BarChart3, 
   AlertTriangle,
-  LogOut,
   Shield,
   MessageSquare
 } from "lucide-react";
-import { removeAdminToken } from "@/lib/auth";
-import { toast } from "sonner";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -60,12 +57,6 @@ const navigation = [
 export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-
-  const handleLogout = () => {
-    removeAdminToken();
-    toast.success("Logout สำเร็จ");
-    router.push('/admin/login');
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">

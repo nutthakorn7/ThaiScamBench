@@ -1,24 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Shield, ShieldAlert, CheckCircle2, Users, FileText, BarChart3, TrendingUp, LogOut, AlertTriangle } from "lucide-react";
+import { ShieldAlert, CheckCircle2, BarChart3, TrendingUp, LogOut, AlertTriangle } from "lucide-react";
 import { getAdminSummary, type SummaryStats } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
-import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
-import Footer from "@/components/Footer";
+import { Overview } from "@/components/ui/overview";
+import { ActivityTicker } from "@/components/ui/activity-ticker";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<SummaryStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const handleLogout = useCallback(() => {
+    removeAdminToken();
+    toast.success('Logged out successfully');
+    router.push('/admin/login');
+  }, [router]);
 
   useEffect(() => {
     if (!isAdminAuthenticated()) {
@@ -30,8 +36,9 @@ export default function AdminDashboard() {
       try {
         const data = await getAdminSummary(7);
         setStats(data);
-      } catch (err: any) {
-        if (err.response?.status === 403) {
+      } catch (err: unknown) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((err as any).response?.status === 403) {
           toast.error("Token ไม่ถูกต้อง", { description: "กรุณา login ใหม่" });
           handleLogout();
         } else {
@@ -43,13 +50,7 @@ export default function AdminDashboard() {
     };
 
     fetchData();
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    toast.success('Logged out successfully');
-    router.push('/admin/login');
-  };
+  }, [router, handleLogout]);
 
   const Content = () => (
     <div className="space-y-8 relative z-10 w-full">
@@ -142,7 +143,37 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          {/* Top Categories - Enhanced */}
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+            <Card className="col-span-1 lg:col-span-4 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold">Overview</CardTitle>
+                <CardDescription>
+                  ยอดการตรวจสอบย้อนหลัง 7 เดือน (Simulated)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pl-2">
+                <Overview 
+                  data={stats?.requests_per_day?.map(d => ({
+                    name: new Date(d.date).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }),
+                    total: d.count
+                  }))} 
+                />
+              </CardContent>
+            </Card>
+            <Card className="col-span-1 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card">
+                <CardHeader>
+                    <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
+                    <CardDescription>
+                        การตรวจสอบล่าสุดแบบ Real-time
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {/* ActivityTicker will go here */}
+                    <ActivityTicker />
+                </CardContent>
+            </Card>
+          </div>
+          
           <div className="grid grid-cols-1 gap-6">
             {stats?.top_categories && stats.top_categories.length > 0 && (
               <Card className="bg-card/95 backdrop-blur-xl border-2 border-border shadow-2xl">

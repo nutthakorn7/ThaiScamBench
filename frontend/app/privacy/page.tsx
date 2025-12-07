@@ -47,7 +47,7 @@ export default function PrivacyPage() {
                   <div>
                     <h2 className="text-3xl font-black mb-4">บทนำ</h2>
                     <p className="text-lg text-muted-foreground leading-relaxed">
-                      ThaiScamDetector ("เรา", "ของเรา") ให้ความสำคัญกับความเป็นส่วนตัวและการคุ้มครองข้อมูลส่วนบุคคลของผู้ใช้บริการทุกท่าน 
+                      ThaiScamDetector (&quot;เรา&quot;, &quot;ของเรา&quot;) ให้ความสำคัญกับความเป็นส่วนตัวและการคุ้มครองข้อมูลส่วนบุคคลของผู้ใช้บริการทุกท่าน 
                       นโยบายความเป็นส่วนตัวฉบับนี้อธิบายถึงวิธีการที่เราเก็บรวบรวม ใช้ เปิดเผย และคุ้มครองข้อมูลส่วนบุคคลของคุณ 
                       เมื่อคุณใช้บริการ ThaiScamDetector
                     </p>

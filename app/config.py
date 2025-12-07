@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     scam_classifier_type: str = "mock"
     
     # LLM Configuration
-    llm_version: str = "mock-v1.0"
-    llm_provider: str = "mock"
+    llm_version: str = "gemini-1.5-flash"
+    llm_provider: str = "gemini-hybrid"
     openai_api_key: str = ""
     
     # Service Configuration

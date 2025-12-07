@@ -169,7 +169,21 @@ class DetectionService:
                 is_scam=class_result.is_scam
             )
             
-            # 6. Save to database (PDPA compliant - hash only, no original message) and Dataset
+            # 6. Hybrid Logic Override (Layer 2)
+            # If Explainer used LLM, use its judgement for final verdict
+            final_risk_score = class_result.risk_score
+            final_is_scam = class_result.is_scam
+            
+            if getattr(explain_result, 'llm_used', False):
+                ai_risk = explain_result.metadata.get("ai_risk_score")
+                ai_is_scam = explain_result.metadata.get("ai_is_scam")
+                
+                if ai_risk is not None:
+                    logger.info(f"🤖 AI Override: Rule({class_result.risk_score}) -> AI({ai_risk})")
+                    final_risk_score = float(ai_risk)
+                    final_is_scam = bool(ai_is_scam)
+            
+            # 7. Save to database
             logger.debug("Saving detection result")
             import uuid
             request_id = str(uuid.uuid4())
@@ -178,11 +192,11 @@ class DetectionService:
             detection = self.detection_repo.create_detection(
                 message_hash=message_hash,
                 category=class_result.category,
-                risk_score=class_result.risk_score,
-                is_scam=class_result.is_scam,
+                risk_score=final_risk_score,
+                is_scam=final_is_scam,
                 reason=explain_result.reason,
                 advice=explain_result.advice,
-                model_version=self.classifier.get_version(),
+                model_version=f"{self.classifier.get_version()}+{self.explainer.provider}",
                 source=source,
                 partner_id=partner_id,
                 metadata={
@@ -190,10 +204,12 @@ class DetectionService:
                     "user_ref": request.user_ref,
                     "classifier_confidence": class_result.confidence,
                     "explainer_confidence": explain_result.confidence,
+                    "rule_score": class_result.risk_score,
+                    "ai_score": final_risk_score
                 }
             )
             
-            # Create Dataset Entry (Raw Data) if enabled
+            # Create Dataset Entry
             if settings.collect_training_data:
                 try:
                     dataset_entry = Dataset(
@@ -201,30 +217,28 @@ class DetectionService:
                         source=source,
                         content=clean_message,
                         labeled_category=class_result.category,
-                        is_scam=class_result.is_scam
+                        is_scam=final_is_scam
                     )
                     self.db.add(dataset_entry)
                     self.db.commit()
-                    logger.info("  └── Saved raw content to dataset")
                 except Exception as e:
                     logger.error(f"Failed to save dataset entry: {e}")
-                    # Non-blocking error
-            
+
             logger.info(
                 f"Detection complete: "
                 f"category={class_result.category}, "
-                f"risk={class_result.risk_score:.2f}, "
-                f"scam={class_result.is_scam}"
+                f"risk={final_risk_score:.2f}, "
+                f"scam={final_is_scam}"
             )
             
-            # 7. Build response
+            # 8. Build response
             response = DetectionResponse(
-                is_scam=class_result.is_scam,
-                risk_score=class_result.risk_score,
+                is_scam=final_is_scam,
+                risk_score=final_risk_score,
                 category=class_result.category,
                 reason=explain_result.reason,
                 advice=explain_result.advice,
-                model_version=self.classifier.get_version(),
+                model_version=f"{self.classifier.get_version()}+{self.explainer.provider}",
                 llm_version=self.explainer.get_version(),
                 request_id=detection.request_id
             )

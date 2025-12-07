@@ -1,5 +1,7 @@
 """Public API endpoints"""
 from fastapi import APIRouter, Depends, Request, HTTPException
+from sqlalchemy.orm import Session
+from app.database import get_db
 from app.models.schemas import PublicDetectRequest, PublicDetectResponse
 from app.services.detection_service import DetectionService, DetectionRequest
 from app.dependencies import get_detection_service

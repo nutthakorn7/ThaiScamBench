@@ -30,12 +30,12 @@ def backup_sqlite():
     import shutil
     from pathlib import Path
     
-    sqlite_db = Path("thai_scam_detector.db")
+    sqlite_db = Path("data/thai_scam_detector.db")
     if not sqlite_db.exists():
         logger.warning("SQLite database not found, skipping backup")
         return None
     
-    backup_path = f"thai_scam_detector.db.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    backup_path = f"data/thai_scam_detector.db.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy(sqlite_db, backup_path)
     logger.info(f"✅ SQLite database backed up to: {backup_path}")
     return backup_path
@@ -43,7 +43,7 @@ def backup_sqlite():
 
 def get_sqlite_session():
     """Create SQLite session"""
-    sqlite_url = "sqlite:///./thai_scam_detector.db"
+    sqlite_url = "sqlite:///./data/thai_scam_detector.db"
     engine = create_engine(sqlite_url)
     Session = sessionmaker(bind=engine)
     return Session(), engine

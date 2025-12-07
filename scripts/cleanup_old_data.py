@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Database configuration
-DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///./thai_scam_detector.db')
+DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///./data/thai_scam_detector.db')
 
 # Retention periods (in days)
 RETENTION_POLICY = {

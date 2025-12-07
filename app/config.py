@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     rate_limit_window: int = 60     # window in seconds (1 minute)
     
     # Database
-    database_url: str = "sqlite:///./thai_scam_detector.db"
+    database_url: str = "sqlite:///./data/thai_scam_detector.db"
     secret_key: str = "your-secret-key-change-in-production"  # For JWT signing
     
     # JWT Configuration

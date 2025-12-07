@@ -220,14 +220,31 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
                 variant="default" // Primary action
                 size="sm"
                 onClick={async () => {
+                  const shareData = {
+                    title: 'Warning - ThaiScamBench',
+                    text: `⚠️ เตือนภัย! ฉันเพิ่งตรวจสอบข้อความนี้: "${result.risk_score >= 0.7 ? 'เสี่ยงสูง 🚨' : 'ปลอดภัย ✅'}" เช็คข้อความของคุณที่นี่:`,
+                    url: `https://thaiscam.zcr.ai?title=${encodeURIComponent(result.risk_score >= 0.7 ? 'เตือนภัยมิจฉาชีพ! 🚨' : 'ปลอดภัย ✅')}&variant=${result.risk_score >= 0.7 ? 'scam' : 'safe'}`,
+                  };
+
                   try {
-                    await navigator.share({
-                      title: 'Warning - ThaiScamBench',
-                      text: `⚠️ เตือนภัย! ฉันเพิ่งตรวจสอบข้อความนี้: "${result.risk_score >= 0.7 ? 'เสี่ยงสูง 🚨' : 'ปลอดภัย ✅'}" เช็คข้อความของคุณที่นี่:`,
-                      url: `https://thaiscam.zcr.ai?title=${encodeURIComponent(result.risk_score >= 0.7 ? 'เตือนภัยมิจฉาชีพ! 🚨' : 'ปลอดภัย ✅')}&variant=${result.risk_score >= 0.7 ? 'scam' : 'safe'}`,
-                    });
+                    if (navigator.share) {
+                      await navigator.share(shareData);
+                    } else {
+                      throw new Error("Web Share API not supported");
+                    }
                   } catch (err) {
-                    console.error("Share failed", err);
+                    // Fallback: Copy to clipboard
+                    await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+                    // You might want to use a toast here if you have one, or just alert/console
+                    // Since we have 'sonner' installed (checked package.json previously or in layout), let's try to import toast or just use native alert for now to be safe, or assumes user can see it's copied.
+                    // Actually, let's just use a simple console log + UI feedback if possible.
+                    // Given we can't easily add a Toast hook imports here without checking, 
+                    // I will trust the user testing it or add a simple browser alert or better yet, assume 'sonner' is available as seen in layout.tsx
+                    // Wait, I can't see import for 'sonner' in this file. I'll stick to clipboard write.
+                    // Let's add an alert for clarity if this is a raw implementation.
+                    // Or better, just relying on the fact it's copied.
+                    console.log("Copied to clipboard instead");
+                    alert("คัดลอกลิงก์เรียบร้อยแล้ว! (Copied to clipboard)");
                   }
                 }}
                 className={cn(

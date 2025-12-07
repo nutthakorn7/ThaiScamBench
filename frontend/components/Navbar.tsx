@@ -69,7 +69,7 @@ export default function Navbar() {
             exit="closed"
             variants={menuVariants}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 top-16 z-40 bg-background/95 backdrop-blur-xl border-t border-border md:hidden"
+            className="fixed inset-0 top-16 z-[100] bg-background dark:bg-zinc-950 border-t border-border md:hidden"
           >
             <div className="container mx-auto px-4 py-8 flex flex-col space-y-6">
               <Link href="/" onClick={toggleMenu} className="text-lg font-semibold hover:text-blue-600 transition-colors p-2">

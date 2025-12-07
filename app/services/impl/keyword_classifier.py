@@ -61,8 +61,21 @@ class KeywordScamClassifier(IScamClassifier):
     
     def __init__(self):
         self._model_name = "keyword_classifier"
-        self._version = "v1.0"
-        logger.info(f"Initialized {self._model_name} {self._version}")
+        self._version = "v1.1-hybrid"
+        
+        # Load Lists
+        self.blacklist = self._load_list("app/data/blacklist.txt")
+        self.whitelist = self._load_list("app/data/whitelist.txt")
+        
+        logger.info(f"Initialized {self._model_name} {self._version} (BL:{len(self.blacklist)}, WL:{len(self.whitelist)})")
+
+    def _load_list(self, path: str) -> set:
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                return {line.strip().lower() for line in f if line.strip() and not line.startswith('#')}
+        except Exception as e:
+            logger.warning(f"Could not load list {path}: {e}")
+            return set()
     
     @property
     def model_name(self) -> str:
@@ -97,6 +110,22 @@ class KeywordScamClassifier(IScamClassifier):
             logger.debug(f"Classifying message (length: {len(message)})")
             
             message_lower = message.lower()
+            
+            # 1. WHITELIST CHECK (Pass immediately)
+            for good in self.whitelist:
+                if good in message_lower:
+                    logger.info(f"✅ Whitelist matched: {good}")
+                    return ClassificationResult(
+                        is_scam=False, risk_score=0.0, category='safe', confidence=1.0
+                    )
+
+            # 2. BLACKLIST CHECK (Block immediately)
+            for bad in self.blacklist:
+                if bad in message_lower:
+                    logger.info(f"🚫 Blacklist matched: {bad}")
+                    return ClassificationResult(
+                        is_scam=True, risk_score=1.0, category='blacklisted', confidence=1.0
+                    )
             
             # Check each scam category
             category_scores = {}

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { blogPosts } from '@/lib/blog-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://thaiscam.zcr.ai';
@@ -47,6 +48,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.7,
     },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    // Add dynamic blog posts
+    ...blogPosts.map((post): MetadataRoute.Sitemap[number] => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: currentDate,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })),
     {
       url: `${baseUrl}/partner/login`,
       lastModified: currentDate,

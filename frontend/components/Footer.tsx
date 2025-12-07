@@ -26,6 +26,11 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    บทความน่ารู้
+                  </Link>
+                </li>
+                <li>
                   <Link href="/report" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     รายงานเบาะแส
                   </Link>

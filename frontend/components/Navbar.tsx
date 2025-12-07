@@ -17,13 +17,16 @@ export default function Navbar() {
           <Link href="/" className="transition-colors hover:text-blue-700">
             หน้าแรก
           </Link>
-          <Link href="/check" className="transition-colors hover:text-blue-700">
+          <Link href="/check" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
             ตรวจสอบ
           </Link>
-          <Link href="/stats" className="transition-colors hover:text-blue-700">
+          <Link href="/stats" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
             สถิติ
           </Link>
-          <Link href="/report" className="transition-colors hover:text-blue-700">
+          <Link href="/blog" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
+            บทความ
+          </Link>
+          <Link href="/report" className="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-colors">
             แจ้งเบาะแส
           </Link>
           <Link href="/partner/login" className="transition-colors hover:text-blue-700">

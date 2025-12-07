@@ -4,7 +4,7 @@ PostgreSQL Migration Script
 Migrates data from SQLite to PostgreSQL database.
 
 Usage:
-    python scripts/migrate_to_postgres.py
+    python scripts/migrations/migrate_to_postgres.py
     
 Prerequisites:
     - PostgreSQL server running

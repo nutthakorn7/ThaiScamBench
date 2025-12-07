@@ -102,10 +102,10 @@ return result
 
 ```bash
 # Cron job รันทุกวันเวลา 02:00 AM
-0 2 * * * /path/to/venv/bin/python /path/to/scripts/cleanup_old_data.py
+0 2 * * * /path/to/venv/bin/python /path/to/scripts/maintenance/cleanup_old_data.py
 ```
 
-**ดูรายละเอียดใน:** `scripts/cleanup_old_data.py`
+**ดูรายละเอียดใน:** `scripts/maintenance/cleanup_old_data.py`
 
 ### การกำหนดเวลาเก็บข้อมูล
 

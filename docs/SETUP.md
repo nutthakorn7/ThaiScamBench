@@ -254,7 +254,7 @@ pytest --cov=app tests/
 pytest tests/test_detection.py
 
 # Production tests
-python scripts/production_test.py
+python scripts/maintenance/production_test.py
 ```
 
 ---

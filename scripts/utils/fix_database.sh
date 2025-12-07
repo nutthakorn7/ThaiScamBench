@@ -42,7 +42,7 @@ if [ $? -eq 0 ]; then
     echo "Next steps:"
     echo "1. Restart the server: uvicorn app.main:app --reload"
     echo "2. Test the API: curl http://localhost:8000/health"
-    echo "3. Run production tests: python scripts/production_test.py"
+    echo "3. Run production tests: python scripts/maintenance/production_test.py"
     echo "================================"
 else
     echo ""

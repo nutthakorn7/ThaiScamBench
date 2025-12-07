@@ -15,7 +15,7 @@ docker compose logs -f postgres
 DATABASE_URL=postgresql://thaiscam_user:thaiscam_dev_password@localhost:5432/thaiscam
 
 # Run migration
-PYTHONPATH=/Users/pop7/Code/ThaiScamBench python3 scripts/migrate_to_postgres.py
+PYTHONPATH=/Users/pop7/Code/ThaiScamBench python3 scripts/migrations/migrate_to_postgres.py
 
 # Run app ปกติ
 uvicorn app.main:app --reload
@@ -141,7 +141,7 @@ docker compose ps
 ### 3. Run Migration
 ```bash
 export DATABASE_URL=postgresql://thaiscam_user:thaiscam_dev_password@localhost:5432/thaiscam
-python3 scripts/migrate_to_postgres.py
+python3 scripts/migrations/migrate_to_postgres.py
 ```
 
 ### 4. Start Development Server
@@ -187,7 +187,7 @@ docker compose down -v
 docker compose up -d postgres
 
 # Re-run migration
-python3 scripts/migrate_to_postgres.py
+python3 scripts/migrations/migrate_to_postgres.py
 ```
 
 ---
@@ -230,7 +230,7 @@ docker compose up -d postgres
 
 # รอ 10 วินาที แล้ว run migration
 sleep 10
-DATABASE_URL=postgresql://thaiscam_user:thaiscam_dev_password@localhost:5432/thaiscam python3 scripts/migrate_to_postgres.py
+DATABASE_URL=postgresql://thaiscam_user:thaiscam_dev_password@localhost:5432/thaiscam python3 scripts/migrations/migrate_to_postgres.py
 
 # เริ่มทำงาน!
 uvicorn app.main:app --reload

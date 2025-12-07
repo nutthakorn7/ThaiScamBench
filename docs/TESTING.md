@@ -575,7 +575,7 @@ curl http://localhost:8000/health
 
 3. **Re-run production tests:**
    ```bash
-   python scripts/production_test.py
+   python scripts/maintenance/production_test.py
    ```
 
 ### Short-term (This Week)
@@ -633,7 +633,7 @@ Despite the database issue, the system shows excellent performance characteristi
 
 ## 📄 Files Generated
 
-- ✅ `scripts/production_test.py` - Comprehensive test suite
+- ✅ `scripts/maintenance/production_test.py` - Comprehensive test suite
 - ✅ `production_test_results.json` - Detailed test results
 - ✅ This report - `PRODUCTION_TEST_REPORT.md`
 

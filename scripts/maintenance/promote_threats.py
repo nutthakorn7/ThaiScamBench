@@ -7,7 +7,7 @@ This script analyzes Crowd Reports (Layer 3) and promotes confirmed threats
 to the Blacklist (Layer 1) for instant blocking.
 
 Usage:
-    python scripts/promote_threats.py
+    python scripts/maintenance/promote_threats.py
 """
 import sys
 import os

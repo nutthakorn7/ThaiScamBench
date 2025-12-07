@@ -2,7 +2,7 @@
 Script to hash admin password for environment configuration
 
 Usage:
-    python scripts/hash_password.py
+    python scripts/utils/hash_password.py
     
 Then copy the hash to ADMIN_PASSWORD_HASH in .env
 """

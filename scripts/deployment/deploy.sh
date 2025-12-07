@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deployment Script for ThaiScamBench
-# Usage: ./scripts/deploy.sh
+# Usage: ./scripts/deployment/deploy.sh
 
 echo "🚀 Starting Deployment..."
 

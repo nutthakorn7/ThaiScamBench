@@ -18,7 +18,7 @@ Automated cleanup script for PDPA compliance - deletes/anonymizes old data accor
 
 ```bash
 # Dry run (check what would be deleted)
-python scripts/cleanup_old_data.py
+python scripts/maintenance/cleanup_old_data.py
 
 # Check the logs
 tail -f logs/cleanup.log
@@ -31,7 +31,7 @@ tail -f logs/cleanup.log
 crontab -e
 
 # Add this line to run daily at 2 AM
-0 2 * * * cd /path/to/ThaiScamBench && /path/to/venv/bin/python scripts/cleanup_old_data.py >> logs/cleanup.log 2>&1
+0 2 * * * cd /path/to/ThaiScamBench && /path/to/venv/bin/python scripts/maintenance/cleanup_old_data.py >> logs/cleanup.log 2>&1
 ```
 
 ### 3. Setup Task Scheduler (Windows)
@@ -52,7 +52,7 @@ services:
     volumes:
       - ./:/app
     working_dir: /app
-    command: python scripts/cleanup_old_data.py
+    command: python scripts/maintenance/cleanup_old_data.py
     environment:
       - DATABASE_URL=${DATABASE_URL}
     deploy:
@@ -95,7 +95,7 @@ Set up monitoring alerts for:
 ### Force Delete All Old Data
 
 ```bash
-python scripts/cleanup_old_data.py --force --days 0
+python scripts/maintenance/cleanup_old_data.py --force --days 0
 ```
 
 ### Restore from Backup

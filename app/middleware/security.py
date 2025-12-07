@@ -45,7 +45,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         
         # Check content length header
         content_length = request.headers.get('content-length')
-        if content_length and int(content_length) > 100000:  # 100KB limit
+        if content_length and int(content_length) > 10000000:  # 10MB limit
             logger.warning(f"Request too large: {content_length} bytes from {request.client.host}")
             raise HTTPException(
                 status_code=413,

@@ -11,7 +11,8 @@ export const api = axios.create({
 
 export interface DetectionRequest {
   text?: string;
-  image?: string; // Base64
+  image?: string; // Base64 (legacy)
+  file?: File; // New file upload support
 }
 
 export interface DetectionResponse {
@@ -22,6 +23,7 @@ export interface DetectionResponse {
   reason: string;
   advice: string;
   model_version: string;
+  extracted_text?: string; // Text from OCR
   // Legacy fields for backward compatibility
   confidence?: number;
   risk_level?: 'safe' | 'suspicious' | 'high_risk';
@@ -30,10 +32,24 @@ export interface DetectionResponse {
 }
 
 export const detectScam = async (data: DetectionRequest): Promise<DetectionResponse> => {
-  const response = await api.post<DetectionResponse>('/public/detect/text', {
-    message: data.text, // Backend expects "message" not "text"
-  });
-  return response.data;
+  if (data.file) {
+    // Image detection flow
+    const formData = new FormData();
+    formData.append('file', data.file);
+    
+    const response = await api.post<DetectionResponse>('/public/detect/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } else {
+    // Text detection flow
+    const response = await api.post<DetectionResponse>('/public/detect/text', {
+      message: data.text, // Backend expects "message" not "text"
+    });
+    return response.data;
+  }
 };
 
 // Define response type

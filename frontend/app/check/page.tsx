@@ -29,7 +29,11 @@ export default function CheckPage() {
     handleCheck,
     handleRandomExample,
     feedbackOpen,
-    setFeedbackOpen
+    setFeedbackOpen,
+    file,
+    preview,
+    handleFileSelect,
+    handleRemoveFile
   } = useScamDetection();
 
   return (
@@ -55,6 +59,10 @@ export default function CheckPage() {
             loading={loading}
             handleCheck={handleCheck}
             handleRandomExample={handleRandomExample}
+            file={file}
+            preview={preview}
+            handleFileSelect={handleFileSelect}
+            handleRemoveFile={handleRemoveFile}
           />
 
           <LoadingOverlay loading={loading} />

@@ -11,34 +11,70 @@ export function useScamDetection() {
   const [result, setResult] = useState<DetectionResponse | null>(null);
   const [error, setError] = useState("");
   const [inputError, setInputError] = useState("");
+  
+  // New state for image upload
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        setInputError("ขนาดรูปภาพต้องไม่เกิน 10MB");
+        return;
+      }
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+      setInputError("");
+      // Clear text input error when image is selected
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFile(null);
+    if (preview) {
+      URL.revokeObjectURL(preview); // Cleanup memory
+      setPreview(null);
+    }
+  };
 
   const handleCheck = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Input validation
-    if (!input.trim()) {
-      setInputError("กรุณาใส่ข้อความที่ต้องการตรวจสอบ");
-      return;
-    }
-    
-    if (input.trim().length < 5) {
-      setInputError("ข้อความต้องมีอย่างน้อย 5 ตัวอักษร");
-      return;
+    // Input validation (Modified for Image support)
+    // If no file selected AND (no text OR text too short) -> Error
+    if (!file) {
+        if (!input.trim()) {
+          setInputError("กรุณาใส่ข้อความหรือแนบรูปภาพ");
+          return;
+        }
+        if (input.trim().length < 5) {
+          setInputError("ข้อความต้องมีอย่างน้อย 5 ตัวอักษร");
+          return;
+        }
     }
 
     setInputError("");
     setLoading(true);
     setError("");
     setResult(null);
-    setLoadingMessage("กำลังวิเคราะห์...");
+    setLoadingMessage(file ? "กำลังอ่านข้อมูลจากรูป..." : "กำลังวิเคราะห์...");
 
     // Simulate progress
     setTimeout(() => setLoadingMessage("เกือบเสร็จแล้ว..."), 1000);
 
     try {
       console.log('[DEBUG] Calling detectScam API...');
-      const data = await detectScam({ text: input });
+      // Pass both text and file (if any)
+      const data = await detectScam({ 
+        text: input,
+        file: file || undefined
+      });
       console.log('[DEBUG] API response:', data);
+      
+      // If OCR extracted text, update input field logic could happen here
+      // But for now we just show result
+      
       setResult(data);
       
       // Add Haptic Feedback for Mobile (vibration pattern)
@@ -76,6 +112,7 @@ export function useScamDetection() {
     ];
     const randomExample = SCAM_EXAMPLES[Math.floor(Math.random() * SCAM_EXAMPLES.length)];
     setInput(randomExample);
+    handleRemoveFile(); // Clear file if random example is clicked
     setInputError("");
   };
 
@@ -116,6 +153,11 @@ Request ID: ${result.request_id}`;
     copied,
     handleCopy,
     feedbackOpen,
-    setFeedbackOpen
+    setFeedbackOpen,
+    // File exports
+    file,
+    preview,
+    handleFileSelect,
+    handleRemoveFile
   };
 }

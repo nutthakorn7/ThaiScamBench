@@ -114,7 +114,7 @@ export default function BlogIndexPage() {
             <Link href={`/blog/${featuredPost.slug}`}>
               <div className="group relative overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl transition-all hover:shadow-2xl">
                 <div className="grid md:grid-cols-2">
-                  <div className="relative h-64 md:h-auto overflow-hidden">
+                  <div className="relative h-64 md:h-full overflow-hidden">
                     <Image 
                       src={featuredPost.coverImage} 
                       alt={featuredPost.title}

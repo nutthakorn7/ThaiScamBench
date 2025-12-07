@@ -124,12 +124,29 @@ export interface ReportRequest {
     text: string;
     is_scam: boolean;
     additional_info?: string;
-    contact_info?: string;
+    contact_info?: string; // Legacy?
+    file?: File;
 }
 
 export const submitReport = async (data: ReportRequest) => {
     try {
-        const response = await api.post('/public/report', data);
+        const formData = new FormData();
+        formData.append('text', data.text);
+        formData.append('is_scam', String(data.is_scam));
+        
+        if (data.additional_info) {
+             formData.append('additional_info', data.additional_info);
+        }
+        
+        if (data.file) {
+            formData.append('file', data.file);
+        }
+
+        const response = await api.post('/public/report', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     } catch (error) {
         console.warn("API Report Error, functioning in mock mode:", error);

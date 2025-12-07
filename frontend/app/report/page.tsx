@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Send, AlertTriangle, CheckCircle2, MessageSquare } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Send, AlertTriangle, CheckCircle2, MessageSquare, Image as ImageIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { submitReport } from "@/lib/api";
 import { toast } from "sonner";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@/hooks/use-window-size";
+import { cn } from "@/lib/utils"; // Ensure cn is imported or use template literals
 
 export default function ReportPage() {
   const [formData, setFormData] = useState({
@@ -23,6 +24,34 @@ export default function ReportPage() {
   const [error, setError] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
+
+  // Image Upload State
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        toast.error("ขนาดรูปภาพต้องไม่เกิน 10MB");
+        return;
+      }
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile));
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFile(null);
+    if (preview) {
+      URL.revokeObjectURL(preview);
+      setPreview(null);
+    }
+    if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  };
 
   // Keyboard shortcut: Cmd/Ctrl + Enter to submit
   useEffect(() => {
@@ -48,12 +77,14 @@ export default function ReportPage() {
       await submitReport({
         text: formData.text,
         is_scam: formData.is_scam_actual === "true",
-        additional_info: formData.comments
+        additional_info: formData.comments,
+        file: file || undefined
       });
       
       setSuccess(true);
       setShowConfetti(true);
       setFormData({ text: "", is_scam_actual: "true", comments: "" });
+      handleRemoveFile(); // Clear image
       
       // Success toast with celebration
       toast.success("รายงานส่งสำเร็จ! 🎉", {
@@ -125,16 +156,60 @@ export default function ReportPage() {
                    aria-label="รายละเอียดการหลอกลวงที่ต้องการแจ้ง"
                    aria-required="true"
                    aria-describedby="text-hint"
-                   className="flex min-h-64 w-full rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none"
-                   placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน, เลขบัญชีที่น่าสงสัย..."
+                   className={`flex min-h-64 w-full rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none ${preview ? 'pb-24' : ''}`}
+                   placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน, เลขบัญชีที่น่าสงสัย หรือแนบรูปภาพ..."
                    value={formData.text}
                    onChange={(e) => setFormData({...formData, text: e.target.value})}
-                   required
+                   required={!file} // If file exists, text is optional
                    rows={10}
                 />
-                <p id="text-hint" className="text-xs text-muted-foreground mt-2">
-                  กรุณากรอกข้อมูลอย่างละเอียดเพื่อช่วยให้การวิเคราะห์แม่นยำ
-                </p>
+
+                {/* Image Upload Button */}
+                <div className="absolute bottom-4 right-4 z-10 flex gap-2">
+                   <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                   />
+                   <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                      onClick={() => fileInputRef.current?.click()}
+                      title="อัปโหลดรูปภาพ"
+                   >
+                      <ImageIcon className="h-6 w-6" />
+                   </Button>
+                </div>
+
+                {/* Image Preview Overlay */}
+                {preview && (
+                  <div className="absolute bottom-4 left-6 z-10 animate-in fade-in zoom-in duration-200">
+                    <div className="relative group/preview inline-block">
+                        <img 
+                            src={preview} 
+                            alt="Preview" 
+                            className="h-20 w-auto object-cover rounded-lg border-2 border-primary/50 shadow-md bg-background"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleRemoveFile}
+                            className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-0.5 shadow-sm hover:bg-destructive/90 transition-colors"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
+                    </div>
+                  </div>
+                )}
+
+                {!preview && (
+                    <p id="text-hint" className="text-xs text-muted-foreground mt-2 absolute -bottom-6 left-2">
+                    กรุณากรอกข้อมูลอย่างละเอียดเพื่อช่วยให้การวิเคราะห์แม่นยำ
+                    </p>
+                )}
               </div>
             </div>
 

@@ -1,5 +1,5 @@
 """Public API endpoints"""
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends, Request, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.schemas import PublicDetectRequest, PublicDetectResponse, PublicReportRequest
@@ -111,48 +111,56 @@ async def get_wiki_data(
 @router.post(
     "/report",
     summary="แจ้งเบาะแส (Report)",
-    description="รับแจ้งเบาะแสจากผู้ใช้ (Crowd Reporting)"
+    description="รับแจ้งเบาะแสจากผู้ใช้ (Crowd Reporting) รองรับรูปภาพ"
 )
 @limiter.limit("10/minute")
 async def report_scam(
     request: Request,
-    body: PublicReportRequest,
+    text: str = Form(..., description="ข้อความที่ต้องการรายงาน"),
+    is_scam: bool = Form(..., description="ใช่ Scam หรือไม่"),
+    additional_info: str = Form(None, description="ข้อมูลเพิ่มเติม"),
+    file: UploadFile = File(None, description="รูปภาพหลักฐาน (ถ้ามี)"),
     service: DetectionService = Depends(get_detection_service)
 ):
     """
     Endpoint for users to manually report scams.
-    These reports act as 'Crowd Wisdom' feeding into Layer 3.
+    Supports both text and image evidence.
     """
     try:
-        # We process this as a 'detection' but force the result based on user input
-        # This allows us to use the same pipeline and storage
+        from app.services.ocr_service import OCRService
         
-        # 1. Create a pseudo-request
-        detect_request = DetectionRequest(
-            message=body.text,
-            channel="web_report",
-            user_ref=None
-        )
+        extracted_text = ""
+        ocr_result_info = ""
+
+        # Process Image if provided
+        if file:
+            # Validate Image
+            if not file.content_type.startswith('image/'):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Invalid file type. Only images are allowed."
+                )
+            
+            # Read and Scan
+            contents = await file.read()
+            ocr_service = OCRService()
+            extracted_text = ocr_service.extract_text(contents)
+            
+            if extracted_text:
+                ocr_result_info = f"\n\n[OCR Extracted]: {extracted_text}"
+
+        # Combine info for storage
+        final_details = (additional_info or "") + ocr_result_info
         
-        # 2. Use service to hash and save, but we need to override the result.
-        # Since 'detect_scam' usually runs analysis, we might want a simpler method 
-        # specifically for saving 'raw reports'.
-        # However, to be consistent with 'get_scam_count', we need it in the Detection table.
-        
-        # Hack: We use the repo directly via service to save a 'forced' record?
-        # Better: Implementation usage of 'service.report_scam_manual' (if it existed)
-        # For now, we reuse detect pipeline but add specific extra data?
-        # NO, that's slow and expensive (AI call).
-        
-        # Let's add a dedicated method to DetectionService or just do it here.
-        # Ideally logic belongs in Service.
-        
+        # Call service to submit report
         return await service.submit_manual_report(
-            message=body.text,
-            is_scam=body.is_scam,
-            details=body.additional_info
+            message=text, # Main text input
+            is_scam=is_scam,
+            details=final_details
         )
         
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Report submission error: {e}", exc_info=True)
         raise HTTPException(

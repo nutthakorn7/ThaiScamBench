@@ -38,6 +38,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { ThemeProvider } from "@/components/theme-provider";
 import { StructuredData } from "@/components/StructuredData";
 import { webApplicationSchema, organizationSchema } from "@/lib/structured-data";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thaiscam.zcr.ai'),
@@ -110,16 +111,18 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <Toaster position="top-right" richColors />
-          <SpeedInsights />
-          <Analytics />
+          <Providers>
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <Toaster position="top-right" richColors />
+            <SpeedInsights />
+            <Analytics />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

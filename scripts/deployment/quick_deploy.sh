@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 # Configuration
 SERVER_IP="172.104.171.16"
 SERVER_USER="root"
-SSH_KEY="~/.ssh/thaiscam_deploy"
+SSH_KEY="$HOME/.ssh/thaiscam_deploy"
 PROJECT_DIR="/opt/thaiscam"
 
 # Check if SSH key exists

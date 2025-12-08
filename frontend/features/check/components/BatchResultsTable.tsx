@@ -21,11 +21,11 @@ export function BatchResultsTable({ result, onReset }: BatchResultsTableProps) {
     const headers = ["Filename", "Status", "Is Scam", "Risk Score", "Category", "Reason"];
     const rows = results.map(r => [
       r.filename,
-      r.status,
+      r.success ? "Success" : "Failed",
       r.is_scam ? "Yes" : "No",
-      (r.risk_score * 100).toFixed(2) + "%",
-      r.category,
-      `"${r.reason.replace(/"/g, '""')}"`
+      r.risk_score ? (r.risk_score * 100).toFixed(2) + "%" : "N/A",
+      r.category || "-",
+      `"${(r.reason || r.error || "").replace(/"/g, '""')}"`
     ]);
     
     const csvContent = [
@@ -48,7 +48,7 @@ export function BatchResultsTable({ result, onReset }: BatchResultsTableProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <SummaryCard 
           title="ทั้งหมด" 
-          value={summary.total} 
+          value={result.total_images} 
           icon={<FileText className="w-5 h-5" />}
           className="bg-slate-50 dark:bg-slate-900 border-slate-200"
         />
@@ -68,7 +68,7 @@ export function BatchResultsTable({ result, onReset }: BatchResultsTableProps) {
         />
         <SummaryCard 
           title="ถูกดัดแปลง" 
-          value={summary.manipulated_count} 
+          value={summary.manipulated_images} 
           icon={<Smartphone className="w-5 h-5" />}
           className="bg-purple-50 dark:bg-purple-950/30 border-purple-200 text-purple-600"
           valueClassName="text-purple-600"
@@ -109,7 +109,7 @@ export function BatchResultsTable({ result, onReset }: BatchResultsTableProps) {
                                 <TableCell className="font-mono text-muted-foreground">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{item.filename}</TableCell>
                                 <TableCell>
-                                    {item.status === 'success' ? (
+                                    {item.success ? (
                                          <Badge 
                                             variant={item.is_scam ? "destructive" : "outline"}
                                             className={cn(
@@ -130,7 +130,7 @@ export function BatchResultsTable({ result, onReset }: BatchResultsTableProps) {
                                     )}
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    {item.risk_score > 0 && (
+                                    {(item.risk_score !== undefined && item.risk_score > 0) && (
                                         <div className="flex items-center justify-end gap-2">
                                             <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                                 <div 

@@ -213,22 +213,29 @@ export const submitReport = async (data: ReportRequest) => {
 };
 
 export interface BatchSummary {
-    total: number;
     successful: number;
     failed: number;
     scam_count: number;
     safe_count: number;
-    avg_risk_score: number;
-    scam_percentage: number;
+    average_risk_score: number;
     categories: Record<string, number>;
-    manipulated_count: number;
+    manipulated_images: number;
+    errors: any[];
 }
 
-export interface BatchImageResponse extends DetectionResponse {
+export interface BatchImageResponse {
     filename: string;
-    original_index: number;
-    status: 'success' | 'failed';
+    index: number;
+    success: boolean;
     error?: string;
+    is_scam?: boolean;
+    risk_score?: number;
+    category?: string;
+    reason?: string;
+    extracted_text?: string;
+    visual_analysis?: any;
+    forensics?: any;
+    slip_verification?: any;
 }
 
 export interface PublicBatchResponse {

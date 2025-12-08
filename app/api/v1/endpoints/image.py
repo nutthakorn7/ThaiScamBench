@@ -170,17 +170,89 @@ async def detect_image_public(
         )
 
 
+
 # --- Public Batch Endpoint ---
 
-from app.models.batch import BatchSummary, BatchImageResponse
-from app.utils.batch_processing import process_batch_images
+from app.models.batch import BatchSummary, BatchImageResult
+from app.utils.batch_processing import process_image_batch
 from typing import List
 
 class PublicBatchResponse(BaseModel):
     batch_id: str
     total_images: int
-    results: List[BatchImageResponse]
+    results: List[BatchImageResult]
     summary: BatchSummary
+
+# Adapter to reuse single image logic within batch processor
+async def _process_public_image_adapter(
+    file: UploadFile,
+    channel: str,
+    user_ref: str,
+    partner_id: str, # Not used for public
+    service: DetectionService
+):
+    # Reuse the logic but return dict structure expected by batch processor
+    # We basically need what detect_image_public does but without the HTTP Response wrapper
+    
+    content = await file.read()
+    
+    # Validation
+    is_valid, error_msg = validate_image_content(content, file.filename)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=error_msg)
+        
+    ocr_service = OCRService()
+    
+    # OCR + Vision
+    try:
+        result_data = await ocr_service.extract_text_and_analyze(content)
+        extracted_text = result_data["text"]
+        visual_analysis = result_data.get("visual_analysis")
+    except AttributeError:
+        extracted_text = ocr_service.extract_text(content)
+        visual_analysis = None
+        
+    if not extracted_text.strip():
+        # Handle empty text (create a dummy result)
+        from app.services.detection_service import DetectionResponse as ServiceResponse
+        result = ServiceResponse(
+            is_scam=False, risk_score=0.0, category="Unknown", 
+            reason="ไม่พบข้อความ", advice="ลองใหม่", model_version="OCR", 
+            llm_version="N/A", request_id="batch_empty"
+        )
+    else:
+        # Detect
+        det_request = DetectionRequest(message=extracted_text, channel=channel)
+        result = await service.detect_scam(request=det_request, source="public_batch")
+
+    # Fusion
+    final_risk = result.risk_score
+    reason = result.reason
+    if visual_analysis:
+        final_risk = (result.risk_score * 0.6) + (visual_analysis.visual_risk_score * 0.4)
+        if visual_analysis.is_suspicious:
+            reason += f" | Visual: {visual_analysis.reason}"
+    
+    # Format for BatchImageResult
+    # (The batch processor expects a dict with "result" object and extra fields)
+    
+    # We need to monkey-patch or clone result to update risk_score/reason if changed by fusion
+    result.risk_score = final_risk
+    result.reason = reason
+    result.is_scam = final_risk >= settings.public_threshold
+
+    return {
+        "result": result,
+        "extracted_text": extracted_text,
+        "visual_analysis": {
+            "is_suspicious": visual_analysis.is_suspicious,
+            "visual_risk_score": visual_analysis.visual_risk_score,
+            "detected_patterns": visual_analysis.detected_patterns,
+            "reason": visual_analysis.reason
+        } if visual_analysis else None,
+        "forensics": None, # Public API might skip heavy forensics for batch speed? Or add it if needed.
+        "slip_verification": None
+    }
 
 @router.post(
     "/v1/public/detect/image/batch",
@@ -189,7 +261,7 @@ class PublicBatchResponse(BaseModel):
     description="ตรวจสอบรูปภาพพร้อมกันหลายรูป (สูงสุด 10 รูป)",
     tags=["Public Detection"]
 )
-@limiter.limit(f"5/minute") # Stricter rate limit for batch
+@limiter.limit(f"5/minute")
 async def detect_image_batch_public(
     request: Request,
     files: List[UploadFile] = File(...),
@@ -199,29 +271,23 @@ async def detect_image_batch_public(
     Public Batch Image Detection
     
     - Max 10 images per request
-    - Returns analysis for each image + summary
     """
-    # 1. Validation
     if len(files) > 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"อนุญาตให้ตรวจสอบสูงสุด 10 รูปภาพต่อครั้ง (ส่งมา {len(files)} รูป)"
+            detail=f"อนุญาตสูงสุด 10 รูป (ส่งมา {len(files)})"
         )
     
     if not files:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="กรุณาแนบไฟล์รูปภาพ"
-        )
+        raise HTTPException(status_code=400, detail="กรุณาแนบไฟล์")
 
-    # 2. Process Batch (Reuse shared utility)
-    # Note: Public API doesn't use quota, so quota_check_fn is None
-    batch_result = await process_batch_images(
+    batch_result = await process_image_batch(
         files=files,
-        detection_service=detection_service,
-        partner_id="public_user", # Marker for logging
-        quota_check_fn=None,
-        deduct_quota_fn=None
+        partner_id="public",
+        service=detection_service,
+        channel="public_batch",
+        user_ref="public_user",
+        process_func=_process_public_image_adapter
     )
     
     return PublicBatchResponse(

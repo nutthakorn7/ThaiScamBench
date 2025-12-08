@@ -35,7 +35,8 @@ export default function CategoriesPage() {
     fetchData();
   }, [fetchData]);
 
-  const columns = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: any[] = [
     {
       header: "Rank",
       cell: (item: CategoryItem) => {
@@ -105,7 +106,7 @@ export default function CategoriesPage() {
       </PageHeader>
 
       <PremiumTable 
-        data={data?.items || []}
+        data={data?.items.map(item => ({ ...item, id: item.category })) || []}
         columns={columns}
         totalItems={data?.total || 0}
         page={page}

@@ -45,7 +45,8 @@ export default function PartnersPage() {
     }
   };
 
-  const columns = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: any[] = [
     {
       header: "Rank",
       cell: (item: PartnerItem) => {
@@ -128,7 +129,7 @@ export default function PartnersPage() {
       </PageHeader>
 
       <PremiumTable 
-        data={data?.items || []}
+        data={data?.items.map(item => ({ ...item, id: item.partner_id })) || []}
         columns={columns}
         totalItems={data?.total || 0}
         page={page}

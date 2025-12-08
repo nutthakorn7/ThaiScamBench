@@ -74,6 +74,18 @@ class Settings(BaseSettings):
     # Dataset Collection (Raw Data for Training)
     collect_training_data: bool = True
     
+    # Email Configuration
+    mail_username: str = "your-email@example.com"
+    mail_password: str = "your-password"
+    mail_from: str = "admin@thaiscam.zcr.ai"
+    mail_port: int = 587
+    mail_server: str = "smtp.gmail.com"
+    mail_starttls: bool = True
+    mail_ssl_tls: bool = False
+    use_credentials: bool = True
+    validate_certs: bool = True
+    domain_name: str = "thaiscam.zcr.ai"  # For generating links
+    
     @property
     def is_development(self) -> bool:
         """Check if running in development mode"""

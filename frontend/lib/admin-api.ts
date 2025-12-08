@@ -304,6 +304,7 @@ export const getFeedbackList = async (page: number = 1, pageSize: number = 50): 
 export interface User {
   id: string;
   email: string;
+  name?: string;
   role: 'admin' | 'user';
   status: 'active' | 'banned';
   last_login: string;
@@ -333,6 +334,20 @@ const getMockUsers = (page: number, pageSize: number): UserListResponse => ({
 
 export const getUsers = async (page: number = 1, pageSize: number = 50): Promise<UserListResponse> => {
   if (isBypassToken()) return getMockUsers(page, pageSize);
-  const response = await adminApi.get<UserListResponse>(`/users?page=${page}&page_size=${pageSize}`);
+  // Endpoint is at /v1/auth/users, adminApi base is /v1/admin
+  const response = await adminApi.get<UserListResponse>(`/../auth/users?page=${page}&page_size=${pageSize}`);
   return response.data;
+};
+
+export interface CreateUserRequest {
+  email: string;
+  name?: string;
+  role: 'admin' | 'partner';
+  password?: string;
+}
+
+export const createUser = async (data: CreateUserRequest): Promise<User> => {
+   // Endpoint is at /v1/auth/users
+   const response = await adminApi.post<User>('/../auth/users', data);
+   return response.data;
 };

@@ -14,32 +14,73 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { getUsers, type User } from "@/lib/admin-api";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { getUsers, createUser, type User } from "@/lib/admin-api";
 import { Search, Loader2, User as UserIcon, Shield, Ban, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    name: "",
+    role: "partner" as "admin" | "partner"
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Data Loading State
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        const data = await getUsers(page, 20);
-        setUsers(data.items);
-      } catch (error) {
-        console.error("Failed to load users", error);
-        toast.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadData();
   }, [page]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await getUsers(page, 20);
+      setUsers(data.items);
+    } catch (error) {
+      console.error("Failed to load users", error);
+      toast.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await createUser({
+        email: newUser.email,
+        name: newUser.name,
+        role: newUser.role
+      });
+      toast.success("สร้างผู้ใช้งานสำเร็จ! ระบบได้ส่งอีเมลยืนยันแล้ว");
+      setIsAddUserOpen(false);
+      setNewUser({ email: "", name: "", role: "partner" });
+      loadData(); // Refresh list
+    } catch (error: any) {
+      console.error("Failed to create user", error);
+      const msg = error.response?.data?.detail || "เกิดข้อผิดพลาดในการสร้างผู้ใช้";
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <AdminLayout>
@@ -52,10 +93,80 @@ export default function UsersPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button>
-              <UserIcon className="mr-2 h-4 w-4" />
-              Add User
-            </Button>
+            <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  Add User
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>เพิ่มผู้ใช้งานใหม่</DialogTitle>
+                  <DialogDescription>
+                    สร้างบัญชีผู้ใช้ใหม่ ระบบจะสร้างรหัสผ่านและส่งทางอีเมลอัตโนมัติ
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddUser} className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="user@example.com"
+                      required
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="name">ชื่อ-นามสกุล (Optional)</Label>
+                    <Input
+                      id="name"
+                      placeholder="Somchai Jai-dee"
+                      value={newUser.name}
+                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Role</Label>
+                    <div className="flex gap-4 pt-1">
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="role"
+                          value="partner"
+                          checked={newUser.role === "partner"}
+                          onChange={() => setNewUser({ ...newUser, role: "partner" })}
+                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                        />
+                        <span>User / Partner</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="role"
+                          value="admin"
+                          checked={newUser.role === "admin"}
+                          onChange={() => setNewUser({ ...newUser, role: "admin" })}
+                          className="h-4 w-4 text-primary border-gray-300 focus:ring-primary"
+                        />
+                        <span>Administrator</span>
+                      </label>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                      ยกเลิก
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      สร้างบัญชี
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -86,6 +197,7 @@ export default function UsersPage() {
                   <TableRow>
                     <TableHead className="w-[100px]">ID</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Last Login</TableHead>
@@ -100,6 +212,9 @@ export default function UsersPage() {
                       </TableCell>
                       <TableCell>
                         <div className="font-medium">{user.email}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-gray-500">{user.name || "-"}</div>
                       </TableCell>
                       <TableCell>
                         {user.role === 'admin' ? (
@@ -122,7 +237,7 @@ export default function UsersPage() {
                         )}
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {new Date(user.last_login).toLocaleString('th-TH')}
+                        {user.last_login ? new Date(user.last_login).toLocaleString('th-TH') : "Never"}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="sm">Edit</Button>

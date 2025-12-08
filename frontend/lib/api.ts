@@ -37,7 +37,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     const formData = new FormData();
     formData.append('file', data.file);
     
-    const response = await api.post<DetectionResponse>('/public/detect/image', formData, {
+    const response = await api.post<DetectionResponse>('/api/public/detect/image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -45,7 +45,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     return response.data;
   } else {
     // Text detection flow
-    const response = await api.post<DetectionResponse>('/public/detect/text', {
+    const response = await api.post<DetectionResponse>('/api/public/detect/text', {
       message: data.text, // Backend expects "message" not "text"
     });
     return response.data;
@@ -69,7 +69,7 @@ export const getStats = async (): Promise<StatsData> => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
     
     try {
-        const res = await fetch(`${baseUrl}/public/stats`, {
+        const res = await fetch(`${baseUrl}/api/public/stats`, {
             next: { revalidate: 60 }, // Cache for 60 seconds
             headers: {
                 'Content-Type': 'application/json',
@@ -107,7 +107,7 @@ export interface FeedbackRequest {
 
 export const submitFeedback = async (data: FeedbackRequest) => {
     try {
-        const response = await api.post('/public/feedback', data);
+        const response = await api.post('/api/public/feedback', data);
         return response.data;
     } catch (error) {
         console.warn("API Feedback Error, functioning in mock mode:", error);
@@ -142,7 +142,7 @@ export const submitReport = async (data: ReportRequest) => {
             formData.append('file', data.file);
         }
 
-        const response = await api.post('/public/report', formData, {
+        const response = await api.post('/api/public/report', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

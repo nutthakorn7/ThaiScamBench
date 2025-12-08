@@ -13,6 +13,7 @@ def generate_uuid():
 class AuditLog(Base):
     """Audit log for tracking API usage without PII"""
     __tablename__ = "audit_logs"
+    __table_args__ = {'extend_existing': True}
     
     id = Column(String(36), primary_key=True, default=generate_uuid)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)

@@ -8,7 +8,7 @@ import logging
 import httpx
 import numpy as np
 import cv2
-from pyzbar.pyzbar import decode
+# from pyzbar.pyzbar import decode  <-- Moved to lazy import
 from typing import Optional
 from app.utils.image_preprocessing import preprocess_for_ocr, get_preprocessing_stats
 
@@ -172,6 +172,13 @@ class OCRService:
         Returns formatted string of detected URLs/Data.
         """
         try:
+            # Lazy import to avoid crashing if zbar is missing
+            try:
+                from pyzbar.pyzbar import decode
+            except (ImportError, OSError):
+                logger.warning("⚠️ zbar library not found. QR detection disabled.")
+                return ""
+
             # Convert bytes to numpy array
             nparr = np.frombuffer(image_content, np.uint8)
             # Decode image

@@ -1,0 +1,257 @@
+name: 🚀 Deploy to Production
+
+on:
+  # Manual trigger only - for safety
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "DEPLOY" to confirm production deployment'
+        required: true
+        default: ''
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/thaiscambench
+
+jobs:
+  # Job 1: Pre-deployment validation
+  validate:
+    name: 🔍 Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Validate deployment confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DEPLOY" ]; then
+            echo "❌ Deployment not confirmed. Please type 'DEPLOY' to proceed."
+            exit 1
+          fi
+          echo "✅ Deployment confirmed"
+      
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-test.txt
+      
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ -v --tb=short
+      
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/ -v --tb=short
+      
+      - name: Security check
+        run: |
+          pip install safety bandit
+          # Check for known vulnerabilities
+          safety check --json || true
+          # Run security linter
+          bandit -r app/ -ll || true
+      
+      - name: Frontend validation
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: "https://api.thaiscam.zcr.ai/api"
+          NEXTAUTH_SECRET: "production-secret"
+          NEXTAUTH_URL: "https://thaiscam.zcr.ai"
+
+  # Job 2: Build and push Docker image
+  build:
+    name: 🏗️ Build Docker Image
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=prod-
+            type=raw,value=latest
+            type=raw,value=previous,enable=${{ github.ref == 'refs/heads/main' }}
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+  # Job 3: Deploy to production (Manual approval required)
+  deploy:
+    name: 🚀 Deploy to Production Server
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://api.thaiscam.zcr.ai
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LINODE_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 172.104.171.16 >> ~/.ssh/known_hosts
+      
+      - name: Test SSH connection
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@172.104.171.16 "echo '✅ SSH connection successful'"
+      
+      - name: Deploy to production
+        run: |
+          ssh -i ~/.ssh/deploy_key root@172.104.171.16 << 'ENDSSH'
+            set -e
+            
+            echo "========================================="
+            echo "🚀 ThaiScamBench Production Deployment"
+            echo "========================================="
+            
+            # Navigate to project directory
+            cd /opt/thaiscam || {
+              echo "❌ Project directory not found. Creating..."
+              mkdir -p /opt/thaiscam
+              cd /opt/thaiscam
+              git clone https://github.com/${{ github.repository }}.git .
+            }
+            
+            # Pull latest code
+            echo "📥 Pulling latest code..."
+            git fetch origin
+            git checkout main
+            git pull origin main
+            
+            # Backup current state
+            echo "💾 Creating backup..."
+            BACKUP_TAG="backup-$(date +%Y%m%d-%H%M%S)"
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$BACKUP_TAG || true
+            
+            # Login to GitHub Container Registry
+            echo "🔐 Logging in to container registry..."
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull latest image
+            echo "🐳 Pulling latest Docker image..."
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            # Stop old containers
+            echo "🛑 Stopping old containers..."
+            docker-compose down --remove-orphans || true
+            
+            # Start new containers
+            echo "🚀 Starting new containers..."
+            docker-compose up -d --force-recreate
+            
+            echo "⏳ Waiting for services to stabilize (30s)..."
+            sleep 30
+            
+          ENDSSH
+      
+      - name: Health check with retry
+        run: |
+          ssh -i ~/.ssh/deploy_key root@172.104.171.16 << 'ENDSSH'
+            echo "🏥 Running health checks..."
+            
+            # Retry health check up to 12 times (60 seconds)
+            for i in {1..12}; do
+              echo "Attempt $i/12..."
+              
+              if curl -f -s http://localhost:8000/health > /dev/null 2>&1; then
+                echo "✅ Health check PASSED!"
+                echo ""
+                echo "========================================="
+                echo "✅ DEPLOYMENT SUCCESSFUL!"
+                echo "========================================="
+                echo "🌐 API: https://api.thaiscam.zcr.ai"
+                echo "📊 Docs: https://api.thaiscam.zcr.ai/docs"
+                echo ""
+                
+                # Show running containers
+                echo "📦 Running containers:"
+                docker-compose ps
+                exit 0
+              fi
+              
+              echo "Health check failed, retrying in 5s..."
+              sleep 5
+            done
+            
+            # Health check failed - rollback
+            echo "❌ Health check FAILED after 60s"
+            echo "🔄 Rolling back to previous version..."
+            
+            docker-compose down
+            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:previous ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            docker-compose up -d
+            
+            echo "❌ DEPLOYMENT FAILED - Rolled back to previous version"
+            exit 1
+          ENDSSH
+      
+      - name: Cleanup old Docker images
+        if: success()
+        run: |
+          ssh -i ~/.ssh/deploy_key root@172.104.171.16 << 'ENDSSH'
+            echo "🧹 Cleaning up old Docker images..."
+            docker image prune -f
+            docker system prune -f --volumes
+          ENDSSH
+      
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "🎉 ========================================="
+          echo "✅ Production deployment completed successfully!"
+          echo "========================================="
+          echo ""
+          echo "🌐 API URL: https://api.thaiscam.zcr.ai"
+          echo "📊 API Docs: https://api.thaiscam.zcr.ai/docs"
+          echo "📈 Admin: https://api.thaiscam.zcr.ai/admin"
+          echo ""
+          echo "🐳 Docker Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "📝 Git Commit: ${{ github.sha }}"
+          echo ""
+      
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "❌ ========================================="
+          echo "Deployment failed and was rolled back"
+          echo "========================================="
+          echo "Please check the logs above for details"
+          exit 1

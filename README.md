@@ -6,6 +6,8 @@ A production-grade, AI-powered scam detection platform featuring a modern **Next
 
 [![Next.js](https://img.shields.io/badge/Front--End-Next.js_14-black)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/Back--End-FastAPI-teal)](https://fastapi.tiangolo.com/)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF)](https://github.com/nutthakorn7/ThaiScamBench/actions)
+[![Deployment](https://img.shields.io/badge/Deployment-Production_Ready-green)](#-deployment)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 [![Status](https://img.shields.io/badge/Status-Production_Ready-green)](https://thaiscambench.com)
 
@@ -141,23 +143,33 @@ ThaiScamBench/
 
 ---
 
-## 🛠️ Scripts
+## � Deployment
 
-We have organized utility scripts into logical categories. For detailed documentation:
+### Quick Production Deploy
 
-👉 **See [scripts/README.md](scripts/README.md)** for all available scripts and usage examples.
-
-Quick examples:
 ```bash
-# Create a new partner API account
-python scripts/utils/create_partner.py
+# Method 1: Automated script (Recommended)
+./scripts/deployment/quick_deploy.sh
 
-# Run production tests
-python scripts/maintenance/production_test.py
+# Method 2: GitHub Actions (CI/CD)
+# Go to: GitHub → Actions → "🚀 Deploy to Production"
+# Type "DEPLOY" to confirm
 
-# Deploy to production
-./scripts/deployment/deploy.sh
+# Method 3: Manual SSH
+ssh root@172.104.171.16 -i ~/.ssh/thaiscam_deploy
+cd /opt/thaiscam && git pull && docker-compose up -d --build
 ```
+
+### Deployment Documentation
+
+📖 **Full deployment guide**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
+- Production server setup
+- GitHub Actions CI/CD pipeline
+- Manual deployment procedures
+- Health checks & monitoring
+- Rollback strategies
+- Troubleshooting guide
 
 ---
 

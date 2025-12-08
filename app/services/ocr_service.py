@@ -6,6 +6,9 @@ import os
 import base64
 import logging
 import httpx
+import numpy as np
+import cv2
+from pyzbar.pyzbar import decode
 from typing import Optional
 
 # Configure logging
@@ -13,6 +16,21 @@ logger = logging.getLogger(__name__)
 
 # Valid image extensions
 VALID_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".gif", ".tiff"}
+
+# Lazy import of vision analyzer to avoid circular dependency
+_vision_analyzer = None
+
+def get_vision_analyzer():
+    global _vision_analyzer
+    if _vision_analyzer is None:
+        try:
+            from app.services.impl.gemini_vision_analyzer import get_vision_analyzer as _get_analyzer
+            _vision_analyzer = _get_analyzer()
+            logger.info("✅ Gemini Vision Analyzer loaded")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to load Vision Analyzer: {e}")
+            _vision_analyzer = None
+    return _vision_analyzer
 
 def validate_image_extension(filename: str) -> bool:
     if not filename:
@@ -77,14 +95,86 @@ class OCRService:
     def extract_text(self, image_content: bytes) -> str:
         """
         Extract text from image bytes using Google Vision API.
+        Also detects QR codes natively.
         Uses API Key (REST) or Service Account based on configuration.
+        
+        DEPRECATED: Use extract_text_and_analyze() for vision analysis.
         """
+        # 1. Detect QR Codes first (Local operation)
+        qr_text = self._detect_qr_code(image_content)
+        
+        # 2. Extract OCR Text (Cloud operation)
+        ocr_text = ""
         if self._use_rest_api and self._api_key:
-            return self._extract_with_api_key(image_content)
+            ocr_text = self._extract_with_api_key(image_content)
         elif self._client:
-            return self._extract_with_client(image_content)
+            ocr_text = self._extract_with_client(image_content)
         else:
-            return self._mock_extract(image_content)
+            ocr_text = self._mock_extract(image_content)
+            
+        # Combine results
+        full_text = f"{ocr_text}\n{qr_text}".strip()
+        return full_text
+    
+    async def extract_text_and_analyze(self, image_content: bytes) -> dict:
+        """
+        Extract text AND perform visual forensics analysis.
+        
+        Returns:
+            dict with:
+                - text: str (OCR + QR combined)
+                - visual_analysis: VisualAnalysisResult (or None if disabled)
+        """
+        # 1-2. Standard text extraction (OCR + QR)
+        text = self.extract_text(image_content)
+        
+        # 3. Visual Forensics (Gemini Vision)
+        vision_analyzer = get_vision_analyzer()
+        visual_analysis = None
+        
+        if vision_analyzer:
+            try:
+                visual_analysis = await vision_analyzer.analyze_image(image_content)
+                logger.info(f"🔍 Visual analysis complete: risk={visual_analysis.visual_risk_score:.2f}")
+            except Exception as e:
+                logger.error(f"Vision analysis failed: {e}")
+                visual_analysis = None
+        
+        return {
+            "text": text,
+            "visual_analysis": visual_analysis
+        }
+
+    def _detect_qr_code(self, image_content: bytes) -> str:
+        """
+        Detect and decode QR codes from image bytes.
+        Returns formatted string of detected URLs/Data.
+        """
+        try:
+            # Convert bytes to numpy array
+            nparr = np.frombuffer(image_content, np.uint8)
+            # Decode image
+            image = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
+            
+            if image is None:
+                return ""
+
+            # Detect QR codes
+            decoded_objects = decode(image)
+            
+            results = []
+            for obj in decoded_objects:
+                data = obj.data.decode("utf-8")
+                results.append(f"[QR CODE FOUND: {data}]")
+                logger.info(f"🔍 QR Code Detected: {data}")
+            
+            if results:
+                return "\n" + "\n".join(results)
+            return ""
+            
+        except Exception as e:
+            logger.warning(f"⚠️ QR Detection failed: {e}")
+            return ""
     
     def _extract_with_api_key(self, image_content: bytes) -> str:
         """Extract text using Vision API with API Key (REST API)."""

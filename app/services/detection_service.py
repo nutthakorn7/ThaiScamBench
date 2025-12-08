@@ -155,6 +155,32 @@ class DetectionService:
             # Different thresholds for public vs partner
             threshold = settings.partner_threshold if source == DetectionSource.partner else settings.public_threshold
             class_result = self.classifier.classify(clean_message)
+            
+            # 4.5 GEMINI CASCADE: Use AI for uncertain cases
+            # If risk score is in uncertain band (0.4-0.6), use Gemini as tiebreaker
+            UNCERTAIN_LOWER = 0.4
+            UNCERTAIN_UPPER = 0.6
+            
+            if UNCERTAIN_LOWER <= class_result.risk_score <= UNCERTAIN_UPPER:
+                logger.info(f"🤔 Uncertain case detected (risk={class_result.risk_score:.2f}), consulting Gemini...")
+                try:
+                    # Lazy import to avoid circular dependency
+                    from app.services.impl.gemini_classifier import get_gemini_classifier
+                    gemini_classifier = get_gemini_classifier()
+                    
+                    if gemini_classifier:
+                        gemini_result = await gemini_classifier.classify_async(clean_message, threshold)
+                        logger.info(
+                            f"🤖 Gemini override: Rule({class_result.risk_score:.2f}) → AI({gemini_result.risk_score:.2f})"
+                        )
+                        # Use Gemini's result for uncertain cases
+                        class_result = gemini_result
+                    else:
+                        logger.warning("⚠️ Gemini Classifier not available, using rule-based result")
+                except Exception as e:
+                    logger.error(f"Gemini classification failed: {e}", exc_info=True)
+                    # Fall back to rule-based result
+                    pass
             # Override is_scam based on threshold if the classifier doesn't handle it directly
             # The classifier usually returns probability. Let's rely on its output but we could enforce strictness here.
             # Assuming classifier.classify returns results based on its internal logic or general probability. 

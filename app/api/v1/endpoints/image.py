@@ -17,6 +17,7 @@ router = APIRouter()
 # Response model extending DetectTextResponse to include extracted text
 class DetectImageResponse(DetectTextResponse):
     extracted_text: str = Field(..., description="Text extracted from the image by OCR")
+    visual_analysis: dict = Field(default=None, description="Visual forensics analysis (if enabled)")
 
 @router.post(
     "/v1/public/detect/image",
@@ -55,10 +56,19 @@ async def detect_image_public(
                 detail="ไฟล์รูปภาพว่างเปล่า"
             )
 
-        # 3. Perform OCR
-        logger.info(f"Processing OCR for file: {file.filename}")
+        # 3. Perform OCR + Visual Analysis
+        logger.info(f"Processing OCR + Vision for file: {file.filename}")
         ocr_service = OCRService() # Get Singleton
-        extracted_text = ocr_service.extract_text(image_content)
+        
+        # Try new visual analysis method (async), fallback to basic OCR
+        try:
+            result_data = await ocr_service.extract_text_and_analyze(image_content)
+            extracted_text = result_data["text"]
+            visual_analysis = result_data.get("visual_analysis")
+        except AttributeError:
+            # Fallback if extract_text_and_analyze not available
+            extracted_text = ocr_service.extract_text(image_content)
+            visual_analysis = None
         
         logger.info(f"OCR Result: {extracted_text[:100]}...") # Log first 100 chars
 
@@ -74,7 +84,8 @@ async def detect_image_public(
                 model_version="OCR-v1",
                 llm_version="N/A",
                 request_id="img_req", # Should generate real ID
-                extracted_text=""
+                extracted_text="",
+                visual_analysis=None
              )
 
         # 4. Analyze Extracted Text
@@ -88,17 +99,43 @@ async def detect_image_public(
             source="public"
         )
         
-        # 5. Return Result
+        # 5. Fuse Text Risk + Visual Risk (if available)
+        final_risk_score = result.risk_score
+        fusion_reason = result.reason
+        
+        if visual_analysis:
+            # Weighted fusion: 60% text, 40% visual
+            text_risk = result.risk_score
+            visual_risk = visual_analysis.visual_risk_score
+            final_risk_score = (text_risk * 0.6) + (visual_risk * 0.4)
+            
+            # Enhance reason with visual findings
+            if visual_analysis.is_suspicious:
+                patterns_str = ", ".join(visual_analysis.detected_patterns)
+                fusion_reason += f" | Visual: {visual_analysis.reason} (Patterns: {patterns_str})"
+            
+            logger.info(f"📊 Fused Risk: Text={text_risk:.2f}, Visual={visual_risk:.2f}, Final={final_risk_score:.2f}")
+        
+        # Determine if scam based on fused score
+        is_scam_final = final_risk_score >= settings.public_threshold
+        
+        # 6. Return Enhanced Result
         return DetectImageResponse(
-            is_scam=result.is_scam,
-            risk_score=result.risk_score,
+            is_scam=is_scam_final,
+            risk_score=final_risk_score,
             category=result.category,
-            reason=result.reason,
+            reason=fusion_reason,
             advice=result.advice,
             model_version=result.model_version,
             llm_version=result.llm_version,
             request_id=result.request_id,
-            extracted_text=extracted_text
+            extracted_text=extracted_text,
+            visual_analysis={
+                "enabled": visual_analysis is not None,
+                "is_suspicious": visual_analysis.is_suspicious if visual_analysis else False,
+                "risk_score": visual_analysis.visual_risk_score if visual_analysis else 0.0,
+                "detected_patterns": visual_analysis.detected_patterns if visual_analysis else []
+            } if visual_analysis else None
         )
 
     except HTTPException as e:

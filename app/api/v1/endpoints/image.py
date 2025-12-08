@@ -9,6 +9,8 @@ from app.core.exceptions import ValidationError, ServiceError
 from app.config import settings
 from app.middleware.rate_limit import limiter
 from app.api.v1.endpoints.detection import DetectTextResponse
+from app.cache import redis_client
+from app.utils.image_utils import validate_image_content, generate_image_hash, get_image_info
 
 logger = logging.getLogger(__name__)
 
@@ -41,22 +43,34 @@ async def detect_image_public(
     - Supports JPG, PNG, BMP, WEBP
     """
     try:
-        # 1. Validate Image Extension
-        if not validate_image_extension(file.filename):
+        # 1. Read Image Content
+        image_content = await file.read()
+        
+        # 2. Generate cache key from image hash
+        image_hash = generate_image_hash(image_content)
+        cache_key = f"image:public:{image_hash}"
+        
+        # 3. Check cache
+        cached_result = redis_client.get(cache_key)
+        if cached_result:
+            logger.info(f"✅ Image cache HIT: {image_hash[:16]}... (public)")
+            return DetectImageResponse(**cached_result)
+        
+        logger.info(f"🔍 Image cache MISS: {image_hash[:16]}... Processing image...")
+        
+        # 4. Enhanced validation
+        is_valid, error_msg = validate_image_content(image_content, file.filename)
+        if not is_valid:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="นามสกุลไฟล์ไม่ถูกต้อง (รองรับ .jpg, .png, .bmp, .webp)"
+                detail=error_msg
             )
+        
+        # Get image info for logging
+        img_info = get_image_info(image_content)
+        logger.info(f"📸 Processing image: {img_info.get('format')}, {img_info.get('width')}x{img_info.get('height')}")
 
-        # 2. Read Image Content
-        image_content = await file.read()
-        if len(image_content) == 0:
-             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="ไฟล์รูปภาพว่างเปล่า"
-            )
-
-        # 3. Perform OCR + Visual Analysis
+        # 5. Perform OCR + Visual Analysis
         logger.info(f"Processing OCR + Vision for file: {file.filename}")
         ocr_service = OCRService() # Get Singleton
         
@@ -137,6 +151,14 @@ async def detect_image_public(
                 "detected_patterns": visual_analysis.detected_patterns if visual_analysis else []
             } if visual_analysis else None
         )
+        
+        # 7. Cache the result (24 hours)
+        response_dict = response.model_dump()
+        cache_success = redis_client.set(cache_key, response_dict, ttl=86400)
+        if cache_success:
+            logger.info(f"💾 Cached image result: {image_hash[:16]}...")
+        
+        return response
 
     except HTTPException as e:
         raise e

@@ -17,6 +17,8 @@ from app.repositories.partner import PartnerRepository
 from app.core.exceptions import ValidationError, ServiceError
 from app.config import settings
 from app.middleware.rate_limit import limiter
+from app.cache import redis_client
+from app.utils.image_utils import validate_image_content, generate_image_hash, get_image_info
 
 logger = logging.getLogger(__name__)
 
@@ -280,18 +282,30 @@ async def _process_text_detection(message: str, channel: str, user_ref: Optional
 
 async def _process_image_detection(file: UploadFile, channel: str, user_ref: Optional[str],
                                    partner_id: str, service: DetectionService):
-    """Process image-only detection."""
-    # Validate image
-    if not validate_image_extension(file.filename):
-        raise HTTPException(400, "Invalid image format (support: .jpg, .png, .bmp, .webp)")
-    
+    """Process image-only detection with caching."""
+    # Read image content first
     image_content = await file.read()
-    if len(image_content) == 0:
-        raise HTTPException(400, "Empty image file")
     
-    # Size limit: 10MB
-    if len(image_content) > 10 * 1024 * 1024:
-        raise HTTPException(400, "Image too large (max 10MB)")
+    # 1. Generate cache key from image hash
+    image_hash = generate_image_hash(image_content)
+    cache_key = f"image:partner:{image_hash}"
+    
+    # 2. Check cache
+    cached_result = redis_client.get(cache_key)
+    if cached_result:
+        logger.info(f"✅ Image cache HIT: {image_hash[:16]}... (partner: {partner_id})")
+        return cached_result
+    
+    logger.info(f"🔍 Image cache MISS: {image_hash[:16]}... Processing image...")
+    
+    # 3. Enhanced validation
+    is_valid, error_msg = validate_image_content(image_content, file.filename)
+    if not is_valid:
+        raise HTTPException(400, error_msg)
+    
+    # Get image info for logging
+    img_info = get_image_info(image_content)
+    logger.info(f"📸 Processing image: {img_info.get('format')}, {img_info.get('width')}x{img_info.get('height')}")
     
     # OCR + Visual Analysis
     ocr_service = OCRService()
@@ -334,7 +348,8 @@ async def _process_image_detection(file: UploadFile, channel: str, user_ref: Opt
             patterns_str = ", ".join(visual_analysis.detected_patterns)
             result.reason += f" | Visual: {visual_analysis.reason} (Patterns: {patterns_str})"
     
-    return {
+    # Build result
+    result_data = {
         "result": result,
         "extracted_text": extracted_text,
         "visual_analysis": {
@@ -344,6 +359,13 @@ async def _process_image_detection(file: UploadFile, channel: str, user_ref: Opt
             "detected_patterns": visual_analysis.detected_patterns if visual_analysis else []
         } if visual_analysis else None
     }
+    
+    # 4. Cache the result (24 hours)
+    cache_success = redis_client.set(cache_key, result_data, ttl=86400)
+    if cache_success:
+        logger.info(f"💾 Cached image result: {image_hash[:16]}...")
+    
+    return result_data
 
 
 async def _process_hybrid_detection(file: UploadFile, message: Optional[str], context: Optional[str],

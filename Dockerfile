@@ -1,46 +1,73 @@
-# Multi-stage build for production-ready image
-FROM python:3.9-slim as builder
+# ==============================================================================
+# Layer 1: Base Python Image
+# ==============================================================================
+FROM python:3.9-slim AS base
+
+# Set environment variables for Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y \
+# ==============================================================================
+# Layer 2: Build Dependencies (gcc, etc.)
+# ==============================================================================
+FROM base AS build-deps
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
-    postgresql-client \
+    g++ \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
+# ==============================================================================
+# Layer 3: Python Dependencies (cached layer)
+# ==============================================================================
+FROM build-deps AS python-deps
+
+# Copy only requirements first for better caching
 COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Final stage
-FROM python:3.9-slim
+# Install Python packages globally (not --user)
+RUN pip install --no-cache-dir -r requirements.txt
 
-WORKDIR /app
+# ==============================================================================
+# Layer 4: Runtime Base (minimal runtime dependencies)
+# ==============================================================================
+FROM base AS runtime
 
-# Install runtime dependencies (pgsql client)
-RUN apt-get update && apt-get install -y \
-    postgresql-client \
+# Install only runtime dependencies (not build tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy installed packages from builder to appuser home
-COPY --from=builder /root/.local /home/appuser/.local
-ENV PATH=/home/appuser/.local/bin:$PATH
-ENV PYTHONPATH=/home/appuser/.local/lib/python3.9/site-packages:$PYTHONPATH
+# Create non-root user early
+RUN useradd -m -u 1000 -s /bin/bash appuser
+
+# ==============================================================================
+# Layer 5: Final Application Image
+# ==============================================================================
+FROM runtime AS production
+
+# Copy installed Python packages from python-deps stage
+COPY --from=python-deps /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=python-deps /usr/local/bin /usr/local/bin
 
 # Copy application code
-COPY . .
+COPY --chown=appuser:appuser . .
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+# Switch to non-root user
 USER appuser
 
 # Expose port
 EXPOSE 8000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD python -c "import requests; requests.get('http://localhost:8000/health')"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
 
 # Default command
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

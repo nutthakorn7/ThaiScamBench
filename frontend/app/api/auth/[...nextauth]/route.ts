@@ -31,13 +31,14 @@ const handler = NextAuth({
           const data = await res.json();
 
           if (res.ok && data.success) {
-            // Return user object with role
+            // Return user object with role and token
             return {
               id: data.user_id,
               name: data.name || data.email,
               email: data.email,
               role: data.role, // "admin" or "partner"
               partnerId: data.partner_id,
+              accessToken: data.access_token, // CAPTURE TOKEN
             };
           }
 
@@ -56,19 +57,21 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        // Store role and partnerId in JWT
-        token.role = (user as { role?: string }).role;
-        token.partnerId = (user as { partnerId?: string }).partnerId;
+        // Store role, partnerId, and accessToken in JWT
+        token.role = (user as any).role;
+        token.partnerId = (user as any).partnerId;
         token.id = user.id;
+        token.accessToken = (user as any).accessToken;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         // Make role and partnerId available in session
-        (session.user as { role?: string }).role = token.role as string;
-        (session.user as { partnerId?: string }).partnerId = token.partnerId as string;
-        (session.user as { id?: string }).id = token.id as string;
+        (session.user as any).role = token.role as string;
+        (session.user as any).partnerId = token.partnerId as string;
+        (session.user as any).id = token.id as string;
+        (session as any).accessToken = token.accessToken as string; // Pass to session root or user
       }
       return session;
     }

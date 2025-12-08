@@ -43,8 +43,8 @@ def test_add_user_flow():
         json={
             "email": new_email,
             "name": "E2E Test User",
-            "role": "partner"
-            # No password
+            "role": "partner",
+            "password": "testPassword123!" # Explicit password for verification
         },
         headers=headers
     )
@@ -60,6 +60,20 @@ def test_add_user_flow():
     # Save email to file for next step
     with open("e2e_temp_email.txt", "w") as f:
         f.write(new_email)
+        
+    print(f"🔄 3. Verifying Login for {new_email}...")
+    # 3. Verify Login
+    verify_resp = session.post(f"{BASE_URL}/auth/login", json={
+        "email": new_email,
+        "password": "testPassword123!"
+    })
+    
+    if verify_resp.status_code != 200:
+        print(f"❌ Verification Login failed: {verify_resp.text}")
+        sys.exit(1)
+        
+    print(f"✅ Verification Login successful! New User ID: {verify_resp.json()['user_id']}")
+    print("🎉 End-to-End Test Passed!")
 
 if __name__ == "__main__":
     test_add_user_flow()

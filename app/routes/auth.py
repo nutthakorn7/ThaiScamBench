@@ -4,7 +4,7 @@ Authentication Routes
 Handles user login and management for unified auth system.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends, status
@@ -15,6 +15,8 @@ from passlib.hash import bcrypt
 from app.database import get_db
 from app.models.database import User, UserRole
 from app.config import settings
+from app.middleware.auth import verify_admin_token
+from app.utils.jwt_utils import create_access_token
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +36,8 @@ class LoginResponse(BaseModel):
     name: Optional[str]
     role: str
     partner_id: Optional[str]
+    access_token: Optional[str] = None
+    token_type: str = "bearer"
     message: str
 
 
@@ -64,6 +68,7 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     """Verify password against hash"""
     return bcrypt.verify(password, hashed)
+
 
 @router.post(
     "/login",
@@ -103,6 +108,13 @@ async def login(
         user.last_login = datetime.utcnow()
         db.commit()
         
+        # Generate Access Token
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": user.email, "role": user.role, "user_id": user.id},
+            expires_delta=access_token_expires
+        )
+        
         logger.info(f"✅ User logged in: {user.email} (role: {user.role})")
         
         return LoginResponse(
@@ -112,6 +124,8 @@ async def login(
             name=user.name,
             role=user.role,
             partner_id=user.partner_id,
+            access_token=access_token,
+            token_type="bearer",
             message="Login successful"
         )
         
@@ -124,16 +138,17 @@ async def login(
             detail="Login failed"
         )
 
+
 @router.post(
     "/users",
     response_model=UserResponse,
     summary="Create User (Admin)",
-    description="Create a new user account (admin only). If password is not provided, one will be generated and emailed."
+    description="Create a new user account (admin only). If password is not provided, one will be generated and emailed.",
+    dependencies=[Depends(verify_admin_token)]
 )
 async def create_user(
     request: CreateUserRequest,
     db: Session = Depends(get_db)
-    # TODO: Add admin auth check via JWT or session
 ):
     """
     Create new user account.
@@ -206,11 +221,11 @@ async def create_user(
     "/users",
     response_model=list[UserResponse],
     summary="List Users (Admin)",
-    description="List all users (admin only)"
+    description="List all users (admin only)",
+    dependencies=[Depends(verify_admin_token)]
 )
 async def list_users(
     db: Session = Depends(get_db)
-    # TODO: Add admin auth check
 ):
     """List all users. Admin only."""
     users = db.query(User).all()

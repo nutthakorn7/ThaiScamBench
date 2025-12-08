@@ -36,6 +36,9 @@ services:
       - thaiscam-network
 
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ghcr.io/nutthakorn7/thaiscambench:latest
     container_name: thaiscam-api-prod
     environment:

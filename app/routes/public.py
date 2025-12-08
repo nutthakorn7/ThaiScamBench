@@ -147,10 +147,12 @@ async def report_scam(
             extracted_text = ocr_service.extract_text(contents)
             
             if extracted_text:
-                ocr_result_info = f"\n\n[OCR Extracted]: {extracted_text}"
+                # Truncate OCR text to prevent DB overflow (extra_data is 1000 chars max)
+                truncated_ocr = extracted_text[:800] if len(extracted_text) > 800 else extracted_text
+                ocr_result_info = f"\n\n[OCR Extracted]: {truncated_ocr}"
 
-        # Combine info for storage
-        final_details = (additional_info or "") + ocr_result_info
+        # Combine info for storage (truncate to 900 chars to be safe)
+        final_details = ((additional_info or "") + ocr_result_info)[:900]
         
         # Call service to submit report
         return await service.submit_manual_report(

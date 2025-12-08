@@ -42,6 +42,7 @@ FROM base AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     libgomp1 \
+    libzbar0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user early

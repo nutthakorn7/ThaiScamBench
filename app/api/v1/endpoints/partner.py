@@ -5,7 +5,7 @@ Endpoints for partner integrations with API key authentication.
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Request, UploadFile, File, Form
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from sqlalchemy.orm import Session
 import logging
 
@@ -21,6 +21,8 @@ from app.cache import redis_client
 from app.utils.image_utils import validate_image_content, generate_image_hash, get_image_info
 from app.utils.slip_verification import verify_thai_bank_slip, analyze_amount_anomalies, get_slip_verification_advice
 from app.utils.visual_forensics import comprehensive_forensics
+from app.utils.batch_processing import process_image_batch
+from app.models.batch import BatchDetectionResponse
 
 logger = logging.getLogger(__name__)
 
@@ -242,6 +244,127 @@ async def detect_partner_universal(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
+        )
+
+
+@router.post("/detect/batch", response_model=BatchDetectionResponse)
+@limiter.limit("10/minute")  # Lower limit for batch operations
+async def detect_batch(
+    request: Request,
+    files: List[UploadFile] = File(..., description="1-100 images to process"),
+    channel: Optional[str] = Form(None, description="Detection channel"),
+    user_ref: Optional[str] = Form(None, description="User reference"),
+    context: Optional[str] = Form(None, description="Additional context"),
+    partner_id: str = Depends(verify_partner_token),
+    service: DetectionService = Depends(get_detection_service),
+    db: Session = Depends(get_db)
+):
+    """
+    Batch image detection for partners.
+    
+    Upload 1-100 images for parallel processing. Each image processed with:
+    - OCR text extraction
+    - Visual analysis  
+    - Forensics detection
+    - Slip verification
+    
+    **Processing:**
+    - Up to 5 images processed concurrently
+    - Individual errors don't fail entire batch
+    - Results returned for all images
+    
+    **Quota Usage:**
+    - Each image counts as 1 request
+    - Batch of 20 images = 20 quota usage
+    
+    **Rate Limits:**
+    - 10 batch requests per minute
+    - Up to 100 images per batch
+    
+    **Example:**
+    ```bash
+    curl -X POST https://api.thaiscam.zcr.ai/v1/partner/detect/batch \\
+      -H "X-API-Key: your-key" \\
+      -F "files=@slip1.jpg" \\
+      -F "files=@slip2.jpg" \\
+      -F "channel=Mobile App"
+    ```
+    
+    Returns comprehensive results for all images with batch statistics.
+    """
+    try:
+        logger.info(
+            f"📦 Batch detection request - "
+            f"partner: {partner_id}, images: {len(files)}, channel: {channel}"
+        )
+        
+        # Check quota BEFORE processing
+        partner_repo = PartnerRepository(db)
+        partner = partner_repo.get_by_id(partner_id)
+        
+        if not partner:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Partner not found"
+            )
+        
+        # Check if quota allows this batch
+        images_count = len(files)
+        remaining = partner.daily_quota - partner.requests_today
+        
+        if images_count > remaining:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Insufficient quota: need {images_count}, have {remaining}"
+            )
+        
+        # Process batch
+        batch_result = await process_image_batch(
+            files=files,
+            partner_id=partner_id,
+            service=service,
+            channel=channel or "Batch",
+            user_ref=user_ref,
+            process_func=_process_image_detection  # Reuse existing function
+        )
+        
+        # Track usage (increment for each image)
+        for _ in range(images_count):
+            partner_repo.increment_usage(partner_id)
+        
+        # Get updated quota
+        partner = partner_repo.get_by_id(partner_id)  # Refresh
+        usage_info = {
+            "requests_today": partner.requests_today,
+            "requests_total": partner.requests_total,
+            "remaining_today": max(0, partner.daily_quota - partner.requests_today),
+            "images_processed": images_count
+        }
+        
+        logger.info(
+            f"✅ Batch complete - batch_id: {batch_result['batch_id']}, "
+            f"successful: {batch_result['summary'].successful}, "
+            f"failed: {batch_result['summary'].failed}"
+        )
+        
+        return BatchDetectionResponse(
+            batch_id=batch_result["batch_id"],
+            total_images=batch_result["total_images"],
+            successful=batch_result["summary"].successful,
+            failed=batch_result["summary"].failed,
+            total_processing_time_ms=batch_result["total_processing_time_ms"],
+            results=batch_result["results"],
+            summary=batch_result["summary"],
+            usage=usage_info
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Batch processing error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Batch processing failed: {str(e)}"
         )
 
 

@@ -354,10 +354,13 @@ class DetectionService:
             # Construct standard fields based on user report
             final_risk_score = 1.0 if is_scam else 0.0
             category = "start_form_report" if is_scam else "safe_report"
-            reason = f"User Reported: {details if details else 'No details'}"
+            # Truncate details to prevent DB overflow (reason column is 2000, but extra_data is 1000)
+            truncated_details = (details[:500] + "...") if details and len(details) > 500 else details
+            reason = f"User Reported: {truncated_details if truncated_details else 'No details'}"
             advice = "Beware! This was reported by a community member." if is_scam else "Marked as safe by community."
             
-            # Create Detection Record
+            # Create Detection Record (truncate metadata to fit extra_data column)
+            metadata_details = (details[:300] + "...") if details and len(details) > 300 else details
             detection = self.detection_repo.create_detection(
                 message_hash=message_hash,
                 category=category,
@@ -369,7 +372,7 @@ class DetectionService:
                 source="report",
                 partner_id=None,
                 metadata={
-                    "details": details,
+                    "details": metadata_details,
                     "manual_report": True
                 }
             )

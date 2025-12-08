@@ -25,6 +25,33 @@ class DetectionSource(str, enum.Enum):
     partner = "partner"
 
 
+class UserRole(str, enum.Enum):
+    """User role for authentication"""
+    admin = "admin"
+    partner = "partner"
+
+
+class User(Base):
+    """User account for unified authentication"""
+    __tablename__ = "users"
+    
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    email = Column(String(255), nullable=False, unique=True, index=True)
+    password_hash = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=True)
+    role = Column(String(20), nullable=False, default=UserRole.partner.value)
+    partner_id = Column(String(36), ForeignKey("partners.id"), nullable=True, index=True)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    last_login = Column(DateTime, nullable=True)
+    
+    # Relationship to partner (for partner users)
+    partner = relationship("Partner", foreign_keys=[partner_id], backref="users")
+    
+    def __repr__(self):
+        return f"<User(email='{self.email}', role='{self.role}')>"
+
+
 class Partner(Base):
     """Partner account for API access"""
     __tablename__ = "partners"

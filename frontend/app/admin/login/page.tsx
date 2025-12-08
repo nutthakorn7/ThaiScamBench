@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState("admin@thaiscam.zcr.ai");
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,13 +32,14 @@ export default function AdminLoginPage() {
 
     try {
       const result = await signIn("credentials", {
+        email: email,
         password: token,
         redirect: false,
         callbackUrl: "/admin"
       });
 
       if (result?.error) {
-        throw new Error("Token ไม่ถูกต้อง");
+        throw new Error("Email หรือ Password ไม่ถูกต้อง");
       }
 
       if (result?.ok) {
@@ -85,13 +87,29 @@ export default function AdminLoginPage() {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="token" className="text-sm font-medium ml-1">Secret Token Access</Label>
+                <Label htmlFor="email" className="text-sm font-medium ml-1">Admin Email</Label>
                 <div className="relative">
                   <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
+                    id="email"
+                    type="email"
+                    placeholder="admin@thaiscam.zcr.ai"
+                    className="pl-9 h-11 bg-background/50 border-input/60 focus:bg-background transition-colors font-mono"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="token" className="text-sm font-medium ml-1">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
                     id="token"
                     type="password"
-                    placeholder="Bearer token..."
+                    placeholder="Password..."
                     value={token}
                     onChange={(e) => {
                       setToken(e.target.value);

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getPartnerDashboard, removePartnerKey, type PartnerDashboardStats } from "@/lib/partner-api";
+import { useSession, signOut } from "next-auth/react";
+import { getPartnerDashboard, type PartnerDashboardStats } from "@/lib/partner-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,28 +15,35 @@ import { toast } from "sonner";
 import Footer from "@/components/Footer";
 
 export default function PartnerDashboard() {
+  const { data: session, status } = useSession();
   const [data, setData] = useState<PartnerDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const dashboardData = await getPartnerDashboard();
-        setData(dashboardData);
-      } catch {
-        router.push("/partner/login");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // If not authenticated, middleware should handle redirect, but safe to check here
+    if (status === "unauthenticated") {
+      router.push("/partner/login");
+      return;
+    }
 
-    loadData();
-  }, [router]);
+    if (status === "authenticated") {
+      const loadData = async () => {
+        try {
+          const dashboardData = await getPartnerDashboard();
+          setData(dashboardData);
+        } catch {
+          // Error handling
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadData();
+    }
+  }, [status, router]);
 
   const handleLogout = () => {
-    removePartnerKey();
-    router.push("/partner/login");
+    signOut({ callbackUrl: "/partner/login" });
   };
 
   const handleCopyCode = () => {

@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
-from app.routes import health, detection, public, partner, admin, feedback, partner_management, admin_auth, csrf
+from app.routes import health, detection, public, partner, admin, feedback, partner_management, admin_auth, csrf, auth
 from app.api.v1.endpoints import image
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 from app.database import init_db
@@ -169,6 +169,7 @@ app.include_router(admin_auth.router)  # Auth endpoints (no auth required)
 app.include_router(admin.router)  # Admin endpoints (auth required)
 app.include_router(feedback.router)
 app.include_router(image.router) # Public Image Detection
+app.include_router(auth.router)  # Unified Auth (NextAuth backend)
 
 # Mount static files for frontend (if directory exists)
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
@@ -195,7 +196,10 @@ async def startup_event():
     logger.info("💾 Initializing database...")
     init_db()
     logger.info("✅ Database initialized")
-
+    
+    # Create default admin user
+    create_default_admin()
+    
     # Start Scheduler (Adaptive Security)
     if settings.environment == "dev" or settings.environment == "prod":  # Run in both for now
         scheduler.add_job(run_promote_threats_task, 'interval', minutes=60)

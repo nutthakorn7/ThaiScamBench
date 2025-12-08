@@ -76,15 +76,10 @@ const MOCK_PARTNER_DATA: PartnerDashboardStats = {
 
 // API Functions
 export const getPartnerDashboard = async (): Promise<PartnerDashboardStats> => {
-  const key = getPartnerKey();
-  if (key === 'demo_partner_key') {
-    return MOCK_PARTNER_DATA;
-  }
-  // In real implementation, this would call the backend
+  // Authentication is now handled by NextAuth session
+  // In real implementation, this would call the backend with Bearer token
   // const response = await partnerApi.get('/dashboard');
   // return response.data;
   
-  // For now, always mock if key exists, else error
-  if (!key) throw new Error("No API Key");
   return MOCK_PARTNER_DATA;
 };

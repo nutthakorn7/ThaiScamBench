@@ -168,3 +168,65 @@ async def detect_image_public(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="เกิดข้อผิดพลาดในการประมวลผลรูปภาพ"
         )
+
+
+# --- Public Batch Endpoint ---
+
+from app.models.batch import BatchSummary, BatchImageResponse
+from app.utils.batch_processing import process_batch_images
+from typing import List
+
+class PublicBatchResponse(BaseModel):
+    batch_id: str
+    total_images: int
+    results: List[BatchImageResponse]
+    summary: BatchSummary
+
+@router.post(
+    "/v1/public/detect/image/batch",
+    response_model=PublicBatchResponse,
+    summary="ตรวจสอบรูปภาพแบบกลุ่ม (Public Batch)",
+    description="ตรวจสอบรูปภาพพร้อมกันหลายรูป (สูงสุด 10 รูป)",
+    tags=["Public Detection"]
+)
+@limiter.limit(f"5/minute") # Stricter rate limit for batch
+async def detect_image_batch_public(
+    request: Request,
+    files: List[UploadFile] = File(...),
+    detection_service: DetectionService = Depends(get_detection_service)
+) -> PublicBatchResponse:
+    """
+    Public Batch Image Detection
+    
+    - Max 10 images per request
+    - Returns analysis for each image + summary
+    """
+    # 1. Validation
+    if len(files) > 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"อนุญาตให้ตรวจสอบสูงสุด 10 รูปภาพต่อครั้ง (ส่งมา {len(files)} รูป)"
+        )
+    
+    if not files:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="กรุณาแนบไฟล์รูปภาพ"
+        )
+
+    # 2. Process Batch (Reuse shared utility)
+    # Note: Public API doesn't use quota, so quota_check_fn is None
+    batch_result = await process_batch_images(
+        files=files,
+        detection_service=detection_service,
+        partner_id="public_user", # Marker for logging
+        quota_check_fn=None,
+        deduct_quota_fn=None
+    )
+    
+    return PublicBatchResponse(
+        batch_id=batch_result["batch_id"],
+        total_images=batch_result["total_images"],
+        results=batch_result["results"],
+        summary=batch_result["summary"]
+    )

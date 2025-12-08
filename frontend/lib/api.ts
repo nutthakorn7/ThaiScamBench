@@ -211,3 +211,43 @@ export const submitReport = async (data: ReportRequest) => {
         };
     }
 };
+
+export interface BatchSummary {
+    total: number;
+    successful: number;
+    failed: number;
+    scam_count: number;
+    safe_count: number;
+    avg_risk_score: number;
+    scam_percentage: number;
+    categories: Record<string, number>;
+    manipulated_count: number;
+}
+
+export interface BatchImageResponse extends DetectionResponse {
+    filename: string;
+    original_index: number;
+    status: 'success' | 'failed';
+    error?: string;
+}
+
+export interface PublicBatchResponse {
+    batch_id: string;
+    total_images: number;
+    results: BatchImageResponse[];
+    summary: BatchSummary;
+}
+
+export const detectBatchImages = async (files: File[]): Promise<PublicBatchResponse> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+        formData.append('files', file);
+    });
+
+    const response = await api.post<PublicBatchResponse>('/public/detect/image/batch', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};

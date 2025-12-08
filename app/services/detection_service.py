@@ -354,13 +354,15 @@ class DetectionService:
             # Construct standard fields based on user report
             final_risk_score = 1.0 if is_scam else 0.0
             category = "start_form_report" if is_scam else "safe_report"
-            # Truncate details to prevent DB overflow (reason column is 2000, but extra_data is 1000)
-            truncated_details = (details[:500] + "...") if details and len(details) > 500 else details
+            # Truncate heavily - Thai chars expand ~6x in JSON (\u0e2b format)
+            # Keep reason short: 80 chars * 6 = 480 which fits in reason column (2000)
+            truncated_details = (details[:80] + "...") if details and len(details) > 80 else details
             reason = f"User Reported: {truncated_details if truncated_details else 'No details'}"
             advice = "Beware! This was reported by a community member." if is_scam else "Marked as safe by community."
             
-            # Create Detection Record (truncate metadata to fit extra_data column)
-            metadata_details = (details[:300] + "...") if details and len(details) > 300 else details
+            # Create Detection Record - metadata goes to extra_data (1000 chars)
+            # 50 Thai chars * 6 = 300 JSON chars + {"details": "", "manual_report": true} = ~350 chars safe
+            metadata_details = (details[:50] + "...") if details and len(details) > 50 else details
             detection = self.detection_repo.create_detection(
                 message_hash=message_hash,
                 category=category,

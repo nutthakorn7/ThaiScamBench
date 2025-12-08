@@ -147,12 +147,13 @@ async def report_scam(
             extracted_text = ocr_service.extract_text(contents)
             
             if extracted_text:
-                # Truncate OCR text to prevent DB overflow (extra_data is 1000 chars max)
-                truncated_ocr = extracted_text[:800] if len(extracted_text) > 800 else extracted_text
-                ocr_result_info = f"\n\n[OCR Extracted]: {truncated_ocr}"
+                # Truncate OCR text aggressively - Thai chars expand to ~6 chars each in JSON (\u0e2b)
+                # 150 Thai chars * 6 = 900 chars JSON, which leaves room for other metadata
+                truncated_ocr = extracted_text[:150] if len(extracted_text) > 150 else extracted_text
+                ocr_result_info = f"\n\n[OCR]: {truncated_ocr}"
 
-        # Combine info for storage (truncate to 900 chars to be safe)
-        final_details = ((additional_info or "") + ocr_result_info)[:900]
+        # Combine info for storage (keep very short due to JSON Unicode expansion)
+        final_details = ((additional_info or "") + ocr_result_info)[:200]
         
         # Call service to submit report
         return await service.submit_manual_report(

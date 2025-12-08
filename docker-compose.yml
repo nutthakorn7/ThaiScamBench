@@ -49,6 +49,10 @@ services:
       - ADMIN_PASSWORD_HASH=b2
       - ADMIN_ALLOWED_IPS=172.104.171.16
       - LOG_LEVEL=INFO
+      # Google API Key for Vision OCR and Gemini (same key works for both)
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key-here}
+    volumes:
+      - ./credentials:/app/credentials:ro
     depends_on:
       postgres:
         condition: service_healthy

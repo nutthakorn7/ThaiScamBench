@@ -274,31 +274,67 @@ export interface FeedbackListResponse {
 
 // -- Mock Data for Tables --
 
-const getMockDetections = (page: number, pageSize: number): DetectionListResponse => ({
-  items: Array.from({ length: pageSize }, (_, i) => {
-    const isImage = Math.random() > 0.8; // 20% are images
-    return {
-        id: `det_${Date.now()}_${i}`,
-        created_at: new Date(Date.now() - i * 600000).toISOString(),
-        type: isImage ? 'image' : 'text',
-        image_url: isImage ? '/placeholder-slip.jpg' : undefined,
-        message: isImage ? "Checking slip transfer..." : [
-        "คุณได้รับเงินรางวัล 1000 บาท คลิกที่นี่",
-        "ธนาคารแจ้งเตือนบัญชีของคุณถูกระงับ",
-        "สวัสดีค่ะ สนใจทำงานเสริมไหมคะ",
-        "พัสดุตกค้าง กรุณาชำระภาษี",
-        "เงินกู้ด่วน อนุมัติไว ได้เงินจริง"
-        ][Math.floor(Math.random() * 5)],
-        is_scam: Math.random() > 0.3,
-        risk_score: Math.random(),
-        category: isImage ? 'fake_slip' : ['financial_scam', 'gambling', 'loan_scam'][Math.floor(Math.random() * 3)],
-        source: 'web'
-    };
-  }),
-  total: 1250,
-  page,
-  page_size: pageSize
-});
+const getMockDetections = (page: number, pageSize: number): DetectionListResponse => {
+  // Story Arc Data: The "Loan Shark" Campaign
+  // Using placeholders since local assets generation is rate-limited
+  const storyDetections: DetectionLog[] = [
+    {
+      id: 'evt_loan_001',
+      created_at: new Date(Date.now() - 1000 * 60 * 2).toISOString(), // 2 mins ago
+      message: 'อนุมัติวงเงิน 50,000 บาท โอนเข้าบัญชีแล้ว (Fake Slip)',
+      is_scam: true,
+      risk_score: 0.98,
+      category: 'financial_fraud',
+      source: 'Line OA: @FastCash',
+      ip_address: '171.96.xxx.xxx',
+      type: 'image',
+      image_url: 'https://placehold.co/600x800/e2e8f0/1e293b.png?text=FAKE+SLIP\n50,000+THB\n(Suspicious)'
+    },
+    {
+      id: 'evt_loan_002',
+      created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 mins ago
+      message: 'ยืนยันการโอนเงินค่ามัดจำกู้ (Pattern Match)',
+      is_scam: true,
+      risk_score: 0.95,
+      category: 'financial_fraud',
+      source: 'SMS Link',
+      ip_address: '49.228.xxx.xxx',
+      type: 'image',
+      image_url: 'https://placehold.co/600x800/e2e8f0/1e293b.png?text=FAKE+SLIP\nPattern+Match'
+    },
+    {
+       id: 'evt_romance_05',
+       created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+       message: 'Hello honey, I need help with hospital bills...',
+       is_scam: true,
+       risk_score: 0.88,
+       category: 'romance_scam',
+       source: 'Facebook',
+       type: 'text'
+    }
+  ];
+
+  const others = Array.from({ length: pageSize - 3 }).map((_, i) => ({
+    id: `evt_${(page - 1) * pageSize + i + 10}`,
+    created_at: new Date(Date.now() - (3600000 * (i + 1))).toISOString(),
+    message: i % 3 === 0 ? "สวัสดีครับ สนใจสินเชื่อดอกเบี้ยต่ำไหม" : 
+             i % 3 === 1 ? "Click here to claim your daily reward!" : 
+             "Urgent: Your account has been locked.",
+    is_scam: i % 5 !== 0,
+    risk_score: i % 5 === 0 ? 0.1 : 0.8 + (Math.random() * 0.2),
+    category: i % 3 === 0 ? 'financial_fraud' : i % 3 === 1 ? 'gambling' : 'phishing',
+    source: i % 2 === 0 ? 'SMS' : 'Line',
+    ip_address: `192.168.1.${i}`,
+    type: (i % 4 === 0 ? 'image' : 'text') as 'image' | 'text'
+  }));
+
+  return {
+    items: page === 1 ? [...storyDetections, ...others] : others, // Show story only on page 1
+    total: 15420,
+    page,
+    page_size: pageSize
+  };
+};
 
 const getMockFeedbackList = (page: number, pageSize: number): FeedbackListResponse => ({
   items: Array.from({ length: pageSize }, (_, i) => ({

@@ -21,7 +21,7 @@ export interface KnowledgeBaseItem {
 const mockKnowledgeBase: KnowledgeBaseItem[] = [
   {
     id: 'kb_baseline_001',
-    image_url: '/assets/fake-romance-profile.jpg',
+    image_url: 'https://placehold.co/600x600/fecaca/991b1b.png?text=ROMANCE+SCAM\nPROFILE+A',
     pattern_name: 'Romance Scam Profile (Doctor Template)',
     confidence: 0.99,
     learned_at: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago

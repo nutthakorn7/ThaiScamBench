@@ -13,8 +13,8 @@ export default function Footer() {
               </p>
             </div>
             <div>
-              <h3 className="font-bold text-lg mb-4">เมนูลัด</h3>
-              <ul className="space-y-2">
+              <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white">เมนูลัด</h3>
+              <ul className="space-y-2 text-gray-600 dark:text-gray-400">
                 <li>
                   <Link href="/check" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     ตรวจสอบความเสี่ยง
@@ -45,7 +45,7 @@ export default function Footer() {
                     เงื่อนไขการใช้งาน
                   </Link>
                 </li>
-                <li><a href="/partner/login" className="hover:text-amber-600 font-medium">Partner Portal</a></li>
+                <li><a href="/partner/login" className="hover:text-amber-600 dark:hover:text-amber-400 font-medium">Partner Portal</a></li>
               </ul>
             </div>
             <div>

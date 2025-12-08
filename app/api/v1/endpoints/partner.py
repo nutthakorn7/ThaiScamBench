@@ -19,6 +19,7 @@ from app.config import settings
 from app.middleware.rate_limit import limiter
 from app.cache import redis_client
 from app.utils.image_utils import validate_image_content, generate_image_hash, get_image_info
+from app.utils.slip_verification import verify_thai_bank_slip, analyze_amount_anomalies, get_slip_verification_advice
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ class PartnerDetectResponse(BaseModel):
     detection_mode: str = Field(..., description="Detection type: 'text', 'image', or 'hybrid'")
     extracted_text: Optional[str] = Field(None, description="OCR extracted text (if image)")
     visual_analysis: Optional[dict] = Field(None, description="Visual forensics (if image)")
+    slip_verification: Optional[dict] = Field(None, description="Bank slip verification (if applicable)")
     
     # Usage tracking
     usage: dict = Field(..., description="Quota usage information")
@@ -163,10 +165,32 @@ async def detect_partner_universal(
             extracted_text = result_data["extracted_text"]
             visual_analysis_data = result_data["visual_analysis"]
         
-        # 4. Track usage (increment based on mode)
+        # 4. Bank slip verification (if image/hybrid mode)
+        slip_verification_data = None
+        if detection_mode in ["image", "hybrid"] and extracted_text:
+            slip_result = verify_thai_bank_slip(extracted_text)
+            slip_verification_data = {
+                "is_likely_genuine": slip_result.is_likely_genuine,
+                "trust_score": slip_result.trust_score,
+                "confidence": slip_result.confidence,
+                "detected_bank": slip_result.detected_bank,
+                "detected_amount": slip_result.detected_amount,
+                "warnings": slip_result.warnings,
+                "checks": slip_result.checks_passed,
+                "advice": get_slip_verification_advice(slip_result)
+            }
+            
+            # If slip verification indicates fake, boost risk score
+            if not slip_result.is_likely_genuine and slip_result.trust_score < 0.5:
+                logger.warning(f"🚨 Suspicious bank slip detected: trust_score={slip_result.trust_score:.2f}")
+                result.risk_score = max(result.risk_score, 0.8)  # Boost to high risk
+                result.is_scam = True
+                result.reason += f" | Slip Verification: {'; '.join(slip_result.warnings[:2])}"
+        
+        # 5. Track usage (increment based on mode)
         _track_usage(partner_repo, partner_id, detection_mode)
         
-        # 5. Get remaining quota
+        # 6. Get remaining quota
         partner = partner_repo.get_by_id(partner_id)  # Refresh
         usage_info = _get_usage_info(partner, detection_mode)
         
@@ -189,6 +213,7 @@ async def detect_partner_universal(
             detection_mode=detection_mode,
             extracted_text=extracted_text,
             visual_analysis=visual_analysis_data,
+            slip_verification=slip_verification_data,
             usage=usage_info
         )
         

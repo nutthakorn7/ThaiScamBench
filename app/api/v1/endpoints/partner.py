@@ -20,6 +20,7 @@ from app.middleware.rate_limit import limiter
 from app.cache import redis_client
 from app.utils.image_utils import validate_image_content, generate_image_hash, get_image_info
 from app.utils.slip_verification import verify_thai_bank_slip, analyze_amount_anomalies, get_slip_verification_advice
+from app.utils.visual_forensics import comprehensive_forensics
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ class PartnerDetectResponse(BaseModel):
     extracted_text: Optional[str] = Field(None, description="OCR extracted text (if image)")
     visual_analysis: Optional[dict] = Field(None, description="Visual forensics (if image)")
     slip_verification: Optional[dict] = Field(None, description="Bank slip verification (if applicable)")
+    forensics: Optional[dict] = Field(None, description="Image manipulation detection (partners only)")
     
     # Usage tracking
     usage: dict = Field(..., description="Quota usage information")
@@ -138,6 +140,7 @@ async def detect_partner_universal(
             )
             extracted_text = None
             visual_analysis_data = None
+            forensics_data = None
             
         elif detection_mode == "image":
             result_data = await _process_image_detection(
@@ -150,6 +153,7 @@ async def detect_partner_universal(
             result = result_data["result"]
             extracted_text = result_data["extracted_text"]
             visual_analysis_data = result_data["visual_analysis"]
+            forensics_data = result_data.get("forensics")
             
         else:  # hybrid
             result_data = await _process_hybrid_detection(
@@ -164,6 +168,7 @@ async def detect_partner_universal(
             result = result_data["result"]
             extracted_text = result_data["extracted_text"]
             visual_analysis_data = result_data["visual_analysis"]
+            forensics_data = result_data.get("forensics")
         
         # 4. Bank slip verification (if image/hybrid mode)
         slip_verification_data = None
@@ -214,6 +219,7 @@ async def detect_partner_universal(
             extracted_text=extracted_text,
             visual_analysis=visual_analysis_data,
             slip_verification=slip_verification_data,
+            forensics=forensics_data,
             usage=usage_info
         )
         
@@ -373,6 +379,39 @@ async def _process_image_detection(file: UploadFile, channel: str, user_ref: Opt
             patterns_str = ", ".join(visual_analysis.detected_patterns)
             result.reason += f" | Visual: {visual_analysis.reason} (Patterns: {patterns_str})"
     
+    # 4. Forensics Analysis (Advanced Visual Forensics for Partners)
+    logger.info("🔬 Running forensics analysis...")
+    forensics_result = comprehensive_forensics(image_content)
+    
+    forensics_data = {
+        "enabled": True,
+        "is_manipulated": forensics_result.is_manipulated,
+        "confidence": forensics_result.confidence,
+        "manipulation_type": forensics_result.manipulation_type,
+        "details": forensics_result.details,
+        "techniques": {
+            "ela": forensics_result.techniques["ela"],
+            "metadata": forensics_result.techniques["metadata"],
+            "compression": forensics_result.techniques["compression"],
+            "cloning": forensics_result.techniques["cloning"]
+        }
+    }
+    
+    # Boost risk score if manipulation detected with high confidence
+    if forensics_result.is_manipulated and forensics_result.confidence > 0.7:
+        logger.warning(
+            f"🚨 Image manipulation detected: {forensics_result.manipulation_type} "
+            f"(confidence: {forensics_result.confidence:.2f})"
+        )
+        # Increase risk score by forensics confidence (capped at 0.95)
+        boosted_risk = min(result.risk_score + (forensics_result.confidence * 0.3), 0.95)
+        result.risk_score = boosted_risk
+        result.is_scam = True
+        
+        # Add to reason
+        if forensics_result.details:
+            result.reason += f" | Forensics: {forensics_result.details}"
+    
     # Build result
     result_data = {
         "result": result,
@@ -382,10 +421,11 @@ async def _process_image_detection(file: UploadFile, channel: str, user_ref: Opt
             "is_suspicious": visual_analysis.is_suspicious if visual_analysis else False,
             "risk_score": visual_analysis.visual_risk_score if visual_analysis else 0.0,
             "detected_patterns": visual_analysis.detected_patterns if visual_analysis else []
-        } if visual_analysis else None
+        } if visual_analysis else None,
+        "forensics": forensics_data
     }
     
-    # 4. Cache the result (24 hours)
+    # 5. Cache the result (24 hours)
     cache_success = redis_client.set(cache_key, result_data, ttl=86400)
     if cache_success:
         logger.info(f"💾 Cached image result: {image_hash[:16]}...")

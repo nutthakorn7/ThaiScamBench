@@ -50,7 +50,7 @@ export default function Navbar() {
             href="/check" 
             className="inline-flex items-center justify-center rounded-full bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           >
-            เริ่มตรวจสอบ
+            เช็คสลิป/ข้อความ
           </Link>
         </nav>
         

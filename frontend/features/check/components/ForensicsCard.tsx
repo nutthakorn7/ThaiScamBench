@@ -109,7 +109,7 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
           <div className="p-4 rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-2">
               <Zap className="w-4 h-4 text-yellow-600" />
-              <span className="font-medium text-sm">Error Level Analysis</span>
+              <span className="font-medium text-sm">ตรวจการบีบอัดภาพ (ELA)</span>
             </div>
             <p className={cn(
               "text-xs mb-2",
@@ -132,7 +132,7 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
           <div className="p-4 rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-2">
               <FileCode className="w-4 h-4 text-blue-600" />
-              <span className="font-medium text-sm">Metadata Analysis</span>
+              <span className="font-medium text-sm">ตรวจข้อมูลจำเพาะ (Metadata)</span>
             </div>
             <p className={cn(
               "text-xs mb-2",
@@ -157,7 +157,7 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
           <div className="p-4 rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-2">
               <FileImage className="w-4 h-4 text-green-600" />
-              <span className="font-medium text-sm">JPEG Analysis</span>
+              <span className="font-medium text-sm">ตรวจการบันทึกซ้ำ</span>
             </div>
             <p className={cn(
               "text-xs mb-2",
@@ -177,7 +177,7 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
           <div className="p-4 rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-2">
               <Copy className="w-4 h-4 text-orange-600" />
-              <span className="font-medium text-sm">Clone Detection</span>
+              <span className="font-medium text-sm">ตรวจการคัดลอกจุดภาพ</span>
             </div>
             <p className={cn(
               "text-xs mb-2",

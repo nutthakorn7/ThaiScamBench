@@ -34,6 +34,7 @@ export default function Home() {
             พัฒนาโดยทีม AI Research
           </Badge>
           
+          
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 leading-[1.1] tracking-tight text-slate-900 dark:text-white font-heading text-center">
             รู้ทัน
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600 animate-gradient"> มิจฉาชีพออนไลน์ </span>
@@ -43,7 +44,8 @@ export default function Home() {
              <TypewriterEffectSmooth
                 words={[
                   { text: "ตรวจ", className: "text-slate-900 dark:text-white" },
-                  { text: "สอบ", className: "text-slate-900 dark:text-white" },
+                  { text: "สลิป", className: "text-blue-600 dark:text-blue-500" },
+                  { text: "และ", className: "text-slate-900 dark:text-white" },
                   { text: "SMS", className: "text-blue-600 dark:text-blue-500" },
                   { text: "ได้", className: "text-slate-900 dark:text-white" },
                   { text: "ทัน", className: "text-slate-900 dark:text-white" },
@@ -55,14 +57,14 @@ export default function Home() {
           </div>
 
           <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-            มั่นใจทุกการโอน ปลอดภัยทุกการคลิก ด้วยระบบ AI ภาษาไทยที่แม่นยำที่สุด
+            เช็คสลิปปลอม ตรวจรูปตัดต่อ และวิเคราะห์ SMS หลอกลวง ด้วยระบบ AI อัจฉริยะแม่นยำที่สุด
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-lg mx-auto">
             <Link href="/check" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto px-8 h-14 text-lg font-bold rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 ring-4 ring-blue-600/20">
                 <Search className="mr-2 h-5 w-5" />
-                ตรวจสอบเลย Free
+                ตรวจสอบสลิป/ข้อความ
               </Button>
             </Link>
             <Link href="/report" className="w-full sm:w-auto">
@@ -108,7 +110,7 @@ export default function Home() {
         <div className="container px-4 mx-auto">
           <div className="text-center mb-24">
             <h2 className="text-5xl md:text-6xl font-black mb-8 tracking-tight text-slate-900 dark:text-white">ทำไมต้อง Thai Scam Detector?</h2>
-            <p className="text-muted-foreground text-2xl max-w-3xl mx-auto leading-relaxed">เราใช้เทคโนโลยีล่าสุดเพื่อปกป้องคุณจากภัยไซเบอร์</p>
+            <p className="text-muted-foreground text-2xl max-w-3xl mx-auto leading-relaxed">เราใช้เทคโนโลยี Image Forensics ล่าสุดเพื่อปกป้องคุณ</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -117,9 +119,9 @@ export default function Home() {
                 <div className="mb-8 h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-700/10 to-teal-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <ShieldCheck className="h-10 w-10 text-blue-700" />
                 </div>
-                <h3 className="text-3xl font-black mb-6">แม่นยำด้วย AI</h3>
+                <h3 className="text-3xl font-black mb-6">วิเคราะห์รูปภาพ</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
-                  โมเดล AI ของเราถูกเทรนด้วยข้อมูล Scam ภาษาไทยกว่า 100,000 รายการ เข้าใจบริบทและคำทับศัพท์
+                  ตรวจสอบสลิปโอนเงินปลอม รูปตัดต่อ และแคปหน้าจอแชท ด้วยเทคโนโลยีค้นหาร่องรอยการปลอมแปลงภาพ
                 </p>
               </CardContent>
             </Card>
@@ -129,7 +131,7 @@ export default function Home() {
                 <div className="mb-8 h-20 w-20 rounded-2xl bg-orange-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <AlertTriangle className="h-10 w-10 text-orange-500" />
                 </div>
-                <h3 className="text-3xl font-black mb-6">รู้ทันทุกรูปแบบ</h3>
+                <h3 className="text-3xl font-black mb-6">รู้ทันทุกกลโกง</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
                   ไม่ว่าจะเป็น SMS หลอกกู้เงิน, แก๊งคอลเซ็นเตอร์, เว็บพนัน หรือหลอกขายของออนไลน์
                 </p>
@@ -143,7 +145,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-3xl font-black mb-6">อัปเดตตลอดเวลา</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
-                  ฐานข้อมูลของเราอัปเดตแบบ Real-time จากการแจ้งเบาะแสของผู้ใช้งานจริง
+                  ฐานข้อมูลของเราอัปเดตแบบ Real-time จากการแจ้งเบาะแสของผู้ใช้งานจริงทั่วประเทศ
                 </p>
               </CardContent>
             </Card>

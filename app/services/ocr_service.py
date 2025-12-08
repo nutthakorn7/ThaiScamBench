@@ -41,8 +41,8 @@ class OCRService:
         if cls._initialized:
             return
         
-        # Option 1: Use API Key (same as Gemini API) - simplest approach
-        cls._api_key = os.environ.get('GOOGLE_API_KEY')
+        # Option 1: Use Vision-specific API Key first, then fall back to shared key
+        cls._api_key = os.environ.get('GOOGLE_VISION_API_KEY') or os.environ.get('GOOGLE_API_KEY')
         if cls._api_key:
             cls._use_rest_api = True
             logger.info("✅ Google Vision API initialized with API Key (REST API)")

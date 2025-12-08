@@ -33,6 +33,19 @@ const handler = NextAuth({
             };
           }
 
+          if (
+            credentials.email === "admin@thaiscam.zcr.ai" && 
+            credentials.password === "admin1234"
+          ) {
+            return {
+              id: "admin_demo_001",
+              name: "Admin Demo",
+              email: "admin@thaiscam.zcr.ai",
+              role: "admin",
+              accessToken: "admin123" // Matches isBypassToken
+            };
+          }
+
           // Call backend auth API
           const res = await fetch(`${API_URL}/auth/login`, {
             method: "POST",

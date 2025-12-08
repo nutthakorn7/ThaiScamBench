@@ -43,6 +43,11 @@ export default function AdminLoginPage() {
       }
 
       if (result?.ok) {
+        // Set token for mock logic (admin-api.ts checks localStorage)
+        if (token === 'admin1234') { 
+            localStorage.setItem('admin_token', 'admin123'); // Matches isBypassToken
+        }
+        
         toast.success("Login สำเร็จ!", {
           description: "กำลังเข้าสู่ระบบ Admin"
         });

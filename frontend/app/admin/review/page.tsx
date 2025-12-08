@@ -22,9 +22,12 @@ import {
   XCircle,
   Image as ImageIcon,
   MessageSquare,
-  Eye
+  Eye,
+  BrainCircuit,
+  Check
 } from "lucide-react";
 import { getUncertainCases, type UncertainCasesResponse, type UncertainCase } from "@/lib/admin-api";
+import { addToKnowledgeBase } from "@/lib/knowledge-base-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
 import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
@@ -64,6 +67,19 @@ export default function ReviewPage() {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, router]);
+
+  const handleTeach = async (caseId: string, category: string) => {
+      const toastId = toast.loading("Analyzing pattern signature...");
+      try {
+          // Simulate AI learning
+          await addToKnowledgeBase(caseId, `Learned Pattern from ${caseId}`, category);
+          toast.success("Pattern added to Knowledge Base", { id: toastId });
+          // In a real app we might remove the case from the list or mark as reviewed
+          fetchData();
+      } catch (error) {
+          toast.error("Failed to update vector index", { id: toastId });
+      }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -243,7 +259,25 @@ export default function ReviewPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                        <Button size="sm" variant="default" className="h-7 text-xs">Review</Button>
+                        <div className="flex items-center gap-1">
+                            <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-100"
+                                title="Approve as Safe"
+                            >
+                                <Check className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                className="h-8 w-8 text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                                onClick={() => handleTeach(case_.request_id, case_.category)}
+                                title="Teach AI (Add to Knowledge Base)"
+                            >
+                                <BrainCircuit className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </TableCell>
                   </TableRow>
                 ))}

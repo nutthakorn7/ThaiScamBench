@@ -13,7 +13,8 @@ import {
   ClipboardList,
   LogOut,
   ChevronLeft,
-  Settings
+  Settings,
+  BrainCircuit // Added
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
@@ -30,6 +31,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Detection Logs", href: "/admin/detections", icon: Shield },
+  { name: "Knowledge Base", href: "/admin/knowledge-base", icon: BrainCircuit }, // Added
   { name: "System Audit", href: "/admin/audit", icon: ClipboardList },
   { name: "Review Cases", href: "/admin/review", icon: AlertTriangle },
   { name: "User Feedback", href: "/admin/feedback", icon: MessageSquare },

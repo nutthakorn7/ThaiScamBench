@@ -18,6 +18,21 @@ const handler = NextAuth({
         }
 
         try {
+          // Mock Login for Demo (Pitching)
+          if (
+            credentials.email === "demo@thaiscam.zcr.ai" && 
+            credentials.password === "demo1234"
+          ) {
+            return {
+              id: "partner_demo_001",
+              name: "Demo Partner",
+              email: "demo@thaiscam.zcr.ai",
+              role: "partner",
+              partnerId: "partner_demo",
+              accessToken: "mock_partner_token_xyz"
+            };
+          }
+
           // Call backend auth API
           const res = await fetch(`${API_URL}/auth/login`, {
             method: "POST",

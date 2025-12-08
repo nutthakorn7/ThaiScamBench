@@ -17,39 +17,17 @@ export interface KnowledgeBaseItem {
   vector_signature?: number[]; // Mock embedding
 }
 
-// Initial Mock Data
+// Initial Mock Data (Story Arc: Baseline Knowledge)
 const mockKnowledgeBase: KnowledgeBaseItem[] = [
   {
-    id: 'kb_1',
-    image_url: '/placeholder-slip.jpg',
-    pattern_name: 'Generic Fake Slip (KBank Template 2024)',
-    confidence: 0.98,
-    learned_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+    id: 'kb_baseline_001',
+    image_url: '/assets/fake-romance-profile.jpg',
+    pattern_name: 'Romance Scam Profile (Doctor Template)',
+    confidence: 0.99,
+    learned_at: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
     status: 'active',
-    category: 'fake_slip',
-    ocr_keywords: ['โอนเงินสำเร็จ', '99.00', 'ธนาคารกสิกรไทย'],
-    vector_signature: [0.12, 0.45, 0.88, 0.11]
-  },
-  {
-    id: 'kb_2',
-    image_url: '/placeholder-slip.jpg',
-    pattern_name: 'Gambling Ad Banner #4',
-    confidence: 0.95,
-    learned_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    source_case_id: 'req_x9z8y7',
-    status: 'active',
-    category: 'gambling',
-    vector_signature: [0.99, 0.01, 0.22, 0.33]
-  },
-  {
-    id: 'kb_3',
-    image_url: '/placeholder-slip.jpg',
-    pattern_name: 'Loan Scam QR Pattern',
-    confidence: 0.89,
-    learned_at: new Date(Date.now() - 43200000).toISOString(),
-    status: 'reviewing',
-    category: 'loan_scam',
-    vector_signature: [0.55, 0.66, 0.77, 0.88]
+    category: 'romance_scam',
+    vector_signature: [0.8, 0.1, 0.1, 0.9]
   }
 ];
 

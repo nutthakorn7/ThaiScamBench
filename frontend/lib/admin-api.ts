@@ -309,6 +309,7 @@ export interface User {
   status: 'active' | 'banned';
   last_login: string;
   created_at: string;
+  generated_password?: string; // Optional field for newly created users
 }
 
 export interface UserListResponse {

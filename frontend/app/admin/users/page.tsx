@@ -25,7 +25,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { getUsers, createUser, type User } from "@/lib/admin-api";
-import { Search, Loader2, User as UserIcon, Shield, Ban, CheckCircle } from "lucide-react";
+import { Search, Loader2, User as UserIcon, Shield, Ban, CheckCircle, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
@@ -36,6 +36,8 @@ export default function UsersPage() {
     role: "partner" as "admin" | "partner"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdUser, setCreatedUser] = useState<User | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Data Loading State
   const [users, setUsers] = useState<User[]>([]);
@@ -64,15 +66,14 @@ export default function UsersPage() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createUser({
+      const user = await createUser({
         email: newUser.email,
         name: newUser.name,
         role: newUser.role
       });
-      toast.success("สร้างผู้ใช้งานสำเร็จ! ระบบได้ส่งอีเมลยืนยันแล้ว");
-      setIsAddUserOpen(false);
-      setNewUser({ email: "", name: "", role: "partner" });
-      loadData(); // Refresh list
+      setCreatedUser(user);
+      toast.success("สร้างผู้ใช้งานสำเร็จ!");
+      loadData(); // Refresh list background
     } catch (error: any) {
       console.error("Failed to create user", error);
       const msg = error.response?.data?.detail || "เกิดข้อผิดพลาดในการสร้างผู้ใช้";
@@ -80,6 +81,23 @@ export default function UsersPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCopyPassword = () => {
+    if (createdUser?.generated_password) {
+      navigator.clipboard.writeText(createdUser.generated_password);
+      setCopied(true);
+      toast.success("คัดลอกรหัสผ่านแล้ว");
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const resetDialog = () => {
+    setIsAddUserOpen(false);
+    setTimeout(() => {
+        setCreatedUser(null);
+        setNewUser({ email: "", name: "", role: "partner" });
+    }, 300);
   };
 
   return (
@@ -101,13 +119,57 @@ export default function UsersPage() {
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>เพิ่มผู้ใช้งานใหม่</DialogTitle>
-                  <DialogDescription>
-                    สร้างบัญชีผู้ใช้ใหม่ ระบบจะสร้างรหัสผ่านและส่งทางอีเมลอัตโนมัติ
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddUser} className="space-y-4 py-4">
+                  {createdUser ? (
+                    // Success View
+                    <div className="py-2 space-y-4">
+                        <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-green-600">
+                            <CheckCircle className="h-6 w-6" />
+                            สร้างบัญชีสำเร็จ
+                        </DialogTitle>
+                        <DialogDescription>
+                            บัญชีผู้ใช้งานถูกสร้างเรียบร้อยแล้ว
+                        </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="bg-muted p-4 rounded-lg space-y-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs text-muted-foreground">Email</Label>
+                                <div className="font-medium">{createdUser.email}</div>
+                            </div>
+
+                            {createdUser.generated_password && (
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">Password (Auto-generated)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <code className="bg-background px-2 py-1 rounded border font-mono text-lg font-bold flex-1 select-all">
+                                            {createdUser.generated_password}
+                                        </code>
+                                        <Button size="icon" variant="outline" onClick={handleCopyPassword}>
+                                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                        </Button>
+                                    </div>
+                                    <p className="text-xs text-amber-600 mt-2">
+                                        ⚠️ โปรดบันทึกรหัสผ่านนี้ทันที ระบบจะไม่แสดงซ้ำอีก
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <DialogFooter>
+                            <Button className="w-full" onClick={resetDialog}>เสร็จสิ้น</Button>
+                        </DialogFooter>
+                    </div>
+                  ) : (
+                    // Form View
+                    <>
+                    <DialogHeader>
+                      <DialogTitle>เพิ่มผู้ใช้งานใหม่</DialogTitle>
+                      <DialogDescription>
+                        สร้างบัญชีผู้ใช้ใหม่ ระบบจะสร้างรหัสผ่านและส่งทางอีเมลอัตโนมัติ
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleAddUser} className="space-y-4 py-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -165,6 +227,8 @@ export default function UsersPage() {
                     </Button>
                   </DialogFooter>
                 </form>
+                </>
+                )}
               </DialogContent>
             </Dialog>
           </div>

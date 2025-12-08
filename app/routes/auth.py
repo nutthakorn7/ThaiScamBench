@@ -57,87 +57,12 @@ class UserResponse(BaseModel):
     partner_id: Optional[str]
     is_active: bool
     created_at: datetime
+    # Optional extended fields for creation response
+    generated_password: Optional[str] = None
 
 
 # Password helpers
-def hash_password(password: str) -> str:
-    """Hash password using bcrypt via passlib"""
-    return bcrypt.hash(password)
-
-
-def verify_password(password: str, hashed: str) -> bool:
-    """Verify password against hash"""
-    return bcrypt.verify(password, hashed)
-
-
-@router.post(
-    "/login",
-    response_model=LoginResponse,
-    summary="User Login",
-    description="Authenticate user with email and password"
-)
-async def login(
-    request: LoginRequest,
-    db: Session = Depends(get_db)
-):
-    """
-    Authenticate user and return user info for session creation.
-    Used by NextAuth CredentialsProvider.
-    """
-    try:
-        # Find user by email
-        user = db.query(User).filter(
-            User.email == request.email,
-            User.is_active == True
-        ).first()
-        
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
-            )
-        
-        # Verify password
-        if not verify_password(request.password, user.password_hash):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password"
-            )
-        
-        # Update last login
-        user.last_login = datetime.utcnow()
-        db.commit()
-        
-        # Generate Access Token
-        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-        access_token = create_access_token(
-            data={"sub": user.email, "role": user.role, "user_id": user.id},
-            expires_delta=access_token_expires
-        )
-        
-        logger.info(f"✅ User logged in: {user.email} (role: {user.role})")
-        
-        return LoginResponse(
-            success=True,
-            user_id=user.id,
-            email=user.email,
-            name=user.name,
-            role=user.role,
-            partner_id=user.partner_id,
-            access_token=access_token,
-            token_type="bearer",
-            message="Login successful"
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Login error: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Login failed"
-        )
-
+# ...
 
 @router.post(
     "/users",
@@ -169,10 +94,13 @@ async def create_user(
         
         # Handle Password
         plain_password = request.password
+        generated_password = None
+        
         if not plain_password:
             # Generate secure random password
             alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
             plain_password = ''.join(secrets.choice(alphabet) for i in range(12))
+            generated_password = plain_password # Store to return to admin
             logger.info(f"Generated password for {request.email}")
 
         # Hash password
@@ -195,7 +123,10 @@ async def create_user(
         logger.info(f"✅ User created: {user.email} (role: {user.role})")
         
         # Send Email Notification
-        await send_new_user_email(user.email, plain_password, user.name)
+        email_sent = await send_new_user_email(user.email, plain_password, user.name)
+        
+        # If email failed and we generated the password, it's CRITICAL to return it
+        # Actually, even if email sent, displaying it once is good UX (AWS style)
         
         return UserResponse(
             id=user.id,
@@ -204,7 +135,8 @@ async def create_user(
             role=user.role,
             partner_id=user.partner_id,
             is_active=user.is_active,
-            created_at=user.created_at
+            created_at=user.created_at,
+            generated_password=generated_password if generated_password else None
         )
         
     except HTTPException:

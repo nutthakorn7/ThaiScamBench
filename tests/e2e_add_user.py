@@ -22,6 +22,16 @@ def test_add_user_flow():
         sys.exit(1)
         
     print("✅ Admin login successful")
+
+    # Get Access Token
+    login_data = login_resp.json()
+    access_token = login_data.get("access_token")
+    if not access_token:
+        print("❌ Login response missing access_token! Security upgrade failed?")
+        print(login_data)
+        sys.exit(1)
+        
+    print(f"🔑 Received Access Token: {access_token[:10]}...")
     
     # 2. Create New User
     timestamp = int(time.time())
@@ -34,8 +44,9 @@ def test_add_user_flow():
     # It has `# TODO: Add admin auth check via JWT or session`
     # So it is PUBLICLY accessible right now for testing? Or maybe it implicitly requires DB access which Depends(get_db) handles.
     # Middleware requires Bearer token to bypass CSRF check
+    # Use Real Token
     headers = {
-        "Authorization": "Bearer mock-token-for-e2e-csrf-bypass"
+        "Authorization": f"Bearer {access_token}"
     }
     
     create_resp = session.post(

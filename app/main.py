@@ -183,6 +183,37 @@ from app.tasks.adaptive_security import run_promote_threats_task
 # Initialize Scheduler
 scheduler = BackgroundScheduler()
 
+# Admin User Creation
+def create_default_admin():
+    from app.database import SessionLocal
+    from app.models.database import User, UserRole
+    from app.routes.auth import hash_password
+    import os
+    
+    db = SessionLocal()
+    try:
+        admin_email = "admin@thaiscam.zcr.ai"
+        # Check if admin exists
+        existing = db.query(User).filter(User.email == admin_email).first()
+        if not existing:
+            logger.info("Creating default admin user...")
+            # Use ADMIN_PASSWORD env var or default
+            admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+            admin_user = User(
+                email=admin_email,
+                password_hash=hash_password(admin_password),
+                name="System Admin",
+                role=UserRole.admin.value,
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            logger.info(f"✅ Default admin created: {admin_email}")
+    except Exception as e:
+        logger.error(f"Failed to create default admin: {e}")
+    finally:
+        db.close()
+
 @app.on_event("startup")
 async def startup_event():
     """Application startup event"""

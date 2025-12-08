@@ -148,7 +148,14 @@ def verify_admin_token(
                         detail="Forbidden: IP not allowed"
                     )
             
-            return True
+            # Return user_id (sub) from JWT
+            # In the login function, we set 'sub' to user.email or user.id?
+            # Checking utils/jwt_utils.py would be good, but assuming 'user_id' is in payload as per login
+            # output in auth.py: data={"sub": user.email, "role": user.role, "user_id": user.id}
+            # So we should return jwt_payload.get("user_id") if available, else sub
+            
+            user_id = jwt_payload.get("user_id") or username
+            return user_id
         
         # If JWT verification failed, this potential_token might be a static token
         token = potential_token
@@ -179,4 +186,4 @@ def verify_admin_token(
     
     client_host = request.client.host if request and request.client else 'unknown'
     logger.info(f"Admin authenticated via static token from {client_host}")
-    return True
+    return "static_admin"

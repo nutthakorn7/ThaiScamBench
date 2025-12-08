@@ -13,6 +13,7 @@ import { AdminLayout } from "@/components/AdminLayout";
 import { motion } from "framer-motion";
 import { Overview } from "@/components/ui/overview";
 import { ActivityTicker } from "@/components/ui/activity-ticker";
+import { ScanningRadar } from "@/components/ui/scanning-radar";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -160,15 +161,22 @@ export default function AdminDashboard() {
                 />
               </CardContent>
             </Card>
-            <Card className="col-span-1 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card">
+            <Card className="col-span-1 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-50 pointer-events-none">
+                    <ScanningRadar />
+                </div>
                 <CardHeader>
-                    <CardTitle className="text-xl font-bold">Recent Activity</CardTitle>
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                        Recent Activity
+                        <div className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    </CardTitle>
                     <CardDescription>
-                        การตรวจสอบล่าสุดแบบ Real-time
+                        Real-time AI Analysis Stream
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="h-[350px] overflow-hidden relative">
                     {/* ActivityTicker will go here */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none h-full" />
                     <ActivityTicker />
                 </CardContent>
             </Card>

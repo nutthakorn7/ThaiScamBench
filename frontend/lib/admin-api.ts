@@ -392,3 +392,42 @@ export const resetUserPassword = async (id: string): Promise<User> => {
   const response = await adminApi.post<User>(`/../auth/users/${id}/reset-password`);
   return response.data;
 };
+
+// -- Audit Logging --
+
+export interface AuditLog {
+  id: string;
+  actor_id: string;
+  action: string;
+  target_id?: string;
+  details?: string;
+  ip_address?: string;
+  created_at: string;
+}
+
+export interface AuditLogListResponse {
+  items: AuditLog[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export const getAuditLogs = async (
+  page: number = 1,
+  pageSize: number = 50,
+  action?: string,
+  actor_id?: string
+): Promise<AuditLogListResponse> => {
+  if (isBypassToken()) {
+      return { items: [], total: 0, page, page_size: pageSize };
+  }
+  
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('page_size', pageSize.toString());
+  if (action && action !== "all") params.append('action', action);
+  if (actor_id) params.append('actor_id', actor_id);
+
+  const response = await adminApi.get<AuditLogListResponse>(`/logs?${params.toString()}`);
+  return response.data;
+};

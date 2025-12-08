@@ -1,166 +1,139 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight, Users } from "lucide-react";
-import { getPartnerStats, type PartnerStats } from "@/lib/admin-api";
-import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
-import { toast } from "sonner";
 import { AdminLayout } from "@/components/AdminLayout";
+import { PageHeader } from "@/components/admin/PageHeader";
+import { PremiumTable } from "@/components/admin/PremiumTable";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Users, RefreshCw, Trophy, Crown, Medal } from "lucide-react"; // Import new icons
+import { getPartnerStats, type PartnerStats } from "@/lib/admin-api";
+import { toast } from "sonner";
 
 export default function PartnersPage() {
-  const router = useRouter();
   const [data, setData] = useState<PartnerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
   useEffect(() => {
-    if (!isAdminAuthenticated()) {
-      router.push('/admin/login');
-      return;
+    loadData();
+  }, [page]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const result = await getPartnerStats(page, pageSize);
+      setData(result);
+    } catch (err) {
+      console.error('Failed to load partner stats:', err);
+      toast.error("Failed to load partner statistics");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const fetchData = async (pageNum: number) => {
-      setLoading(true);
-      try {
-        const result = await getPartnerStats(pageNum, pageSize);
-        setData(result);
-      } catch (err: unknown) {
-        console.error('Failed to load partner stats:', err);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        if ((err as any).response?.status === 403) {
-          toast.error("Token หมดอายุ", { description: "กรุณา login ใหม่" });
-          removeAdminToken();
-          router.push('/admin/login');
-        } else {
-          toast.error("ไม่สามารถโหลดข้อมูล Partner ได้");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+  const getRankIcon = (index: number) => {
+    switch (index) {
+      case 0: return <Crown className="h-4 w-4 text-yellow-500" />;
+      case 1: return <Medal className="h-4 w-4 text-gray-400" />;
+      case 2: return <Medal className="h-4 w-4 text-amber-600" />;
+      default: return <span className="text-muted-foreground text-xs font-mono">#{index + 1}</span>;
+    }
+  };
 
-    fetchData(page);
-  }, [page, router]);
+  const columns = [
+    {
+      header: "Rank",
+      cell: (item: any) => {
+        // Calculate index based on current page
+        const globalIndex = ((page - 1) * pageSize) + (data?.items.indexOf(item) || 0);
+        return (
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50">
+            {getRankIcon(globalIndex)}
+          </div>
+        );
+      },
+      className: "w-[80px] text-center",
+    },
+    {
+      header: "Partner ID",
+      accessorKey: "partner_id",
+      cell: (item: any) => (
+        <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-muted-foreground">
+          {item.partner_id}
+        </code>
+      ),
+    },
+    {
+      header: "Name",
+      accessorKey: "name",
+      cell: (item: any) => (
+        <span className="font-medium text-foreground">{item.name}</span>
+      ),
+    },
+    {
+      header: "Total Requests",
+      accessorKey: "total_requests",
+      cell: (item: any) => (
+        <div className="font-mono text-sm">{item.total_requests.toLocaleString()}</div>
+      ),
+      className: "text-right",
+    },
+    {
+      header: "Scam Detected",
+      accessorKey: "scam_detected",
+      cell: (item: any) => (
+        <div className="font-mono text-sm text-red-500 dark:text-red-400 font-semibold">
+          {item.scam_detected.toLocaleString()}
+        </div>
+      ),
+      className: "text-right",
+    },
+    {
+      header: "Detection Rate",
+      cell: (item: any) => {
+        const rate = (item.scam_detected / item.total_requests) * 100;
+        let colorClass = "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100"; // Low risk
+        
+        if (rate > 50) colorClass = "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-100"; // High scam rate
+        else if (rate > 20) colorClass = "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 hover:bg-orange-100";
 
-  const totalPages = data ? Math.ceil(data.total / pageSize) : 1;
+        return (
+          <div className="flex justify-end">
+            <Badge variant="secondary" className={`font-mono transition-colors ${colorClass}`}>
+              {rate.toFixed(1)}%
+            </Badge>
+          </div>
+        );
+      },
+      className: "text-right",
+    },
+  ];
 
   return (
     <AdminLayout>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Partner Statistics</h1>
-        <p className="text-muted-foreground">การใช้งานของ Partners แต่ละราย</p>
-      </div>
+      <PageHeader 
+        title="Partner Statistics" 
+        description="Monitor partner performance and scam detection effectiveness."
+        icon={Users}
+      >
+        <Button variant="outline" size="sm" onClick={loadData} disabled={loading} className="gap-2">
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </PageHeader>
 
-      {/* Summary Cards */}
-      {data && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Partners</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{data.total}</div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Data Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Partner List</CardTitle>
-          <CardDescription>
-            หน้า {page} จาก {totalPages} (รายการทั้งหมด: {data?.total || 0})
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
-          ) : data && data.items.length > 0 ? (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Partner ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead className="text-right">Total Requests</TableHead>
-                    <TableHead className="text-right">Scam Detected</TableHead>
-                    <TableHead className="text-right">Detection Rate</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.items.map((partner) => (
-                    <TableRow key={partner.partner_id}>
-                      <TableCell className="font-mono text-xs">
-                        {partner.partner_id}
-                      </TableCell>
-                      <TableCell className="font-medium">{partner.name}</TableCell>
-                      <TableCell className="text-right">
-                        {partner.total_requests.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right text-red-600">
-                        {partner.scam_detected.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {((partner.scam_detected / partner.total_requests) * 100).toFixed(1)}%
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {/* Pagination */}
-              <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-muted-foreground">
-                  Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, data.total)} of {data.total}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Next
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              ไม่มีข้อมูล Partner
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <PremiumTable 
+        data={data?.items || []}
+        columns={columns}
+        totalItems={data?.total || 0}
+        page={page}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        loading={loading}
+        emptyMessage="No partner data found."
+      />
     </AdminLayout>
   );
 }

@@ -7,10 +7,11 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
 from passlib.hash import bcrypt
+from app.utils.audit import log_action
 
 from app.database import get_db
 from app.models.database import User, UserRole
@@ -130,10 +131,11 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     response_model=UserResponse,
     summary="Create User (Admin)",
     description="Create a new user account (admin only). If password is not provided, one will be generated and emailed.",
-    dependencies=[Depends(verify_admin_token)]
 )
 async def create_user(
-    request: CreateUserRequest,
+    body: CreateUserRequest,
+    req: Request,
+    admin_id: str = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """
@@ -169,15 +171,28 @@ async def create_user(
         
         # Create user
         user = User(
-            email=request.email,
+            email=body.email,
             password_hash=password_hash,
-            name=request.name,
-            role=request.role,
-            partner_id=request.partner_id,
+            name=body.name,
+            role=body.role,
+            partner_id=body.partner_id,
             is_active=True
         )
         
         db.add(user)
+        # Flush to get ID for logging
+        db.flush() 
+
+        # Audit Log
+        log_action(
+            db, 
+            actor_id=admin_id, 
+            action="CREATE_USER", 
+            target_id=user.id, 
+            details={"email": user.email, "role": user.role},
+            ip_address=req.client.host
+        )
+
         db.commit()
         db.refresh(user)
         
@@ -216,7 +231,6 @@ async def create_user(
     response_model=UserListResponse,
     summary="List Users (Admin)",
     description="List all users with pagination, search, and filtering (admin only)",
-    dependencies=[Depends(verify_admin_token)]
 )
 async def list_users(
     page: int = 1,
@@ -224,6 +238,7 @@ async def list_users(
     q: Optional[str] = None,
     role: Optional[str] = None,
     status: Optional[str] = None,  # 'active', 'banned'
+    admin_id: str = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """
@@ -282,11 +297,13 @@ async def list_users(
     "/users/{user_id}",
     response_model=UserResponse,
     summary="Update User (Admin)",
-    dependencies=[Depends(verify_admin_token)]
+    description="Update user details, role, or ban status (admin only)",
 )
 async def update_user(
     user_id: str,
-    request: UpdateUserRequest,
+    body: UpdateUserRequest,
+    req: Request,
+    admin_id: str = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """Update user details (Role, Ban/Unban)"""
@@ -294,13 +311,31 @@ async def update_user(
     if not user:
         raise HTTPException(404, "User not found")
         
-    if request.name is not None:
-        user.name = request.name
-    if request.role is not None:
-        user.role = request.role
-    if request.is_active is not None:
-        user.is_active = request.is_active
+    changes = {}
+    if body.name is not None:
+        user.name = body.name
+        changes['name'] = body.name
+    if body.role is not None:
+        user.role = body.role
+        changes['role'] = body.role
+    if body.is_active is not None:
+        user.is_active = body.is_active
+        changes['is_active'] = body.is_active
         
+    # Audit Log
+    if changes:
+        action_type = "BAN_USER" if body.is_active is False else "UPDATE_USER"
+        if body.is_active is True and not user.is_active: action_type = "UNBAN_USER"
+            
+        log_action(
+            db,
+            actor_id=admin_id,
+            action=action_type,
+            target_id=user.id,
+            details=changes,
+            ip_address=req.client.host
+        )
+
     db.commit()
     return UserResponse(
         id=user.id,
@@ -318,10 +353,12 @@ async def update_user(
     "/users/{user_id}",
     summary="Delete User (Admin)",
     status_code=204,
-    dependencies=[Depends(verify_admin_token)]
+    description="Permanently delete a user account (admin only)"
 )
 async def delete_user(
     user_id: str,
+    req: Request,
+    admin_id: str = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """Delete a user permanently"""
@@ -329,6 +366,15 @@ async def delete_user(
     if not user:
         raise HTTPException(404, "User not found")
         
+    log_action(
+        db,
+        actor_id=admin_id,
+        action="DELETE_USER",
+        target_id=user.id,
+        details={"email": user.email},
+        ip_address=req.client.host
+    )
+
     db.delete(user)
     db.commit()
     return None
@@ -338,10 +384,12 @@ async def delete_user(
     "/users/{user_id}/reset-password",
     response_model=UserResponse,
     summary="Reset User Password (Admin)",
-    dependencies=[Depends(verify_admin_token)]
+    description="Reset a user's password and email them the new one (admin only)",
 )
 async def reset_password(
     user_id: str,
+    req: Request,
+    admin_id: str = Depends(verify_admin_token),
     db: Session = Depends(get_db)
 ):
     """Reset user password to a new auto-generated one and email it."""
@@ -358,6 +406,16 @@ async def reset_password(
     plain_password = ''.join(secrets.choice(alphabet) for i in range(12))
     
     user.password_hash = hash_password(plain_password)
+    
+    log_action(
+        db,
+        actor_id=admin_id,
+        action="RESET_PASSWORD",
+        target_id=user.id,
+        details="Admin requested password reset",
+        ip_address=req.client.host
+    )
+
     db.commit()
     
     logger.info(f"♻️ Password reset for {user.email}")

@@ -158,27 +158,56 @@ const getMockCategories = (): CategoryStats => ({
   page_size: 20
 });
 
-const getMockUncertainCases = (): UncertainCasesResponse => ({
-  total: 12,
-  uncertain_count: 8,
-  incorrect_feedback_count: 4,
-  cases: Array.from({ length: 12 }, (_, i) => {
-    const isImage = i % 3 === 0;
-    return {
-        request_id: `req_${Math.random().toString(36).substr(2, 9)}`,
-        created_at: new Date(Date.now() - i * 3600000).toISOString(),
-        message_hash: `hash_${i}`,
-        type: isImage ? 'image' : 'text',
-        message: isImage ? undefined : "Suspicious message requiring review...",
-        image_url: isImage ? '/placeholder-slip.jpg' : undefined,
-        is_scam: Math.random() > 0.5,
-        risk_score: 0.45 + Math.random() * 0.1, // 0.45 - 0.55 (uncertain)
-        category: ['financial_scam', 'gambling', 'shopping_scam', 'fake_slip'][Math.floor(Math.random() * 4)],
-        incorrect_feedback_count: Math.random() > 0.7 ? 1 : 0,
-        priority: i < 3 ? 'high' : i < 7 ? 'medium' : 'low'
-    };
-  })
-});
+const getMockUncertainCases = (limit: number = 50): UncertainCasesResponse => {
+  // Story Arc: The "Hero Case" for the Demo
+  const storyCases: UncertainCase[] = [
+    {
+      request_id: 'case_hero_001',
+      created_at: new Date().toISOString(), // Just now
+      message_hash: 'hash_loan_001',
+      is_scam: true, // Actually fraud
+      risk_score: 0.65, // Uncertain enough to need human review
+      category: 'financial_fraud',
+      incorrect_feedback_count: 2,
+      priority: 'high',
+      type: 'image',
+      image_url: 'https://placehold.co/600x800/e2e8f0/1e293b.png?text=FAKE+SLIP\n50,000+THB\n(Review+Needed)',
+      message: 'Image containing text: "อนุมัติยอด 50,000 บาท"'
+    },
+    {
+       request_id: 'case_hero_002',
+       created_at: new Date(Date.now() - 3600000).toISOString(),
+       message_hash: 'hash_gambling_01',
+       is_scam: true,
+       risk_score: 0.55,
+       category: 'gambling',
+       incorrect_feedback_count: 0,
+       priority: 'medium',
+       type: 'text',
+       message: 'เว็บตรง มั่นคง ปลอดภัย ฝาก-ถอน ออโต้'
+    }
+  ];
+  
+  const others: UncertainCase[] = Array.from({ length: limit - 2 }).map((_, i) => ({
+    request_id: `req_${i + 1}`,
+    created_at: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+    message_hash: `hash_${i}`,
+    is_scam: i % 2 === 0,
+    risk_score: 0.4 + Math.random() * 0.2, // 0.4 - 0.6 range
+    category: 'unknown',
+    incorrect_feedback_count: Math.floor(Math.random() * 3),
+    priority: i % 10 === 0 ? 'high' : 'medium',
+    type: i % 3 === 0 ? 'image' : 'text',
+    message: i % 3 === 0 ? 'Suspicious Image Analysis...' : 'ข้อความชวนสงสัย...'
+  }));
+
+  return {
+    cases: [...storyCases, ...others],
+    total: 42,
+    uncertain_count: 15,
+    incorrect_feedback_count: 8
+  };
+};
 
 /**
  * Get summary statistics for admin dashboard

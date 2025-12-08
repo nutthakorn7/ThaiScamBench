@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y \
 # Copy installed packages from builder to appuser home
 COPY --from=builder /root/.local /home/appuser/.local
 ENV PATH=/home/appuser/.local/bin:$PATH
+ENV PYTHONPATH=/home/appuser/.local/lib/python3.9/site-packages:$PYTHONPATH
 
 # Copy application code
 COPY . .

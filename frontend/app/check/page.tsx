@@ -45,7 +45,7 @@ export default function CheckPage() {
             ตรวจสอบความเสี่ยง
           </h1>
           <p className="text-muted-foreground text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
-            ใส่ข้อความ SMS, ลิงก์, หรือเลขบัญชีที่น่าสงสัย เพื่อให้ AI ช่วยวิเคราะห์ความปลอดภัย
+            ใส่ข้อความ SMS, ลิงก์, เลขบัญชี หรือ <span className="text-blue-600 dark:text-blue-400 font-medium">แนบรูปสลิป/แชท</span> เพื่อให้ AI ช่วยวิเคราะห์
           </p>
         </div>
 

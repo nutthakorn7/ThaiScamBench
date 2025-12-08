@@ -10,6 +10,7 @@ import numpy as np
 import cv2
 from pyzbar.pyzbar import decode
 from typing import Optional
+from app.utils.image_preprocessing import preprocess_for_ocr, get_preprocessing_stats
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -92,41 +93,60 @@ class OCRService:
             
         cls._initialized = True
 
-    def extract_text(self, image_content: bytes) -> str:
+    def extract_text(self, image_content: bytes, use_preprocessing: bool = True) -> str:
         """
         Extract text from image bytes using Google Vision API.
         Also detects QR codes natively.
         Uses API Key (REST) or Service Account based on configuration.
         
+        Args:
+            image_content: Raw image bytes
+            use_preprocessing: Whether to apply image preprocessing for better OCR (default: True)
+        
         DEPRECATED: Use extract_text_and_analyze() for vision analysis.
         """
+        # 0. Optional preprocessing for better OCR accuracy
+        processed_content = image_content
+        if use_preprocessing:
+            try:
+                processed_content = preprocess_for_ocr(image_content)
+                logger.debug("✨ Applied image preprocessing for OCR")
+            except Exception as e:
+                logger.warning(f"Preprocessing failed, using original: {e}")
+                processed_content = image_content
+        
         # 1. Detect QR Codes first (Local operation)
-        qr_text = self._detect_qr_code(image_content)
+        qr_text = self._detect_qr_code(processed_content)
         
         # 2. Extract OCR Text (Cloud operation)
         ocr_text = ""
         if self._use_rest_api and self._api_key:
-            ocr_text = self._extract_with_api_key(image_content)
+            ocr_text = self._extract_with_api_key(processed_content)
         elif self._client:
-            ocr_text = self._extract_with_client(image_content)
+            ocr_text = self._extract_with_client(processed_content)
         else:
-            ocr_text = self._mock_extract(image_content)
+            ocr_text = self._mock_extract(processed_content)
             
         # Combine results
         full_text = f"{ocr_text}\n{qr_text}".strip()
         return full_text
     
-    async def extract_text_and_analyze(self, image_content: bytes) -> dict:
+    async def extract_text_and_analyze(self, image_content: bytes, use_preprocessing: bool = True) -> dict:
         """
         Extract text AND perform visual forensics analysis.
+        
+        Args:
+            image_content: Raw image bytes
+            use_preprocessing: Whether to apply image preprocessing for better OCR (default: True)
         
         Returns:
             dict with:
                 - text: str (OCR + QR combined)
                 - visual_analysis: VisualAnalysisResult (or None if disabled)
+                - preprocessing_applied: bool
         """
-        # 1-2. Standard text extraction (OCR + QR)
-        text = self.extract_text(image_content)
+        # 1-2. Standard text extraction (OCR + QR) with optional preprocessing
+        text = self.extract_text(image_content, use_preprocessing=use_preprocessing)
         
         # 3. Visual Forensics (Gemini Vision)
         vision_analyzer = get_vision_analyzer()
@@ -142,7 +162,8 @@ class OCRService:
         
         return {
             "text": text,
-            "visual_analysis": visual_analysis
+            "visual_analysis": visual_analysis,
+            "preprocessing_applied": use_preprocessing
         }
 
     def _detect_qr_code(self, image_content: bytes) -> str:

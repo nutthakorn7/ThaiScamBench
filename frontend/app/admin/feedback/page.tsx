@@ -61,6 +61,7 @@ export default function FeedbackPage() {
                   <TableRow>
                     <TableHead className="w-[100px]">Time</TableHead>
                     <TableHead>Type</TableHead>
+                    <TableHead>Content Preview</TableHead>
                     <TableHead>Request ID</TableHead>
                     <TableHead>Comment</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -83,10 +84,15 @@ export default function FeedbackPage() {
                           </Badge>
                         )}
                       </TableCell>
+                      <TableCell>
+                        <div className="max-w-[200px] truncate text-sm font-mono bg-slate-50 dark:bg-slate-900 p-1 px-2 rounded border text-muted-foreground" title={item.message_preview}>
+                            {item.message_preview || "N/A"}
+                        </div>
+                      </TableCell>
                       <TableCell className="font-mono text-xs text-muted-foreground">
                         {item.request_id}
                       </TableCell>
-                      <TableCell className="max-w-[400px]">
+                      <TableCell className="max-w-[300px]">
                         {item.comment ? (
                           <span className="text-sm">{item.comment}</span>
                         ) : (

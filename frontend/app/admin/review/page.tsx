@@ -14,11 +14,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { 
   AlertTriangle, 
   TrendingDown,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Image as ImageIcon,
+  MessageSquare,
+  Eye
 } from "lucide-react";
 import { getUncertainCases, type UncertainCasesResponse, type UncertainCase } from "@/lib/admin-api";
 import { isAdminAuthenticated, removeAdminToken } from "@/lib/auth";
@@ -81,7 +85,7 @@ export default function ReviewPage() {
     <AdminLayout>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Cases for Review</h1>
-        <p className="text-muted-foreground">กรณีที่ต้องตรวจสอบเพื่อปรับปรุง Model</p>
+        <p className="text-muted-foreground">กรณีที่ต้องตรวจสอบเพื่อปรับปรุง Model (Uncertain / Incorrect Feedback)</p>
       </div>
 
       {/* Summary Cards */}
@@ -162,12 +166,13 @@ export default function ReviewPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Priority</TableHead>
-                  <TableHead>Request ID</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Content</TableHead>
                   <TableHead>Category</TableHead>
                   <TableHead className="text-center">Risk Score</TableHead>
                   <TableHead className="text-center">Is Scam</TableHead>
                   <TableHead className="text-center">Feedback</TableHead>
-                  <TableHead>Created At</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -179,10 +184,43 @@ export default function ReviewPage() {
                         {case_.priority}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {case_.request_id.slice(0, 8)}...
+                    <TableCell>
+                        {case_.type === 'image' ? (
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 gap-1 text-[10px]">
+                                <ImageIcon className="h-3 w-3" /> Image
+                            </Badge>
+                        ) : (
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 gap-1 text-[10px]">
+                                <MessageSquare className="h-3 w-3" /> Text
+                            </Badge>
+                        )}
                     </TableCell>
-                    <TableCell className="capitalize">
+                    <TableCell>
+                       {case_.type === 'image' ? (
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                        <Eye className="h-4 w-4 text-purple-500" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-3xl">
+                                    <div className="flex flex-col items-center justify-center p-4">
+                                        <div className="relative w-full aspect-video bg-slate-100 dark:bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden border">
+                                             <div className="text-center p-8">
+                                                <ImageIcon className="h-16 w-16 mx-auto text-slate-300 mb-4" />
+                                                <p className="text-muted-foreground">Undecided Image</p>
+                                             </div>
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                       ) : (
+                           <span className="text-xs text-muted-foreground truncate max-w-[150px] block" title={case_.message as string}>
+                               {case_.message || "No content"}
+                           </span>
+                       )}
+                    </TableCell>
+                    <TableCell className="capitalize text-xs">
                       {case_.category.replace(/_/g, " ")}
                     </TableCell>
                     <TableCell className="text-center">
@@ -204,8 +242,8 @@ export default function ReviewPage() {
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {new Date(case_.created_at).toLocaleDateString('th-TH')}
+                    <TableCell>
+                        <Button size="sm" variant="default" className="h-7 text-xs">Review</Button>
                     </TableCell>
                   </TableRow>
                 ))}

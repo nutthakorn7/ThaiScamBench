@@ -15,13 +15,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getDetections, type DetectionLog } from "@/lib/admin-api";
-import { Search, Download, Loader2, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Search, Download, Loader2, ShieldAlert, ShieldCheck, Image as ImageIcon, MessageSquare, Eye } from "lucide-react";
 
 export default function DetectionsPage() {
   const [detections, setDetections] = useState<DetectionLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -46,7 +48,7 @@ export default function DetectionsPage() {
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Detection Logs</h2>
             <p className="text-muted-foreground">
-              ประวัติการตรวจสอบทั้งหมดในระบบ
+              ประวัติการตรวจสอบทั้งหมดในระบบ (Text & Image)
             </p>
           </div>
           <div className="flex gap-2">
@@ -82,8 +84,9 @@ export default function DetectionsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[100px]">Time</TableHead>
-                    <TableHead>Message</TableHead>
+                    <TableHead className="w-[100px]">Type</TableHead>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Content</TableHead>
                     <TableHead>Risk Score</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead className="text-right">Result</TableHead>
@@ -92,13 +95,49 @@ export default function DetectionsPage() {
                 <TableBody>
                   {detections.map((item) => (
                     <TableRow key={item.id}>
+                      <TableCell>
+                         {item.type === 'image' ? (
+                             <Badge variant="secondary" className="bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 gap-1">
+                                 <ImageIcon className="h-3 w-3" /> Image
+                             </Badge>
+                         ) : (
+                             <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 gap-1">
+                                 <MessageSquare className="h-3 w-3" /> Text
+                             </Badge>
+                         )}
+                      </TableCell>
                       <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(item.created_at).toLocaleString('th-TH')}
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-[300px] truncate text-sm" title={item.message}>
-                          {item.message}
-                        </div>
+                        {item.type === 'image' ? (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm italic text-muted-foreground">Image Analysis</span>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+                                            <Eye className="h-3 w-3" /> View Source
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-3xl">
+                                        <div className="flex flex-col items-center justify-center p-4">
+                                            <div className="relative w-full aspect-video bg-slate-100 dark:bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden border">
+                                                {/* In real app, use next/image with item.image_url */}
+                                                <div className="text-center p-8">
+                                                    <ImageIcon className="h-16 w-16 mx-auto text-slate-300 mb-4" />
+                                                    <p className="text-muted-foreground">Original Source Image</p>
+                                                    <p className="text-xs text-slate-400 mt-2">{item.id}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        ) : (
+                            <div className="max-w-[300px] truncate text-sm font-mono bg-slate-50 dark:bg-slate-900 p-1 px-2 rounded border" title={item.message as string}>
+                                {item.message}
+                            </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

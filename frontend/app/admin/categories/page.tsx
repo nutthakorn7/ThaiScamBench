@@ -10,6 +10,8 @@ import { BarChart3, RefreshCw } from "lucide-react";
 import { getCategoryStats, type CategoryStats } from "@/lib/admin-api";
 import { toast } from "sonner";
 
+type CategoryItem = CategoryStats['items'][0];
+
 export default function CategoriesPage() {
   const [data, setData] = useState<CategoryStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ export default function CategoriesPage() {
   const columns = [
     {
       header: "Rank",
-      cell: (item: any) => {
+      cell: (item: CategoryItem) => {
         const globalIndex = ((page - 1) * pageSize) + (data?.items.indexOf(item) || 0) + 1;
         return (
           <Badge variant="secondary" className="bg-muted text-muted-foreground w-8 h-8 flex items-center justify-center rounded-full p-0">
@@ -49,7 +51,7 @@ export default function CategoriesPage() {
     {
       header: "Category",
       accessorKey: "category",
-      cell: (item: any) => (
+      cell: (item: CategoryItem) => (
         <div className="flex flex-col">
             <span className="font-bold text-foreground capitalize text-base">
                 {item.category.replace(/_/g, " ")}
@@ -61,7 +63,7 @@ export default function CategoriesPage() {
     {
       header: "Count",
       accessorKey: "count",
-      cell: (item: any) => (
+      cell: (item: CategoryItem) => (
         <div className="font-mono text-sm font-medium">{item.count.toLocaleString()} cases</div>
       ),
       className: "text-right",
@@ -69,14 +71,14 @@ export default function CategoriesPage() {
     {
       header: "Percentage",
       accessorKey: "percentage",
-      cell: (item: any) => (
+      cell: (item: CategoryItem) => (
         <div className="font-mono text-sm text-muted-foreground">{item.percentage.toFixed(2)}%</div>
       ),
       className: "text-right",
     },
     {
       header: "Distribution",
-      cell: (item: any) => (
+      cell: (item: CategoryItem) => (
         <div className="w-full max-w-[200px]">
           <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden">
             <div 

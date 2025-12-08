@@ -6,9 +6,11 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { PremiumTable } from "@/components/admin/PremiumTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, RefreshCw, Trophy, Crown, Medal } from "lucide-react"; // Import new icons
+import { Users, RefreshCw, Crown, Medal } from "lucide-react";
 import { getPartnerStats, type PartnerStats } from "@/lib/admin-api";
 import { toast } from "sonner";
+
+type PartnerItem = PartnerStats['items'][0];
 
 export default function PartnersPage() {
   const [data, setData] = useState<PartnerStats | null>(null);
@@ -18,6 +20,7 @@ export default function PartnersPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   const loadData = async () => {
@@ -45,7 +48,7 @@ export default function PartnersPage() {
   const columns = [
     {
       header: "Rank",
-      cell: (item: any) => {
+      cell: (item: PartnerItem) => {
         // Calculate index based on current page
         const globalIndex = ((page - 1) * pageSize) + (data?.items.indexOf(item) || 0);
         return (
@@ -59,7 +62,7 @@ export default function PartnersPage() {
     {
       header: "Partner ID",
       accessorKey: "partner_id",
-      cell: (item: any) => (
+      cell: (item: PartnerItem) => (
         <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-muted-foreground">
           {item.partner_id}
         </code>
@@ -68,14 +71,14 @@ export default function PartnersPage() {
     {
       header: "Name",
       accessorKey: "name",
-      cell: (item: any) => (
+      cell: (item: PartnerItem) => (
         <span className="font-medium text-foreground">{item.name}</span>
       ),
     },
     {
       header: "Total Requests",
       accessorKey: "total_requests",
-      cell: (item: any) => (
+      cell: (item: PartnerItem) => (
         <div className="font-mono text-sm">{item.total_requests.toLocaleString()}</div>
       ),
       className: "text-right",
@@ -83,7 +86,7 @@ export default function PartnersPage() {
     {
       header: "Scam Detected",
       accessorKey: "scam_detected",
-      cell: (item: any) => (
+      cell: (item: PartnerItem) => (
         <div className="font-mono text-sm text-red-500 dark:text-red-400 font-semibold">
           {item.scam_detected.toLocaleString()}
         </div>
@@ -92,7 +95,7 @@ export default function PartnersPage() {
     },
     {
       header: "Detection Rate",
-      cell: (item: any) => {
+      cell: (item: PartnerItem) => {
         const rate = (item.scam_detected / item.total_requests) * 100;
         let colorClass = "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-100"; // Low risk
         

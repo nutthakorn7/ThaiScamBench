@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { getAuditLogs, AuditLog } from "../../../lib/admin-api";
+import { getAuditLogs, type AuditLog } from "@/lib/admin-api";
 import { format } from "date-fns";
 import { ClipboardList, Globe, RefreshCw, Eye } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ export default function AuditLogsPage() {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, actionFilter]);
 
   const loadData = async () => {
@@ -46,14 +47,25 @@ export default function AuditLogsPage() {
       case "BAN_USER": return "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300 border-orange-200 dark:border-orange-800";
       case "UNBAN_USER": return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800";
       case "RESET_PASSWORD": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
+      case "UPDATE_USER": return "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 border-purple-200 dark:border-purple-800";
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
 
-  const columns = [
+  const formatDetails = (details?: string) => {
+    if (!details) return "No details provided.";
+    try {
+        return JSON.stringify(JSON.parse(details), null, 2);
+    } catch {
+        return details; // Return as is if not JSON
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: any[] = [
     {
       header: "Timestamp",
-      accessorKey: "created_at" as keyof AuditLog,
+      accessorKey: "created_at",
       cell: (item: AuditLog) => (
         <span className="font-mono text-xs text-muted-foreground">
           {format(new Date(item.created_at), "yyyy-MM-dd HH:mm:ss")}
@@ -62,7 +74,7 @@ export default function AuditLogsPage() {
     },
     {
       header: "Actor",
-      accessorKey: "actor_id" as keyof AuditLog,
+      accessorKey: "actor_id",
       cell: (item: AuditLog) => (
          <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
@@ -76,7 +88,7 @@ export default function AuditLogsPage() {
     },
     {
       header: "Action",
-      accessorKey: "action" as keyof AuditLog,
+      accessorKey: "action",
       cell: (item: AuditLog) => (
         <Badge variant="outline" className={`${getActionColor(item.action)}`}>
           {item.action}
@@ -85,7 +97,7 @@ export default function AuditLogsPage() {
     },
     {
       header: "Target",
-      accessorKey: "target_id" as keyof AuditLog,
+      accessorKey: "target_id",
       cell: (item: AuditLog) => (
         <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-muted-foreground truncate max-w-[150px] block" title={item.target_id}>
            {item.target_id || "-"}
@@ -94,7 +106,7 @@ export default function AuditLogsPage() {
     },
     {
       header: "IP Address",
-      accessorKey: "ip_address" as keyof AuditLog,
+      accessorKey: "ip_address",
       cell: (item: AuditLog) => (
         <div className="flex items-center text-xs text-muted-foreground">
           <Globe className="h-3 w-3 mr-1.5 opacity-70" /> 
@@ -147,7 +159,7 @@ export default function AuditLogsPage() {
                         <span className="text-sm font-medium">Payload Data</span>
                         <ScrollArea className="h-[300px] w-full rounded-lg border bg-slate-950 p-4">
                         <pre className="text-xs font-mono text-blue-300 whitespace-pre-wrap leading-relaxed">
-                            {item.details ? JSON.stringify(JSON.parse(item.details), null, 2) : "No details provided."}
+                            {formatDetails(item.details)}
                         </pre>
                         </ScrollArea>
                     </div>

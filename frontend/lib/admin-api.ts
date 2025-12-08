@@ -86,6 +86,10 @@ export interface UncertainCase {
   category: string;
   incorrect_feedback_count: number;
   priority: 'high' | 'medium' | 'low';
+  // New fields
+  type: 'text' | 'image';
+  message?: string | string[];
+  image_url?: string;
 }
 
 export interface UncertainCasesResponse {
@@ -158,16 +162,22 @@ const getMockUncertainCases = (): UncertainCasesResponse => ({
   total: 12,
   uncertain_count: 8,
   incorrect_feedback_count: 4,
-  cases: Array.from({ length: 12 }, (_, i) => ({
-    request_id: `req_${Math.random().toString(36).substr(2, 9)}`,
-    created_at: new Date(Date.now() - i * 3600000).toISOString(),
-    message_hash: `hash_${i}`,
-    is_scam: Math.random() > 0.5,
-    risk_score: 0.45 + Math.random() * 0.1, // 0.45 - 0.55 (uncertain)
-    category: ['financial_scam', 'gambling', 'shopping_scam'][Math.floor(Math.random() * 3)],
-    incorrect_feedback_count: Math.random() > 0.7 ? 1 : 0,
-    priority: i < 3 ? 'high' : i < 7 ? 'medium' : 'low'
-  }))
+  cases: Array.from({ length: 12 }, (_, i) => {
+    const isImage = i % 3 === 0;
+    return {
+        request_id: `req_${Math.random().toString(36).substr(2, 9)}`,
+        created_at: new Date(Date.now() - i * 3600000).toISOString(),
+        message_hash: `hash_${i}`,
+        type: isImage ? 'image' : 'text',
+        message: isImage ? undefined : "Suspicious message requiring review...",
+        image_url: isImage ? '/placeholder-slip.jpg' : undefined,
+        is_scam: Math.random() > 0.5,
+        risk_score: 0.45 + Math.random() * 0.1, // 0.45 - 0.55 (uncertain)
+        category: ['financial_scam', 'gambling', 'shopping_scam', 'fake_slip'][Math.floor(Math.random() * 4)],
+        incorrect_feedback_count: Math.random() > 0.7 ? 1 : 0,
+        priority: i < 3 ? 'high' : i < 7 ? 'medium' : 'low'
+    };
+  })
 });
 
 /**
@@ -232,6 +242,9 @@ export interface DetectionLog {
   category: string;
   source: string;
   ip_address?: string;
+  // New fields
+  type: 'text' | 'image';
+  image_url?: string;
 }
 
 export interface DetectionListResponse {
@@ -240,6 +253,8 @@ export interface DetectionListResponse {
   page: number;
   page_size: number;
 }
+
+// ... existing code ...
 
 export interface FeedbackLog {
   id: string;
@@ -260,21 +275,26 @@ export interface FeedbackListResponse {
 // -- Mock Data for Tables --
 
 const getMockDetections = (page: number, pageSize: number): DetectionListResponse => ({
-  items: Array.from({ length: pageSize }, (_, i) => ({
-    id: `det_${Date.now()}_${i}`,
-    created_at: new Date(Date.now() - i * 600000).toISOString(),
-    message: [
-      "คุณได้รับเงินรางวัล 1000 บาท คลิกที่นี่",
-      "ธนาคารแจ้งเตือนบัญชีของคุณถูกระงับ",
-      "สวัสดีค่ะ สนใจทำงานเสริมไหมคะ",
-      "พัสดุตกค้าง กรุณาชำระภาษี",
-      "เงินกู้ด่วน อนุมัติไว ได้เงินจริง"
-    ][Math.floor(Math.random() * 5)],
-    is_scam: Math.random() > 0.3,
-    risk_score: Math.random(),
-    category: ['financial_scam', 'gambling', 'loan_scam'][Math.floor(Math.random() * 3)],
-    source: 'web'
-  })),
+  items: Array.from({ length: pageSize }, (_, i) => {
+    const isImage = Math.random() > 0.8; // 20% are images
+    return {
+        id: `det_${Date.now()}_${i}`,
+        created_at: new Date(Date.now() - i * 600000).toISOString(),
+        type: isImage ? 'image' : 'text',
+        image_url: isImage ? '/placeholder-slip.jpg' : undefined,
+        message: isImage ? "Checking slip transfer..." : [
+        "คุณได้รับเงินรางวัล 1000 บาท คลิกที่นี่",
+        "ธนาคารแจ้งเตือนบัญชีของคุณถูกระงับ",
+        "สวัสดีค่ะ สนใจทำงานเสริมไหมคะ",
+        "พัสดุตกค้าง กรุณาชำระภาษี",
+        "เงินกู้ด่วน อนุมัติไว ได้เงินจริง"
+        ][Math.floor(Math.random() * 5)],
+        is_scam: Math.random() > 0.3,
+        risk_score: Math.random(),
+        category: isImage ? 'fake_slip' : ['financial_scam', 'gambling', 'loan_scam'][Math.floor(Math.random() * 3)],
+        source: 'web'
+    };
+  }),
   total: 1250,
   page,
   page_size: pageSize

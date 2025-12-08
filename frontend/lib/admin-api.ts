@@ -487,6 +487,61 @@ export const resetUserPassword = async (id: string): Promise<User> => {
   return response.data;
 };
 
+// -- Mock AI Analysis (Level 2: Intent Recognition) --
+
+export interface TextAnalysisResult {
+  intent: string;
+  sentiment: 'scam_likely' | 'neutral' | 'safe';
+  urgency_score: number; // 0-1
+  triggered_psychology: string[]; // e.g. "Greed", "Fear", "Authority"
+  explanation: string;
+}
+
+export const analyzeTextIntent = async (text: string): Promise<TextAnalysisResult> => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Hardcoded responses for Story Arc
+    if (text.includes("50,000")) {
+        return {
+            intent: "Loan Fraud Attempt",
+            sentiment: "scam_likely",
+            urgency_score: 0.9,
+            triggered_psychology: ["Greed", "Financial Desperation"],
+            explanation: "The text promises an unrealistically fast loan approval ('อนุมัติไว') combined with a specific large amount to trigger greed. High probability of advance-fee fraud."
+        };
+    }
+    
+    if (text.includes("เว็บตรง")) {
+         return {
+            intent: "Illegal Gambling Promotion",
+            sentiment: "scam_likely",
+            urgency_score: 0.7,
+            triggered_psychology: ["Greed", "Addiction"],
+            explanation: "Uses common gambling keywords ('เว็บตรง', 'ฝาก-ถอน ออโต้'). Promotes illegal activities with promises of stability."
+        };
+    }
+
+    if (text.includes("honey") || text.includes("hospital")) {
+         return {
+            intent: "Romance Scam Solicitation",
+            sentiment: "scam_likely",
+            urgency_score: 0.85,
+            triggered_psychology: ["Love/Trust", "Emergency/Fear"],
+            explanation: "Classic 'Emergency' pattern in romance scams. Manipulates emotional connection ('honey') followed by a financial crisis ('hospital bills')."
+        };
+    }
+
+    // Default generic response
+    return {
+        intent: "Unknown / General Spam",
+        sentiment: "neutral",
+        urgency_score: 0.3,
+        triggered_psychology: ["Curiosity"],
+        explanation: "The text contains generic promotional language but lacks specific high-risk scam indicators."
+    };
+}
+
 // -- Audit Logging --
 
 export interface AuditLog {

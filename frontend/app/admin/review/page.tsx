@@ -277,6 +277,25 @@ export default function ReviewPage() {
                             >
                                 <BrainCircuit className="h-4 w-4" />
                             </Button>
+                            
+                            {/* Level 2: Text Intent Analysis Demo */}
+                            {case_.type === 'text' && (
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button 
+                                            size="sm" 
+                                            variant="ghost" 
+                                            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                            title="AI Intent Analysis (Level 2)"
+                                        >
+                                            <MessageSquare className="h-4 w-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-md">
+                                        <AIAnalysisView text={case_.message as string} />
+                                    </DialogContent>
+                                </Dialog>
+                            )}
                         </div>
                     </TableCell>
                   </TableRow>
@@ -292,4 +311,89 @@ export default function ReviewPage() {
       </Card>
     </AdminLayout>
   );
+}
+
+// Sub-component for Analysis View
+import { analyzeTextIntent, type TextAnalysisResult } from "@/lib/admin-api";
+import { Sparkles, Brain } from "lucide-react";
+
+function AIAnalysisView({ text }: { text: string }) {
+    const [result, setResult] = useState<TextAnalysisResult | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        analyzeTextIntent(text).then(res => {
+            setResult(res);
+            setLoading(false);
+        });
+    }, [text]);
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 space-y-4">
+                <div className="relative">
+                    <Brain className="h-12 w-12 text-blue-500 animate-pulse" />
+                    <Sparkles className="absolute -top-1 -right-1 h-5 w-5 text-yellow-500 animate-spin" />
+                </div>
+                <p className="text-sm text-muted-foreground animate-pulse">AI is deconstructing semantic intent...</p>
+            </div>
+        );
+    }
+
+    if (!result) return null;
+
+    return (
+        <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b pb-4">
+                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                    <h3 className="font-bold text-lg">AI Intent Analysis</h3>
+                    <p className="text-xs text-muted-foreground">Level 2: Semantic Understanding</p>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded border text-sm italic border-l-4 border-l-blue-500">
+                    "{text}"
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase">Detected Intent</span>
+                        <p className="font-medium text-blue-700 dark:text-blue-300">{result.intent}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <span className="text-xs font-semibold text-muted-foreground uppercase">Urgency Score</span>
+                        <div className="flex items-center gap-2">
+                            <div className="h-2 flex-1 bg-slate-200 rounded-full overflow-hidden">
+                                <div 
+                                    className={`h-full ${result.urgency_score > 0.7 ? 'bg-red-500' : 'bg-green-500'}`} 
+                                    style={{ width: `${result.urgency_score * 100}%` }}
+                                />
+                            </div>
+                            <span className="text-xs font-mono">{(result.urgency_score * 100).toFixed(0)}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase">Psychological Triggers</span>
+                    <div className="flex flex-wrap gap-2">
+                        {result.triggered_psychology.map(t => (
+                            <Badge key={t} variant="outline" className="border-orange-200 bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800">
+                                {t}
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+
+                 <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm">
+                    <span className="font-semibold block mb-1">Analysis:</span>
+                    {result.explanation}
+                </div>
+            </div>
+        </div>
+    );
 }

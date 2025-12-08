@@ -23,6 +23,7 @@ class CSRFProtection(BaseHTTPMiddleware):
         "/v1/public/feedback", 
         "/v1/partner/detect/text",
         "/v1/partner/rotate-key",
+        "/v1/auth/login",  # NextAuth login
         "/admin/auth/login",
         "/admin/auth/refresh",
         "/docs",

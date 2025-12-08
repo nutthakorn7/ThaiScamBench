@@ -149,19 +149,60 @@ async def create_user(
         )
 
 
+class UserListResponse(BaseModel):
+    items: list[UserResponse]
+    total: int
+    page: int
+    page_size: int
+
+# ...
+
 @router.get(
     "/users",
-    response_model=list[UserResponse],
+    response_model=UserListResponse,
     summary="List Users (Admin)",
-    description="List all users (admin only)",
+    description="List all users with pagination, search, and filtering (admin only)",
     dependencies=[Depends(verify_admin_token)]
 )
 async def list_users(
+    page: int = 1,
+    page_size: int = 50,
+    q: Optional[str] = None,
+    role: Optional[str] = None,
+    status: Optional[str] = None,  # 'active', 'banned'
     db: Session = Depends(get_db)
 ):
-    """List all users. Admin only."""
-    users = db.query(User).all()
-    return [
+    """
+    List all users with advanced filtering.
+    """
+    query = db.query(User)
+    
+    # 1. Search (Email or Name)
+    if q:
+        search = f"%{q}%"
+        query = query.filter(
+            (User.email.ilike(search)) | 
+            (User.name.ilike(search))
+        )
+    
+    # 2. Filter by Role
+    if role and role != "all":
+        query = query.filter(User.role == role)
+        
+    # 3. Filter by Status (Derived)
+    if status and status != "all":
+        if status == "active":
+            query = query.filter(User.is_active == True)
+        elif status == "banned":
+            query = query.filter(User.is_active == False)
+            
+    # Calculate total before pagination
+    total = query.count()
+    
+    # 4. Pagination
+    users = query.offset((page - 1) * page_size).limit(page_size).all()
+    
+    items = [
         UserResponse(
             id=u.id,
             email=u.email,
@@ -173,3 +214,115 @@ async def list_users(
         )
         for u in users
     ]
+    
+    return UserListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size
+    )
+
+
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = Field(None, pattern="^(admin|partner)$")
+    is_active: Optional[bool] = None
+
+
+@router.patch(
+    "/users/{user_id}",
+    response_model=UserResponse,
+    summary="Update User (Admin)",
+    dependencies=[Depends(verify_admin_token)]
+)
+async def update_user(
+    user_id: str,
+    request: UpdateUserRequest,
+    db: Session = Depends(get_db)
+):
+    """Update user details (Role, Ban/Unban)"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found")
+        
+    if request.name is not None:
+        user.name = request.name
+    if request.role is not None:
+        user.role = request.role
+    if request.is_active is not None:
+        user.is_active = request.is_active
+        
+    db.commit()
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role,
+        partner_id=user.partner_id,
+        is_active=user.is_active,
+        created_at=user.created_at
+    )
+
+
+@router.delete(
+    "/users/{user_id}",
+    summary="Delete User (Admin)",
+    status_code=204,
+    dependencies=[Depends(verify_admin_token)]
+)
+async def delete_user(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """Delete a user permanently"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found")
+        
+    db.delete(user)
+    db.commit()
+    return None
+
+
+@router.post(
+    "/users/{user_id}/reset-password",
+    response_model=UserResponse,
+    summary="Reset User Password (Admin)",
+    dependencies=[Depends(verify_admin_token)]
+)
+async def reset_password(
+    user_id: str,
+    db: Session = Depends(get_db)
+):
+    """Reset user password to a new auto-generated one and email it."""
+    from app.utils.email import send_new_user_email
+    import secrets
+    import string
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(404, "User not found")
+        
+    # Generate new password
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+    plain_password = ''.join(secrets.choice(alphabet) for i in range(12))
+    
+    user.password_hash = hash_password(plain_password)
+    db.commit()
+    
+    logger.info(f"♻️ Password reset for {user.email}")
+    
+    # Send Email
+    await send_new_user_email(user.email, plain_password, user.name)
+    
+    # Return user with new password (failsafe)
+    return UserResponse(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role,
+        partner_id=user.partner_id,
+        is_active=user.is_active,
+        created_at=user.created_at,
+        generated_password=plain_password
+    )

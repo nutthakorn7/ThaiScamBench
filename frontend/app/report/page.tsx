@@ -148,7 +148,7 @@ export default function ReportPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-3">
               <Label htmlFor="text" className="text-lg font-semibold">
-                1. ข้อความ / ลิงก์ / เลขบัญชี ที่ต้องการรายงาน
+                1. ข้อความ / ลิงก์ / เลขบัญชี / <span className="text-blue-600 dark:text-blue-400">รูปภาพสลิป</span> ที่ต้องการรายงาน
               </Label>
               <div className="relative">
                 <textarea
@@ -157,7 +157,7 @@ export default function ReportPage() {
                    aria-required="true"
                    aria-describedby="text-hint"
                    className={`flex min-h-64 w-full rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-900 px-6 py-5 text-lg ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 focus-visible:border-blue-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none ${preview ? 'pb-24' : ''}`}
-                   placeholder="เช่น ข้อความ SMS ที่ได้รับ, ลิงก์เว็บพนัน, เลขบัญชีที่น่าสงสัย หรือแนบรูปภาพ..."
+                   placeholder="พิมพ์รายละเอียดที่นี่ หรือกดปุ่มด้านล่างเพื่อแนบรูปสลิป/แชทไลน์..."
                    value={formData.text}
                    onChange={(e) => setFormData({...formData, text: e.target.value})}
                    required={!file} // If file exists, text is optional
@@ -175,13 +175,14 @@ export default function ReportPage() {
                    />
                    <Button
                       type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full"
+                      variant="outline"
+                      size="sm"
+                      className="text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full h-10 px-4 border-2"
                       onClick={() => fileInputRef.current?.click()}
                       title="อัปโหลดรูปภาพ"
                    >
-                      <ImageIcon className="h-6 w-6" />
+                      <ImageIcon className="h-5 w-5 mr-2" />
+                      แนบรูปหลักฐาน
                    </Button>
                 </div>
 

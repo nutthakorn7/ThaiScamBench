@@ -9,7 +9,7 @@ export default function Footer() {
               <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">เกี่ยวกับเรา</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                 ThaiScamDetector เป็นระบบ AI อัจฉริยะที่ช่วยปกป้องคุณจากการถูกหลอกลวงออนไลน์ 
-                โดยการวิเคราะห์ข้อความและลิงก์ที่น่าสงสัยได้อย่างแม่นยำ
+                โดยการวิเคราะห์ข้อความ สลิปโอนเงิน และรูปภาพที่น่าสงสัยได้อย่างแม่นยำ
               </p>
             </div>
             <div>
@@ -18,6 +18,13 @@ export default function Footer() {
                 <li>
                   <Link href="/check" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     ตรวจสอบความเสี่ยง
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/check/batch" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <span className="flex items-center gap-1">
+                        ตรวจสอบสลิปหลายรูป <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full dark:bg-red-900/30 dark:text-red-400">NEW</span>
+                    </span>
                   </Link>
                 </li>
                 <li>

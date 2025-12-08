@@ -61,8 +61,68 @@ class UserResponse(BaseModel):
     generated_password: Optional[str] = None
 
 
+class UserListResponse(BaseModel):
+    items: list[UserResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+class UpdateUserRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = Field(None, pattern="^(admin|partner)$")
+    is_active: Optional[bool] = None
+
+
 # Password helpers
-# ...
+def verify_password(plain_password, hashed_password):
+    return bcrypt.verify(plain_password, hashed_password)
+
+def hash_password(password):
+    return bcrypt.hash(password)
+
+
+@router.post("/login", response_model=LoginResponse)
+async def login(request: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user or not verify_password(request.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is banned/inactive"
+        )
+    
+    # Update last login
+    user.last_login = datetime.now()
+    db.commit()
+
+    # Generate Access Token
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user.email, "role": user.role, "user_id": user.id},
+        expires_delta=access_token_expires
+    )
+    
+    logger.info(f"✅ User logged in: {user.email} (role: {user.role})")
+    
+    return LoginResponse(
+        success=True,
+        user_id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role,
+        partner_id=user.partner_id,
+        access_token=access_token,
+        token_type="bearer",
+        message="Login successful"
+    )
+
 
 @router.post(
     "/users",
@@ -149,14 +209,6 @@ async def create_user(
         )
 
 
-class UserListResponse(BaseModel):
-    items: list[UserResponse]
-    total: int
-    page: int
-    page_size: int
-
-# ...
-
 @router.get(
     "/users",
     response_model=UserListResponse,
@@ -221,12 +273,6 @@ async def list_users(
         page=page,
         page_size=page_size
     )
-
-
-class UpdateUserRequest(BaseModel):
-    name: Optional[str] = None
-    role: Optional[str] = Field(None, pattern="^(admin|partner)$")
-    is_active: Optional[bool] = None
 
 
 @router.patch(

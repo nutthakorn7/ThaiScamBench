@@ -34,6 +34,10 @@ export interface SummaryStats {
   scam_requests: number;
   safe_requests: number;
   scam_percentage: number;
+  // New Image Stats
+  total_images: number;
+  scam_images: number;
+  
   top_categories?: Array<{
     category: string;
     count: number;
@@ -104,11 +108,16 @@ const getMockSummary = (): SummaryStats => ({
   scam_requests: 6890,
   safe_requests: 8353,
   scam_percentage: 45.2,
+  
+  // Image Stats Mock
+  total_images: 3450,
+  scam_images: 840,
+
   top_categories: [
     { category: 'financial_scam', count: 2450, percentage: 35.5 },
     { category: 'gambling', count: 1890, percentage: 27.4 },
     { category: 'shopping_scam', count: 1200, percentage: 17.4 },
-    { category: 'identity_theft', count: 850, percentage: 12.3 },
+    { category: 'fake_slip', count: 840, percentage: 12.3 }, // Added fake slip category
     { category: 'romance_scam', count: 500, percentage: 7.2 }
   ],
   daily_stats: Array.from({ length: 7 }, (_, i) => ({

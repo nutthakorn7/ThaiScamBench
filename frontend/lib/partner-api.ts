@@ -46,6 +46,10 @@ export interface PartnerDashboardStats {
   plan_tier: string;
   total_requests: number;
   requests_limit: number;
+  // New Image Stats
+  total_image_requests: number;
+  image_limit: number;
+  
   scam_detected: number;
   safe_detected: number;
   recent_logs: Array<{
@@ -63,15 +67,23 @@ const MOCK_PARTNER_DATA: PartnerDashboardStats = {
   plan_tier: "Enterprise",
   total_requests: 45230,
   requests_limit: 100000,
+  
+  // Image Mock
+  total_image_requests: 1250,
+  image_limit: 5000,
+
   scam_detected: 12400,
   safe_detected: 32830,
-  recent_logs: Array.from({ length: 10 }, (_, i) => ({
-    id: `req_${Date.now()}_${i}`,
-    timestamp: new Date(Date.now() - i * 60000).toISOString(),
-    endpoint: "/v1/partner/detect",
-    status: 200,
-    latency: `${Math.floor(Math.random() * 50 + 20)}ms`
-  }))
+  recent_logs: Array.from({ length: 15 }, (_, i) => {
+    const isImage = Math.random() > 0.7;
+    return {
+        id: `req_${Date.now()}_${i}`,
+        timestamp: new Date(Date.now() - i * 60000).toISOString(),
+        endpoint: isImage ? "/v1/partner/detect/image" : "/v1/partner/detect",
+        status: 200,
+        latency: isImage ? `${Math.floor(Math.random() * 200 + 100)}ms` : `${Math.floor(Math.random() * 50 + 20)}ms`
+    }
+  })
 };
 
 // API Functions

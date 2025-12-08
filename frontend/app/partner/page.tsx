@@ -125,64 +125,79 @@ export default function PartnerDashboard() {
              className="space-y-8"
           >
             {/* Stats Grid */}
-            <div className="grid gap-6 md:grid-cols-3">
-              {/* Total Requests - Blue */}
-              <Card className="bg-card/95 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {/* Total Text Requests - Blue */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-900/10 shadow-lg hover:-translate-y-1 transition-all duration-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-400">Total Requests</CardTitle>
-                  <Activity className="h-6 w-6 text-blue-600" />
+                  <CardTitle className="text-sm font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Text API Usage</CardTitle>
+                  <Activity className="h-5 w-5 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                  {/* HUGE Number */}
-                  <div className="text-6xl md:text-8xl font-black text-blue-700 dark:text-blue-400 mb-2">
+                  <div className="text-4xl font-black text-blue-700 dark:text-blue-400 mb-2">
                     {data.total_requests.toLocaleString()}
                   </div>
-                  <p className="text-sm text-blue-700/70 dark:text-blue-300/70 mb-3">
-                    Limit: {data.requests_limit.toLocaleString()} / month
+                  <p className="text-xs text-blue-700/70 dark:text-blue-300/70 mb-3">
+                    Limit: {data.requests_limit.toLocaleString()}
                   </p>
-                  {/* Gradient Progress Bar */}
-                  <div className="mt-4 h-3 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-blue-200 dark:bg-blue-800 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-blue-600 to-blue-400" 
+                      className="h-full bg-blue-600" 
                       style={{ width: `${Math.min((data.total_requests / data.requests_limit) * 100, 100)}%` }} 
                     />
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Scam Detected - Red */}
-              <Card className="bg-card/95 backdrop-blur-xl border-2 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+              {/* Total Image Requests - Purple (New) */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-900 bg-purple-50/50 dark:bg-purple-900/10 shadow-lg hover:-translate-y-1 transition-all duration-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-400">Scam Detected</CardTitle>
-                  <Shield className="h-6 w-6 text-red-600" />
+                  <CardTitle className="text-sm font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wider">Image API Usage</CardTitle>
+                  <FileCode className="h-5 w-5 text-purple-600" />
                 </CardHeader>
                 <CardContent>
-                  {/* HUGE Number */}
-                  <div className="text-6xl md:text-8xl font-black text-red-600 dark:text-red-400 mb-2">
+                  <div className="text-4xl font-black text-purple-700 dark:text-purple-400 mb-2">
+                    {data.total_image_requests.toLocaleString()}
+                  </div>
+                  <p className="text-xs text-purple-700/70 dark:text-purple-300/70 mb-3">
+                    Limit: {data.image_limit.toLocaleString()}
+                  </p>
+                  <div className="h-2 w-full bg-purple-200 dark:bg-purple-800 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-purple-600" 
+                      style={{ width: `${Math.min((data.total_image_requests / data.image_limit) * 100, 100)}%` }} 
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Scam Detected - Red */}
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-900/10 shadow-lg hover:-translate-y-1 transition-all duration-200">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                  <CardTitle className="text-sm font-semibold text-red-700 dark:text-red-400 uppercase tracking-wider">Scam Detected</CardTitle>
+                  <Shield className="h-5 w-5 text-red-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-black text-red-600 dark:text-red-400 mb-2">
                     {data.scam_detected.toLocaleString()}
                   </div>
-                  <p className="text-sm text-red-700/70 dark:text-red-300/70">
-                     {(data.total_requests > 0 ? (data.scam_detected / data.total_requests * 100) : 0).toFixed(1)}% of total traffic
+                  <p className="text-xs text-red-700/70 dark:text-red-300/70">
+                     Global Rate: {(data.total_requests > 0 ? (data.scam_detected / data.total_requests * 100) : 0).toFixed(1)}%
                   </p>
                 </CardContent>
               </Card>
 
               {/* API Status - Green */}
-              <Card className="bg-card/95 backdrop-blur-xl border-2 border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+              <Card className="bg-card/95 backdrop-blur-xl border-2 border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-900/10 shadow-lg hover:-translate-y-1 transition-all duration-200">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-400">API Status</CardTitle>
-                  <div className="h-4 w-4 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] animate-pulse" />
+                  <CardTitle className="text-sm font-semibold text-green-700 dark:text-green-400 uppercase tracking-wider">System Status</CardTitle>
+                  <div className="h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e] animate-pulse" />
                 </CardHeader>
                 <CardContent>
-                  {/* HUGE Text */}
-                  <div className="text-6xl md:text-8xl font-black text-green-600 dark:text-green-400 mb-2">
-                    ✓
+                  <div className="text-4xl font-black text-green-600 dark:text-green-400 mb-2">
+                    99.9%
                   </div>
-                  <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-1">
-                    Operational
-                  </div>
-                  <p className="text-sm text-green-700/70 dark:text-green-300/70">
-                    Latency: 45ms (avg)
+                   <p className="text-xs text-green-700/70 dark:text-green-300/70">
+                    Latency: 45ms
                   </p>
                 </CardContent>
               </Card>
@@ -203,7 +218,7 @@ export default function PartnerDashboard() {
                         <Badge variant="outline" className="text-blue-400 border-blue-400/50 text-base">REST API</Badge>
                       </h3>
                       <p className="text-slate-300 text-base max-w-2xl">
-                        Connect your application using our secure REST API. Include your unique API Key in the header of every request.
+                        Connect your application using our secure REST API. Include your unique API Key in the header.
                       </p>
                     </div>
                   </div>
@@ -215,20 +230,42 @@ export default function PartnerDashboard() {
                     className="bg-white/10 hover:bg-white/20 border-white/20 text-white shrink-0"
                   >
                     <Copy className="h-4 w-4 mr-2" />
-                    Copy
+                    Copy Text Example
                   </Button>
                 </div>
-                <div className="mt-4 p-4 bg-black/50 rounded-xl border-2 border-white/10 font-mono text-sm overflow-x-auto">
-                  <div className="flex justify-between items-center mb-3 text-xs text-slate-400">
-                    <span className="font-semibold">Terminal</span>
-                    <span>bash</span>
-                  </div>
-                  <code className="text-green-400">
-                    curl -X POST https://api.thaiscam.zcr.ai/partner/detect \<br/>
-                    &nbsp;&nbsp;-H &quot;X-API-Key: YOUR_KEY&quot; \<br/>
-                    &nbsp;&nbsp;-d &apos;&#123;&quot;text&quot;: &quot;suspicious message&quot;&#125;&apos;
-                  </code>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Text API */}
+                    <div>
+                        <div className="flex justify-between items-center mb-2 px-1">
+                            <span className="text-xs font-semibold text-blue-300">Text Detection</span>
+                            <span className="text-[10px] text-slate-500">POST /partner/detect</span>
+                        </div>
+                        <div className="p-4 bg-black/50 rounded-xl border-2 border-white/10 font-mono text-sm overflow-x-auto h-40">
+                            <code className="text-green-400 text-xs leading-relaxed">
+                                curl -X POST https://api.thaiscam.zcr.ai/partner/detect \<br/>
+                                &nbsp;&nbsp;-H &quot;X-API-Key: YOUR_KEY&quot; \<br/>
+                                &nbsp;&nbsp;-d &apos;&#123;&quot;text&quot;: &quot;suspicious message&quot;&#125;&apos;
+                            </code>
+                        </div>
+                    </div>
+
+                    {/* Image API */}
+                    <div>
+                         <div className="flex justify-between items-center mb-2 px-1">
+                            <span className="text-xs font-semibold text-purple-300">Image/Slip Detection</span>
+                            <span className="text-[10px] text-slate-500">POST /partner/detect/image</span>
+                        </div>
+                        <div className="p-4 bg-black/50 rounded-xl border-2 border-white/10 font-mono text-sm overflow-x-auto h-40">
+                            <code className="text-purple-300 text-xs leading-relaxed">
+                                curl -X POST https://api.thaiscam.zcr.ai/partner/detect/image \<br/>
+                                &nbsp;&nbsp;-H &quot;X-API-Key: YOUR_KEY&quot; \<br/>
+                                &nbsp;&nbsp;-F &quot;file=@slip.jpg&quot;
+                            </code>
+                         </div>
+                    </div>
                 </div>
+
               </CardContent>
             </Card>
 

@@ -74,50 +74,49 @@ export default function AdminDashboard() {
       </div>
 
           {/* Stats Grid - World-Class */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Total Requests - Blue */}
-            <Card className="bg-blue-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Total Text Requests - Blue */}
+            <Card className="bg-blue-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                 <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-300">Total Requests</CardTitle>
                 <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
-                {/* HUGE Number */}
-                <div className="text-5xl md:text-7xl font-black text-blue-700 dark:text-blue-300 mb-2">
+                <div className="text-5xl font-black text-blue-700 dark:text-blue-300 mb-2">
                   {stats?.total_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-blue-700/70 dark:text-blue-300/70">
-                  การตรวจสอบทั้งหมด
+                  การตรวจสอบข้อความทั้งหมด
                 </p>
               </CardContent>
             </Card>
 
-            {/* Scam Detected - Red */}
-            <Card className="bg-red-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-red-200 dark:border-red-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            {/* Total Image Requests - Purple */}
+            <Card className="bg-purple-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-300">Scam Detected</CardTitle>
-                <ShieldAlert className="h-6 w-6 text-red-600 dark:text-red-400" />
+                <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-300">Image Scans</CardTitle>
+                <div className="p-1 bg-purple-200 dark:bg-purple-900 rounded">
+                    <BarChart3 className="h-4 w-4 text-purple-700 dark:text-purple-300" />
+                </div>
               </CardHeader>
               <CardContent>
-                {/* HUGE Number */}
-                <div className="text-5xl md:text-7xl font-black text-red-600 dark:text-red-300 mb-2">
-                  {stats?.scam_requests?.toLocaleString() || 0}
+                <div className="text-5xl font-black text-purple-700 dark:text-purple-300 mb-2">
+                  {stats?.total_images?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-red-700/70 dark:text-red-300/70">
-                  {stats?.scam_percentage?.toFixed(1) || 0}% ของทั้งหมด
+                <p className="text-sm text-purple-700/70 dark:text-purple-300/70">
+                  การตรวจสอบรูปภาพสลิป
                 </p>
               </CardContent>
             </Card>
 
             {/* Safe Messages - Green */}
-            <Card className="bg-green-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-green-200 dark:border-green-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            <Card className="bg-green-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-green-200 dark:border-green-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-300">Safe Messages</CardTitle>
+                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-300">Safe Content</CardTitle>
                 <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
-                {/* HUGE Number */}
-                <div className="text-5xl md:text-7xl font-black text-green-600 dark:text-green-300 mb-2">
+                <div className="text-5xl font-black text-green-600 dark:text-green-300 mb-2">
                   {stats?.safe_requests?.toLocaleString() || 0}
                 </div>
                 <p className="text-sm text-green-700/70 dark:text-green-300/70">
@@ -126,19 +125,50 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            {/* Detection Rate - Purple */}
-            <Card className="bg-purple-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-800 shadow-2xl hover:-translate-y-1 transition-all duration-200">
+            {/* Scam Detected - Red */}
+            <Card className="bg-red-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-red-200 dark:border-red-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-300">Scams Found</CardTitle>
+                <ShieldAlert className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-5xl font-black text-red-600 dark:text-red-300 mb-2">
+                  {stats?.scam_requests?.toLocaleString() || 0}
+                </div>
+                <p className="text-sm text-red-700/70 dark:text-red-300/70">
+                  {stats?.scam_percentage?.toFixed(1) || 0}% ของทั้งหมด
+                </p>
+              </CardContent>
+            </Card>
+            
+             {/* Fake Slips - Orange */}
+             <Card className="bg-orange-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-orange-200 dark:border-orange-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-lg font-semibold text-orange-700 dark:text-orange-300">Fake Slips</CardTitle>
+                <AlertTriangle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-5xl font-black text-orange-600 dark:text-orange-300 mb-2">
+                  {stats?.scam_images?.toLocaleString() || 0}
+                </div>
+                <p className="text-sm text-orange-700/70 dark:text-orange-300/70">
+                   {stats ? ((stats.scam_images / (stats.total_images || 1)) * 100).toFixed(1) : 0}% ของรูปภาพ
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Detection Rate - Gray/Mixed */}
+            <Card className="bg-slate-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-700 shadow-xl hover:-translate-y-1 transition-all duration-200">
                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                 <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-300">Detection Rate</CardTitle>
-                 <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                 <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-300">Overall Risk</CardTitle>
+                 <TrendingUp className="h-6 w-6 text-slate-600 dark:text-slate-400" />
                </CardHeader>
                <CardContent>
-                 {/* HUGE Number */}
-                 <div className="text-5xl md:text-7xl font-black text-purple-600 dark:text-purple-300 mb-2">
+                 <div className="text-5xl font-black text-slate-700 dark:text-slate-300 mb-2">
                    {stats?.scam_percentage?.toFixed(1) || 0}%
                  </div>
-                 <p className="text-sm text-purple-700/70 dark:text-purple-300/70">
-                   Scam detection percentage
+                 <p className="text-sm text-slate-700/70 dark:text-slate-300/70">
+                   Average Risk Score
                  </p>
                </CardContent>
             </Card>

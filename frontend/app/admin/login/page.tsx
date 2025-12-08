@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@thaiscam.zcr.ai");
+  const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -93,7 +93,7 @@ export default function AdminLoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@thaiscam.zcr.ai"
+                    placeholder="user@example.com"
                     className="pl-9 h-11 bg-background/50 border-input/60 focus:bg-background transition-colors font-mono"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}

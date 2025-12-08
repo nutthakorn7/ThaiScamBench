@@ -24,8 +24,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getUsers, createUser, type User } from "@/lib/admin-api";
-import { Search, Loader2, User as UserIcon, Shield, Ban, CheckCircle, Copy, Check } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { getUsers, createUser, updateUser, deleteUser, resetUserPassword, type User } from "@/lib/admin-api";
+import { Search, Loader2, User as UserIcon, Shield, Ban, CheckCircle, Copy, Check, MoreHorizontal, Trash, Key, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 export default function UsersPage() {
@@ -43,17 +58,24 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterRole, setFilterRole] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
   useEffect(() => {
-    loadData();
-  }, [page]);
+    const delayDebounceFn = setTimeout(() => {
+        loadData();
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [page, searchTerm, filterRole, filterStatus]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await getUsers(page, 20);
+      const data = await getUsers(page, 20, searchTerm, filterRole, filterStatus);
       setUsers(data.items);
+      setTotal(data.total); // Backend should return total
     } catch (error) {
       console.error("Failed to load users", error);
       toast.error("ไม่สามารถโหลดข้อมูลผู้ใช้ได้");
@@ -98,6 +120,37 @@ export default function UsersPage() {
         setCreatedUser(null);
         setNewUser({ email: "", name: "", role: "partner" });
     }, 300);
+  };
+
+  const handleUpdateStatus = async (id: string, currentStatus: boolean) => {
+    try {
+        await updateUser(id, { is_active: !currentStatus });
+        toast.success(currentStatus ? "User Banned" : "User Activated");
+        loadData();
+    } catch (error) {
+        toast.error("Failed to update status");
+    }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    try {
+        await deleteUser(id);
+        toast.success("User deleted");
+        loadData();
+    } catch (error) {
+        toast.error("Failed to delete user");
+    }
+  };
+
+  const handleResetPassword = async (id: string) => {
+    if (!confirm("This will reset the user's password and email them a new one. Continue?")) return;
+    try {
+        await resetUserPassword(id);
+        toast.success("Password reset and emailed to user");
+    } catch (error) {
+        toast.error("Failed to reset password");
+    }
   };
 
   return (
@@ -238,15 +291,34 @@ export default function UsersPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Registered Users</CardTitle>
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input 
-                  placeholder="ค้นหาชื่อ หรือ Email..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <Button size="icon" variant="ghost">
-                  <Search className="h-4 w-4" />
-                </Button>
+              <div className="flex w-full max-w-2xl items-center space-x-2">
+                 <div className="grid grid-cols-3 gap-2 w-full">
+                    <Input 
+                        placeholder="Search users..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <Select value={filterRole} onValueChange={setFilterRole}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Filter Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Roles</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="partner">User/Partner</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                         <SelectTrigger>
+                            <SelectValue placeholder="Filter Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="banned">Banned</SelectItem>
+                        </SelectContent>
+                    </Select>
+                 </div>
               </div>
             </div>
           </CardHeader>
@@ -290,7 +362,7 @@ export default function UsersPage() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {user.status === 'active' ? (
+                        {user.is_active ? (
                           <div className="flex items-center text-green-600 text-sm">
                             <CheckCircle className="h-4 w-4 mr-1" /> Active
                           </div>
@@ -304,7 +376,43 @@ export default function UsersPage() {
                         {user.last_login ? new Date(user.last_login).toLocaleString('th-TH') : "Never"}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">Edit</Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
+                              Copy ID
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleUpdateStatus(user.id, user.is_active)}>
+                                {user.is_active ? (
+                                    <>
+                                        <Ban className="mr-2 h-4 w-4 text-red-500" />
+                                        <span>Ban User</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                                        <span>Activate User</span>
+                                    </>
+                                )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleResetPassword(user.id)}>
+                              <Key className="mr-2 h-4 w-4" />
+                              Reset Password
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteUser(user.id)}>
+                              <Trash className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}

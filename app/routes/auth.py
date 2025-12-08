@@ -57,6 +57,7 @@ class UserResponse(BaseModel):
     partner_id: Optional[str]
     is_active: bool
     created_at: datetime
+    last_login: Optional[datetime] = None
     # Optional extended fields for creation response
     generated_password: Optional[str] = None
 
@@ -196,6 +197,7 @@ async def create_user(
             partner_id=user.partner_id,
             is_active=user.is_active,
             created_at=user.created_at,
+            last_login=user.last_login,
             generated_password=generated_password if generated_password else None
         )
         
@@ -262,7 +264,8 @@ async def list_users(
             role=u.role,
             partner_id=u.partner_id,
             is_active=u.is_active,
-            created_at=u.created_at
+            created_at=u.created_at,
+            last_login=u.last_login
         )
         for u in users
     ]
@@ -306,7 +309,8 @@ async def update_user(
         role=user.role,
         partner_id=user.partner_id,
         is_active=user.is_active,
-        created_at=user.created_at
+        created_at=user.created_at,
+        last_login=user.last_login
     )
 
 
@@ -370,5 +374,6 @@ async def reset_password(
         partner_id=user.partner_id,
         is_active=user.is_active,
         created_at=user.created_at,
+        last_login=user.last_login,
         generated_password=plain_password
     )

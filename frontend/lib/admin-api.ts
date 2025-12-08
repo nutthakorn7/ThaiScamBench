@@ -305,11 +305,12 @@ export interface User {
   id: string;
   email: string;
   name?: string;
-  role: 'admin' | 'user';
-  status: 'active' | 'banned';
-  last_login: string;
-  created_at: string;
-  generated_password?: string; // Optional field for newly created users
+  role: 'admin' | 'partner';
+  partner_id?: string;
+  created_at?: string;
+  last_login?: string;
+  is_active: boolean; // Added field to match backend
+  generated_password?: string; // Optional field for creation response
 }
 
 export interface UserListResponse {
@@ -319,24 +320,49 @@ export interface UserListResponse {
   page_size: number;
 }
 
-const getMockUsers = (page: number, pageSize: number): UserListResponse => ({
-  items: Array.from({ length: pageSize }, (_, i) => ({
-    id: `usr_${Date.now()}_${i}`,
+const getMockUsers = (page: number, pageSize: number): UserListResponse => {
+  const users: User[] = Array.from({ length: pageSize }).map((_, i) => ({
+    id: `mock-user-${(page - 1) * pageSize + i + 1}`,
     email: `user${(page - 1) * pageSize + i + 1}@example.com`,
-    role: i === 0 ? 'admin' : 'user',
-    status: Math.random() > 0.9 ? 'banned' : 'active',
-    last_login: new Date(Date.now() - Math.random() * 864000000).toISOString(),
-    created_at: new Date(Date.now() - Math.random() * 31536000000).toISOString()
-  })),
-  total: 1240,
-  page,
-  page_size: pageSize
-});
+    name: `Mock User ${(page - 1) * pageSize + i + 1}`,
+    role: i % 5 === 0 ? 'admin' : 'partner',
+    is_active: i % 10 !== 0, // 10% inactive
+    created_at: new Date(Date.now() - Math.random() * 31536000000).toISOString(),
+    last_login: new Date(Date.now() - Math.random() * 864000000).toISOString()
+  }));
+  return {
+    items: users,
+    total: 1240,
+    page,
+    page_size: pageSize
+  };
+};
 
-export const getUsers = async (page: number = 1, pageSize: number = 50): Promise<UserListResponse> => {
+export interface UpdateUserRequest {
+  name?: string;
+  role?: 'admin' | 'partner';
+  is_active?: boolean;
+}
+
+export const getUsers = async (
+  page: number = 1, 
+  pageSize: number = 50,
+  q?: string,
+  role?: string,
+  status?: string
+): Promise<UserListResponse> => {
   if (isBypassToken()) return getMockUsers(page, pageSize);
+  
+  // Build query params
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('page_size', pageSize.toString());
+  if (q) params.append('q', q);
+  if (role && role !== 'all') params.append('role', role);
+  if (status && status !== 'all') params.append('status', status);
+
   // Endpoint is at /v1/auth/users, adminApi base is /v1/admin
-  const response = await adminApi.get<UserListResponse>(`/../auth/users?page=${page}&page_size=${pageSize}`);
+  const response = await adminApi.get<UserListResponse>(`/../auth/users?${params.toString()}`);
   return response.data;
 };
 
@@ -351,4 +377,18 @@ export const createUser = async (data: CreateUserRequest): Promise<User> => {
    // Endpoint is at /v1/auth/users
    const response = await adminApi.post<User>('/../auth/users', data);
    return response.data;
+};
+
+export const updateUser = async (id: string, data: UpdateUserRequest): Promise<User> => {
+  const response = await adminApi.patch<User>(`/../auth/users/${id}`, data);
+  return response.data;
+};
+
+export const deleteUser = async (id: string): Promise<void> => {
+  await adminApi.delete(`/../auth/users/${id}`);
+};
+
+export const resetUserPassword = async (id: string): Promise<User> => {
+  const response = await adminApi.post<User>(`/../auth/users/${id}/reset-password`);
+  return response.data;
 };

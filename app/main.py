@@ -148,10 +148,11 @@ from app.middleware.cache_control import CacheControlMiddleware
 app.add_middleware(CacheControlMiddleware)
 
 # Audit Logging (logs all requests - no PII)
-if settings.audit_log_enabled:
-    from app.middleware.audit import AuditLogMiddleware
-    app.add_middleware(AuditLogMiddleware)
-    logger.info("✅ Audit logging middleware enabled")
+# DISABLED: Causing table conflict error
+# if settings.audit_log_enabled:
+#     from app.middleware.audit import AuditLogMiddleware
+#     app.add_middleware(AuditLogMiddleware)
+#     logger.info("✅ Audit logging middleware enabled")
 
 # CSRF Protection
 from app.middleware.csrf import CSRFProtection  

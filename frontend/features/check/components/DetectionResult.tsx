@@ -7,10 +7,13 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DetectionResponse } from "@/lib/api";
-
-// ... imports
 import Confetti from "react-confetti";
 import { useState, useEffect } from "react";
+
+// New component imports
+import { ForensicsCard } from "./ForensicsCard";
+import { SlipVerificationCard } from "./SlipVerificationCard";
+import { OCRTextDisplay } from "./OCRTextDisplay";
 
 interface DetectionResultProps {
   result: DetectionResponse | null;
@@ -287,6 +290,27 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
           </motion.div>
         </CardContent>
       </Card>
+
+      {/* OCR Text Display */}
+      {result.extracted_text && (
+        <motion.div variants={item}>
+          <OCRTextDisplay extractedText={result.extracted_text} />
+        </motion.div>
+      )}
+
+      {/* Forensics Card */}
+      {result.forensics && (
+        <motion.div variants={item}>
+          <ForensicsCard forensics={result.forensics} />
+        </motion.div>
+      )}
+
+      {/* Slip Verification */}
+      {result.slip_verification && (
+        <motion.div variants={item}>
+          <SlipVerificationCard slip={result.slip_verification} />
+        </motion.div>
+      )}
     </motion.div>
   );
 }

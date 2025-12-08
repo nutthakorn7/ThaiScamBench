@@ -24,6 +24,59 @@ export interface DetectionResponse {
   advice: string;
   model_version: string;
   extracted_text?: string; // Text from OCR
+  
+  // Image-specific fields
+  forensics?: {
+    enabled: boolean;
+    is_manipulated: boolean;
+    confidence: number;
+    manipulation_type?: string;
+    details?: string;
+    techniques: {
+      ela: {
+        suspicious: boolean;
+        score: number;
+        variance: number;
+        reason: string;
+      };
+      metadata: {
+        tampered: boolean;
+        confidence: number;
+        editing_software?: string[];
+        issues?: string[];
+      };
+      compression: {
+        edited: boolean;
+        confidence: number;
+        estimated_saves: number;
+        reason: string;
+      };
+      cloning: {
+        detected: boolean;
+        confidence: number;
+        clone_regions: number;
+        reason: string;
+      };
+    };
+  };
+  
+  slip_verification?: {
+    is_likely_genuine: boolean;
+    trust_score: number;
+    confidence: number;
+    detected_bank?: string;
+    detected_amount?: string;
+    warnings: string[];
+    checks: string[];
+    advice: string;
+  };
+  
+  visual_analysis?: {
+    enabled: boolean;
+    risk_score: number;
+    patterns_detected: string[];
+  };
+  
   // Legacy fields for backward compatibility
   confidence?: number;
   risk_level?: 'safe' | 'suspicious' | 'high_risk';

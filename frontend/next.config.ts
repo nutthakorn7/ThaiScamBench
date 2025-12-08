@@ -5,7 +5,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        source: '/api/auth/:path*',
+        destination: '/api/auth/:path*',
+      },
+      {
+        source: '/api/:path((?!auth).*)',
         destination: process.env.NEXT_PUBLIC_API_URL 
           ? `${process.env.NEXT_PUBLIC_API_URL}/:path*`
           : 'https://api.thaiscam.zcr.ai/v1/:path*',

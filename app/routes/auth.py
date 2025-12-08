@@ -65,7 +65,64 @@ def verify_password(password: str, hashed: str) -> bool:
     """Verify password against hash"""
     return bcrypt.verify(password, hashed)
 
-# ... (login function remains unchanged) ...
+@router.post(
+    "/login",
+    response_model=LoginResponse,
+    summary="User Login",
+    description="Authenticate user with email and password"
+)
+async def login(
+    request: LoginRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Authenticate user and return user info for session creation.
+    Used by NextAuth CredentialsProvider.
+    """
+    try:
+        # Find user by email
+        user = db.query(User).filter(
+            User.email == request.email,
+            User.is_active == True
+        ).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        # Verify password
+        if not verify_password(request.password, user.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        # Update last login
+        user.last_login = datetime.utcnow()
+        db.commit()
+        
+        logger.info(f"✅ User logged in: {user.email} (role: {user.role})")
+        
+        return LoginResponse(
+            success=True,
+            user_id=user.id,
+            email=user.email,
+            name=user.name,
+            role=user.role,
+            partner_id=user.partner_id,
+            message="Login successful"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed"
+        )
 
 @router.post(
     "/users",

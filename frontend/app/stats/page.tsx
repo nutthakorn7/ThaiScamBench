@@ -69,6 +69,50 @@ export default async function StatsPage() {
           </Card>
         </div>
 
+        {/* Image Stats Section */}
+        <div className="mb-16">
+            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                <span className="bg-purple-100 text-purple-600 p-2 rounded-lg dark:bg-purple-900/30">📸</span> 
+                สถิติการตรวจสอบรูปภาพ
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Card className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300 border-2 border-purple-500/20 bg-purple-500/5">
+                    <CardHeader>
+                        <CardTitle className="text-purple-700 dark:text-purple-400 flex items-center gap-2">
+                             ตรวจสอบสลิป/รูปภาพ
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-baseline gap-4">
+                            <div className="text-6xl font-black text-purple-600 dark:text-purple-400">
+                                {(stats.total_images || 0).toLocaleString()}
+                            </div>
+                            <div className="text-xl text-muted-foreground">ใบ</div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300 border-2 border-orange-500/20 bg-orange-500/5">
+                    <CardHeader>
+                        <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center gap-2">
+                             พบสลิปปลอม
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                         <div className="flex items-baseline gap-4">
+                            <div className="text-6xl font-black text-orange-600 dark:text-orange-400">
+                                {(stats.scam_slips || 0).toLocaleString()}
+                            </div>
+                            <div className="text-xl text-muted-foreground">ใบ</div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-2">
+                            คิดเป็น {((stats.scam_slips / (stats.total_images || 1)) * 100).toFixed(1)}% ของรูปภาพทั้งหมด
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+
         {/* Charts Section (Client Component) */}
         <StatsCharts pieData={pieData} barData={barData} />
 

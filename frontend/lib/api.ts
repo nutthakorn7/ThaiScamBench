@@ -109,6 +109,10 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
 interface StatsData {
   total_detections: number;
   scam_percentage: number;
+  // Image Stats
+  total_images: number;
+  scam_slips: number;
+  
   top_categories: Array<{
     category: string;
     count: number;
@@ -135,17 +139,22 @@ export const getStats = async (): Promise<StatsData> => {
 
         return await res.json();
     } catch (error) {
-        console.warn("API Error, returning mock stats:", error);
+        // console.warn("API Error, returning mock stats:", error);
         // Mock data for fallback
         return {
             total_detections: 12543,
             scam_percentage: 42.5,
+            
+            // Image Stats (Mock)
+            total_images: 1420,
+            scam_slips: 385,
+
             top_categories: [
                 { category: "online_gambling", count: 3200, percentage: 35 },
                 { category: "loan_scam", count: 2100, percentage: 23 },
                 { category: "purchase_scam", count: 1800, percentage: 19 },
-                { category: "giveaway_scam", count: 1200, percentage: 13 },
-                { category: "romance_scam", count: 900, percentage: 10 }
+                { category: "fake_slip", count: 1540, percentage: 15 }, // Added fake slip category
+                { category: "giveaway_scam", count: 1200, percentage: 8 }
             ],
             period: "Last 30 Days"
         };

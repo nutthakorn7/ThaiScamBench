@@ -93,7 +93,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     const formData = new FormData();
     formData.append('file', data.file);
     
-    const response = await api.post<DetectionResponse>('/v1/public/detect/image', formData, {
+    const response = await api.post<DetectionResponse>('/public/detect/image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

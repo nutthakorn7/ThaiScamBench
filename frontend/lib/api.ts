@@ -108,7 +108,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     return {
         request_id: `img_${Date.now()}`,
         is_scam: forensicsData.forensic_result === 'FAKE_LIKELY' || forensicsData.forensic_result === 'SUSPICIOUS',
-        risk_score: forensicsData.score * 100, // Convert 0-1 to 0-100
+        risk_score: forensicsData.score, // Return raw 0-1 score (UI handles %)
         category: forensicsData.forensic_result === 'FAKE_LIKELY' ? 'manipulated_slip' : 'suspicious_image',
         reason: forensicsData.reasons.length > 0 ? forensicsData.reasons[0] : "Suspicious image patterns detected",
         advice: "โปรดตรวจสอบความถูกต้องของภาพอีกครั้ง หรือติดต่อหน่วยงานที่เกี่ยวข้อง",
@@ -116,11 +116,11 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
         
         // Map to complex object structure used by frontend components
         visual_analysis: {
-            visual_risk_score: forensicsData.score * 100,
+            visual_risk_score: forensicsData.score, // Return raw 0-1 score
             is_suspicious: forensicsData.score >= 0.4,
             slip_verification: {
                 // Fill with safe defaults or mapped data
-                trust_score: 100 - (forensicsData.score * 100),
+                trust_score: 1.0 - forensicsData.score, // Return raw 0-1 score
                 is_likely_genuine: forensicsData.score < 0.4,
                 checks_passed: 0,
                 total_checks: 0,
@@ -334,7 +334,7 @@ export const detectBatchImages = async (files: File[]): Promise<PublicBatchRespo
                 index: index,
                 success: true,
                 is_scam: isScam,
-                risk_score: data.score * 100,
+                risk_score: data.score, // Return raw 0-1 score
                 category: isScam ? 'manipulated' : 'clean',
                 reason: data.reasons[0] || "",
                 forensics: { score: data.score, details: data.features }

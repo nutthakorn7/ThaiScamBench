@@ -2,6 +2,53 @@
 
 **The Gold Standard in Thai Scam Detection & Prevention**
 
+AI-powered scam detection system for Thai language messages and bank slip images, featuring adaptive learning and crowd-sourced threat intelligence.
+
+## 🏦 3-Layer Image Detection System
+
+**Advanced bank slip verification with 57-61% risk reduction for genuine slips!**
+
+### How It Works
+
+1. **🔤 Text Analysis (30% weight)**
+   - OCR extraction via Google Vision API
+   - Keyword pattern matching
+   - AI classification (Gemini/GPT)
+
+2. **👁️ Visual Forensics (20% weight)**
+   - Error Level Analysis (ELA)
+   - Metadata examination
+   - Clone detection
+   - JPEG compression analysis
+
+3. **🏦 Slip Verification (50% weight)**
+   - ✅ Bank name detection (14+ Thai banks)
+   - ✅ Account format validation
+   - ✅ Amount sanity checks
+   - ✅ Date/time format verification
+   - ✅ Reference number patterns
+   - ✅ Fake indicator detection
+   
+   **Trust Score:** 0.0 (fake) → 1.0 (genuine)
+
+### Smart Fusion Algorithm
+
+```python
+if slip_trust > 0.7:  # Genuine slip detected
+    final_risk = (text × 0.3) + (visual × 0.2) + (slip × 0.5)
+    # Prioritizes slip verification 50%!
+else:
+    final_risk = (text × 0.4) + (visual × 0.3) + (slip × 0.3)
+```
+
+### Production Results ✅
+
+| Slip | Text Risk | Slip Trust | Final Risk | Improvement |
+|------|-----------|------------|------------|-------------|
+| Bangkok Bank 20 THB | 0.95 | 83% | **0.37** | -61% ✅ |
+| Krungthai 90 THB | 0.00 | 100% | **0.00** | Perfect ✅ |
+| SCB 50,000 THB | 0.65 | 83% | **0.28** | -57% ✅ |
+
 A production-grade, AI-powered scam detection platform featuring a modern **Next.js 14 Frontend**, **FastAPI Backend**, and enterprise-grade **Security**.
 
 [![Next.js](https://img.shields.io/badge/Front--End-Next.js_14-black)](https://nextjs.org/)

@@ -26,58 +26,59 @@ export interface DetectionResponse {
   extracted_text?: string; // Text from OCR
   
   // Image-specific fields
-  forensics?: {
-    enabled: boolean;
-    is_manipulated: boolean;
-    confidence: number;
-    manipulation_type?: string;
-    details?: string;
-    techniques: {
-      ela: {
-        suspicious: boolean;
-        score: number;
-        variance: number;
-        reason: string;
-      };
-      metadata: {
-        tampered: boolean;
-        confidence: number;
-        editing_software?: string[];
-        issues?: string[];
-      };
-      compression: {
-        edited: boolean;
-        confidence: number;
-        estimated_saves: number;
-        reason: string;
-      };
-      cloning: {
-        detected: boolean;
-        confidence: number;
-        clone_regions: number;
-        reason: string;
+  // Image-specific fields (3-Layer Detection)
+  visual_analysis?: {
+    visual_risk_score: number;
+    is_suspicious: boolean;
+    slip_verification: {
+      trust_score: number;
+      is_likely_genuine: boolean;
+      detected_bank?: string;
+      detected_amount?: string;
+      checks_passed: number;
+      total_checks: number;
+      warnings: string[];
+      checks: string[]; // List of passed check names
+      advice?: string;
+    };
+    forensics: {
+      enabled: boolean;
+      is_manipulated: boolean;
+      confidence: number;
+      manipulation_type?: string;
+      details?: string;
+      techniques: {
+        ela: {
+          suspicious: boolean;
+          score: number;
+          variance: number;
+          reason: string;
+        };
+        metadata: {
+          tampered: boolean;
+          confidence: number;
+          editing_software?: string[];
+          issues?: string[];
+        };
+        compression: {
+          edited: boolean;
+          confidence: number;
+          estimated_saves: number;
+          reason: string;
+        };
+        cloning: {
+          detected: boolean;
+          confidence: number;
+          clone_regions: number;
+          reason: string;
+        };
       };
     };
   };
   
-  slip_verification?: {
-    is_likely_genuine: boolean;
-    trust_score: number;
-    confidence: number;
-    detected_bank?: string;
-    detected_amount?: string;
-    warnings: string[];
-    checks: string[];
-    advice: string;
-  };
-  
-  visual_analysis?: {
-    enabled: boolean;
-    risk_score: number;
-    patterns_detected: string[];
-  };
-  
   // Legacy fields for backward compatibility
+  forensics?: any; // Keep loosely typed to avoid breaking legacy checks if any
+  slip_verification?: any; // Legacy direct field
   confidence?: number;
   risk_level?: 'safe' | 'suspicious' | 'high_risk';
   scam_type?: string;

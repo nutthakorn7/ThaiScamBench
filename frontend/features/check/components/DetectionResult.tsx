@@ -299,16 +299,16 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
       )}
 
       {/* Forensics Card */}
-      {result.forensics && (
+      {result.visual_analysis?.forensics && (
         <motion.div variants={item}>
-          <ForensicsCard forensics={result.forensics} />
+          <ForensicsCard forensics={result.visual_analysis.forensics} />
         </motion.div>
       )}
 
       {/* Slip Verification */}
-      {result.slip_verification && (
+      {result.visual_analysis?.slip_verification && (
         <motion.div variants={item}>
-          <SlipVerificationCard slip={result.slip_verification} />
+          <SlipVerificationCard slip={result.visual_analysis.slip_verification} />
         </motion.div>
       )}
     </motion.div>

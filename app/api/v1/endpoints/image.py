@@ -45,6 +45,9 @@ async def detect_image_public(
     - Automatic text classification
     - Supports JPG, PNG, BMP, WEBP
     """
+    # CRITICAL: First log to confirm we reached this endpoint!
+    logger.info(f"🚀 ENTRY POINT: /v1/public/detect/image called with file: {file.filename}")
+    
     try:
         # 1. Read Image Content
         image_content = await file.read()

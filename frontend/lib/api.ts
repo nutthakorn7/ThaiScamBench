@@ -106,12 +106,29 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     const forensicsData = response.data;
     const ocrData = forensicsData.ocr_result || { extracted_data: {}, raw_text: "" };
     
+    // Helper to translate warnings if backend is stale
+    const translateWarning = (w: string) => {
+        if (w.includes("missing_exif")) return "Missing EXIF - ไม่พบข้อมูลจำเพาะของภาพ (อาจเกิดจากการแคปหน้าจอหรือถูกลบข้อมูล)";
+        if (w.includes("high_entropy")) return `High Entropy - ความซับซ้อนของข้อมูลสูงผิดปกติ (อาจเป็นภาพสังเคราะห์)`;
+        if (w.includes("noise_too_smooth")) return "Noise Too Smooth - จุดรบกวนในภาพเรียบเนียนผิดปกติ (มักพบในภาพ AI หรือภาพที่ถูกลบรอย)";
+        if (w.includes("photoshop")) return "Photoshop Signature - ตรวจพบการบันทึกภาพด้วยโปรแกรม Photoshop";
+        if (w.includes("ai_software")) return "AI Software Detected - ตรวจพบร่องรอยซอฟต์แวร์ AI";
+        if (w.includes("non_standard_quantization")) return "Non-Standard Compression - ตารางการบีบอัดภาพไม่เป็นมาตรฐาน (อาจผ่านการแก้ไข)";
+        if (w.includes("low_high_frequency")) return "Low High-Frequency Energy - ขาดรายละเอียดความถี่สูงตามธรรมชาติ (ลักษณะคล้ายภาพ AI)";
+        if (w.includes("periodic_frequency")) return "Frequency Artifacts (GAN) - ตรวจพบรูปแบบซ้ำซ้อนในความถี่ (มักพบในภาพที่สร้างโดย AI)";
+        if (w.includes("inconsistent_noise")) return "Inconsistent Noise - ระดับจุดรบกวนไม่สม่ำเสมอ (อาจมีการตัดต่อหรือแก้ไขเฉพาะจุด)";
+        if (w.includes("double_compression")) return "Double Compression - ตรวจพบร่องรอยการบีบอัดไฟล์ซ้ำ (อาจมีการแก้ไขแล้ว Save ทับ)";
+        return w;
+    };
+
+    const translatedWarnings = (forensicsData.reasons || []).map(translateWarning);
+    
     return {
         request_id: `img_${Date.now()}`,
         is_scam: forensicsData.forensic_result === 'FAKE_LIKELY' || forensicsData.forensic_result === 'SUSPICIOUS',
         risk_score: forensicsData.score, // Return raw 0-1 score (UI handles %)
         category: forensicsData.forensic_result === 'FAKE_LIKELY' ? 'manipulated_slip' : 'suspicious_image',
-        reason: forensicsData.reasons.length > 0 ? forensicsData.reasons[0] : "Suspicious image patterns detected",
+        reason: forensicsData.reasons.length > 0 ? translateWarning(forensicsData.reasons[0]) : "Suspicious image patterns detected",
         advice: "โปรดตรวจสอบความถูกต้องของภาพอีกครั้ง หรือติดต่อหน่วยงานที่เกี่ยวข้อง",
         model_version: "v4.0 (Forensics + OCR)",
         extracted_text: ocrData.raw_text,
@@ -128,7 +145,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
                 detected_amount: ocrData.extracted_data?.amount,
                 checks_passed: 0,
                 total_checks: 0,
-                warnings: forensicsData.reasons,
+                warnings: translatedWarnings,
                 checks: []
             },
             forensics: {

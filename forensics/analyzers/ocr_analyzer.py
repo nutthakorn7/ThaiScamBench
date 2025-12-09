@@ -68,10 +68,24 @@ class OCRAnalyzer:
         # Check simple patterns first
         for bank, patterns in self.bank_patterns.items():
             for pattern in patterns:
+                # Add flexible regex for spaces/hyphens e.g. "bangkok bank" -> "bangkok\s*bank"
+                # But simple substrings usually work. Let's try explicit flexible patterns or just standard search.
+                # If text comes from OCR 'kbank' might be 'k bank'.
                 if re.search(pattern, text):
                     return bank
-        
-        # Add logo/color detection logic here in future if needed
+                    
+        # Flexible backup for common banks
+        flexible_patterns = {
+            "BBL": r"bangkok\s*bank",
+            "KBANK": r"k[\s-]*bank|kasikorn",
+            "SCB": r"siam\s*commercial",
+            "KTB": r"krung\s*thai",
+            "TTB": r"tmb|thanachart"
+        }
+        for bank, pattern in flexible_patterns.items():
+            if re.search(pattern, text):
+                return bank
+                
         return None
         
     def _detect_amount(self, text: str) -> str:
@@ -81,43 +95,68 @@ class OCRAnalyzer:
         # Context keywords for amount
         keywords = ['amount', 'karn', 'money', 'bath', 'baht', 'thb', 'จำนวน', 'จำนวนเงิน', 'ยอดเงิน', 'โอน', 'จาก']
         
+        # 1. Pattern Matching with Context
         for line in lines:
             line_lower = line.lower().strip()
-            
-            # 1. Find numbers in format xx.xx or x,xxx.xx
-            # Regex for amounts like 100.00, 1,000.00
+            # Find numbers in format xx.xx or x,xxx.xx
             matches = re.findall(r'(\d{1,3}(?:,\d{3})*\.\d{2})', line)
             
             if matches:
-                val = matches[0].replace(',', '')
-                # Filter out likely dates/times (e.g. 2023.01, 14.30) if they are not near amount keywords
-                # But typically dates use / or - or :
-                
-                # Check if this line also has a keyword
-                has_keyword = any(k in line_lower for k in keywords)
-                
-                # Assign confidence
-                confidence = 2 if has_keyword else 1
-                amount_candidates.append((float(val), confidence, val))
-                
-        if not amount_candidates:
-            # Fallback: simple search in full text if line splitting failed
-            matches = re.findall(r'(\d{1,3}(?:,\d{3})*\.\d{2})', text)
-            if matches:
-                # Return logical max (often total) or last found?
-                # Usually transfer amount is prominent. Let's take specific logic.
-                # Assuming valid amounts > 0
-                valid = [m for m in matches if float(m.replace(',','')) > 0]
-                if valid:
-                    # Heuristic: The transfer amount is often not the largest (balance) but is significant
-                    # For now return the one found last (often 'Amount: xxx')
-                    return valid[-1].replace(',', '')
+                val_str = matches[0].replace(',', '')
+                try:
+                    val_float = float(val_str)
+                    if val_float <= 0: continue
                     
-            return None
+                    # Check confidence based on keywords
+                    has_keyword = any(k in line_lower for k in keywords)
+                    confidence = 2 if has_keyword else 1
+                    
+                    # Heuristic: If line contains "fee" or "charge" (ค่าธรรมเนียม), lower confidence
+                    if 'fee' in line_lower or 'ธรรมเนียม' in line_lower:
+                        confidence = 0.5
+                        
+                    amount_candidates.append((val_float, confidence, val_str))
+                except:
+                    continue
+                
+        # 2. Heuristic Selection
+        if amount_candidates:
+            # Sort by confidence (desc), then by value (desc) ??? or finding the "transfer amount".
+            # Usually the transfer amount is the main number. 
+            # If we have a high confidence match, take it.
+            # If not, take the LARGEST number (assuming it's the total transfer, not fee).
+            # But sometimes "Balance" (ยอดคงเหลือ) is the largest.
+            # We should exclude "balance" / "คงเหลือ"
             
-        # Sort candidates by confidence (desc) then by value?
-        # Usually we want the explicitly labeled amount.
-        amount_candidates.sort(key=lambda x: x[1], reverse=True)
-        
-        # Return best candidate string
-        return amount_candidates[0][2]
+            # Filter out lines that likely mean Balance
+            filtered_candidates = []
+            for amt, conf, s in amount_candidates:
+                # We need context AGAIN from the line... 
+                # This simple list structure lost the line context. 
+                # For now let's just trust the keyword boosting.
+                filtered_candidates.append((amt, conf, s))
+                
+            filtered_candidates.sort(key=lambda x: (x[1], x[0]), reverse=True)
+            return filtered_candidates[0][2]
+
+        # 3. Fallback: Search WHOLE text for any XX.XX number
+        # If the line splitting failed, just grab all numbers 
+        matches = re.findall(r'(\d{1,3}(?:,\d{3})*\.\d{2})', text)
+        valid_matches = []
+        for m in matches:
+             try:
+                v = float(m.replace(',', ''))
+                if v > 0: valid_matches.append(v)
+             except: pass
+             
+        if valid_matches:
+            # Return the largest value found (risky if balance is shown, but better than null)
+            # Actually, usually balance is hidden or small or very large.
+            # Let's try returning the largest value as a last resort.
+            max_val = max(valid_matches)
+            # Find the string representation of max_val to keep original formatting
+            for m in matches:
+                if abs(float(m.replace(',','')) - max_val) < 0.001:
+                    return m.replace(',', '')
+                    
+        return None

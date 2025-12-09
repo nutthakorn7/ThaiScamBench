@@ -14,6 +14,7 @@ from analyzers.jpeg_forensics import JpegForensicsAnalyzer
 from analyzers.noise_residual import NoiseResidualAnalyzer
 from analyzers.frequency_domain import FrequencyDomainAnalyzer
 from analyzers.ocr_analyzer import OCRAnalyzer
+from analyzers.ela_analyzer import ELAAnalyzer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +33,7 @@ jpeg_analyzer = JpegForensicsAnalyzer()
 noise_analyzer = NoiseResidualAnalyzer()
 fft_analyzer = FrequencyDomainAnalyzer()
 ocr_analyzer = OCRAnalyzer()
+ela_analyzer = ELAAnalyzer()
 
 # Track metrics
 metrics = {
@@ -95,13 +97,17 @@ async def analyze_image(file: UploadFile = File(...)):
 
         # Phase 5: OCR Extraction
         ocr_result = ocr_analyzer.analyze(image_bytes)
+
+        # Phase 6: ELA Analysis
+        ela_result = ela_analyzer.analyze(image_bytes)
         
         # Combine results
         all_features = {
             "file_metadata": metadata_result["features"],
             "jpeg_forensics": jpeg_result["features"],
             "noise_analysis": noise_result["features"],
-            "frequency_analysis": fft_result["features"]
+            "frequency_analysis": fft_result["features"],
+            "ela_analysis": ela_result
         }
         
         all_warnings = (
@@ -116,7 +122,8 @@ async def analyze_image(file: UploadFile = File(...)):
             metadata_result["score"], 
             jpeg_result["score"],
             noise_result["score"],
-            fft_result["score"]
+            fft_result["score"],
+            ela_result.get("ela_score", 0.0)
         )
         
         # Determine result category

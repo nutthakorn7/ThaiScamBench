@@ -55,6 +55,8 @@ export interface DetectionResponse {
           score: number;
           variance: number;
           reason: string;
+          ela_image?: string; // Base64 encoded heatmap
+          max_difference?: number;
         };
         metadata: {
           tampered: boolean;
@@ -155,7 +157,14 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
                 details: "Advanced Forensics Analysis",
                 techniques: {
                     // Map feature flags if available, otherwise default
-                    ela: { suspicious: false, score: 0, variance: 0, reason: "" },
+                    ela: { 
+                        suspicious: false, 
+                        score: forensicsData.features?.ela_analysis?.ela_score || 0, 
+                        variance: 0, 
+                        reason: "",
+                        ela_image: forensicsData.features?.ela_analysis?.ela_image,
+                        max_difference: forensicsData.features?.ela_analysis?.max_difference
+                    },
                     metadata: { tampered: false, confidence: 0 },
                     compression: { edited: false, confidence: 0, estimated_saves: 0, reason: "" },
                     cloning: { detected: false, confidence: 0, clone_regions: 0, reason: "" }

@@ -18,6 +18,8 @@ interface ForensicsData {
       score: number;
       variance: number;
       reason: string;
+      ela_image?: string;
+      max_difference?: number;
     };
     metadata: {
       tampered: boolean;
@@ -107,10 +109,24 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* ELA */}
           <div className="p-4 rounded-lg bg-white dark:bg-black/20 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-4 h-4 text-yellow-600" />
-              <span className="font-medium text-sm">ตรวจการบีบอัดภาพ (ELA)</span>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-600" />
+                <span className="font-medium text-sm">ตรวจการบีบอัดภาพ (ELA)</span>
+              </div>
+              
+              {/* ELA Toggle - Only show if image is available */}
+              {forensics.techniques.ela.ela_image && (
+                 <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded cursor-pointer hover:bg-blue-100" 
+                      onClick={() => {
+                        const img = document.getElementById('ela-heatmap-img');
+                        if(img) img.classList.toggle('hidden');
+                      }}>
+                    👁️ เปิด Heatmap
+                 </div>
+              )}
             </div>
+            
             <p className={cn(
               "text-xs mb-2",
               forensics.techniques.ela.suspicious ? "text-red-600" : "text-green-600"
@@ -124,8 +140,17 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
               />
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Variance: {forensics.techniques.ela.variance.toFixed(1)}
+              Score: {(forensics.techniques.ela.score * 100).toFixed(0)}/100
+              {forensics.techniques.ela.max_difference && ` (MaxDiff: ${forensics.techniques.ela.max_difference})`}
             </p>
+
+            {/* Hidden ELA Heatmap Image */}
+            {forensics.techniques.ela.ela_image && (
+                <div id="ela-heatmap-img" className="hidden mt-3 p-1 bg-black rounded">
+                    <p className="text-[10px] text-white text-center mb-1">ELA Heatmap (จุดสีขาว = มีการแก้ไข)</p>
+                    <img src={forensics.techniques.ela.ela_image} alt="ELA Heatmap" className="w-full rounded" />
+                </div>
+            )}
           </div>
           
           {/* Metadata */}

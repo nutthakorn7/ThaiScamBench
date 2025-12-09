@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { Shield, Lock, Eye, UserCheck, FileText, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -40,7 +41,7 @@ export default function PrivacyPage() {
             className="space-y-8"
           >
             {/* Introduction */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <FileText className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -58,10 +59,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Data Collection */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <Eye className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -122,10 +123,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Data Usage */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <UserCheck className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -185,10 +186,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Data Security */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <Lock className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -239,10 +240,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* User Rights */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <UserCheck className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -295,10 +296,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Cookies */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">การใช้ Cookies</h2>
                 
@@ -324,10 +325,10 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Third Party */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">การแบ่งปันข้อมูลกับบุคคลที่สาม</h2>
                 
@@ -367,10 +368,10 @@ export default function PrivacyPage() {
                   </ul>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Data Retention */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">ระยะเวลาการเก็บรักษาข้อมูล</h2>
                 
@@ -416,10 +417,10 @@ export default function PrivacyPage() {
                   หลังจากหมดระยะเวลา เราจะลบหรือทำให้ข้อมูลเป็นนิรนาม (anonymize) เพื่อไม่สามารถระบุตัวตนได้
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* International Transfer */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">การถ่ายโอนข้อมูลข้ามประเทศ</h2>
                 
@@ -445,10 +446,10 @@ export default function PrivacyPage() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Children */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">บริการสำหรับเด็ก</h2>
                 
@@ -462,10 +463,10 @@ export default function PrivacyPage() {
                   กรุณาติดต่อเราเพื่อให้เราสามารถดำเนินการที่จำเป็น
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Changes */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="border-2 shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">การเปลี่ยนแปลงนโยบาย</h2>
                 
@@ -483,10 +484,10 @@ export default function PrivacyPage() {
                   </ul>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Contact */}
-            <Card className="border-2 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
+            <GlassCard className="border-2 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4">
                   <Mail className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -527,7 +528,7 @@ export default function PrivacyPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Footer Note */}
             <div className="text-center text-sm text-muted-foreground mt-8 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">

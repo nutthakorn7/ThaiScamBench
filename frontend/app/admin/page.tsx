@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { Overview } from "@/components/ui/overview";
 import { ActivityTicker } from "@/components/ui/activity-ticker";
 import { ScanningRadar } from "@/components/ui/scanning-radar";
+import { GlassCard } from "@/components/ui/glass-card";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -76,106 +77,112 @@ export default function AdminDashboard() {
           {/* Stats Grid - World-Class */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Total Text Requests - Blue */}
-            <Card className="bg-blue-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-blue-200 dark:border-blue-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <GlassCard className="border-blue-200/30 dark:border-blue-800/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl pointer-events-none" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-blue-700 dark:text-blue-300">Total Requests</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Total Requests</CardTitle>
                 <BarChart3 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-black text-blue-700 dark:text-blue-300 mb-2">
+                <div className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 mb-2">
                   {stats?.total_requests?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-blue-700/70 dark:text-blue-300/70">
+                <p className="text-sm text-muted-foreground">
                   การตรวจสอบข้อความทั้งหมด
-                </p>
+                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Total Image Requests - Purple */}
-            <Card className="bg-purple-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-purple-200 dark:border-purple-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <GlassCard className="border-purple-200/30 dark:border-purple-800/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-2xl pointer-events-none" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-purple-700 dark:text-purple-300">Image Scans</CardTitle>
-                <div className="p-1 bg-purple-200 dark:bg-purple-900 rounded">
-                    <BarChart3 className="h-4 w-4 text-purple-700 dark:text-purple-300" />
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Image Scans</CardTitle>
+                <div className="p-1 bg-purple-500/20 dark:bg-purple-600/30 rounded">
+                    <BarChart3 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-black text-purple-700 dark:text-purple-300 mb-2">
+                <div className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-purple-400 mb-2">
                   {stats?.total_images?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-purple-700/70 dark:text-purple-300/70">
+                <p className="text-sm text-muted-foreground">
                   การตรวจสอบรูปภาพสลิป
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Safe Messages - Green */}
-            <Card className="bg-green-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-green-200 dark:border-green-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <GlassCard className="border-green-200/30 dark:border-green-800/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-2xl pointer-events-none" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-green-700 dark:text-green-300">Safe Content</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Safe Content</CardTitle>
                 <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-black text-green-600 dark:text-green-300 mb-2">
+                <div className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-500 mb-2">
                   {stats?.safe_requests?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-green-700/70 dark:text-green-300/70">
+                <p className="text-sm text-muted-foreground">
                   {stats ? (100 - stats.scam_percentage).toFixed(1) : 0}% ของทั้งหมด
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Scam Detected - Red */}
-            <Card className="bg-red-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-red-200 dark:border-red-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <GlassCard className="border-red-200/30 dark:border-red-800/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl pointer-events-none" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-red-700 dark:text-red-300">Scams Found</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Scams Found</CardTitle>
                 <ShieldAlert className="h-6 w-6 text-red-600 dark:text-red-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-black text-red-600 dark:text-red-300 mb-2">
+                <div className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-500 mb-2">
                   {stats?.scam_requests?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-red-700/70 dark:text-red-300/70">
+                <p className="text-sm text-muted-foreground">
                   {stats?.scam_percentage?.toFixed(1) || 0}% ของทั้งหมด
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
             
              {/* Fake Slips - Orange */}
-             <Card className="bg-orange-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-orange-200 dark:border-orange-800 shadow-xl hover:-translate-y-1 transition-all duration-200">
+             <GlassCard className="border-orange-200/30 dark:border-orange-800/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl pointer-events-none" />
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                <CardTitle className="text-lg font-semibold text-orange-700 dark:text-orange-300">Fake Slips</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Fake Slips</CardTitle>
                 <AlertTriangle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               </CardHeader>
               <CardContent>
-                <div className="text-5xl font-black text-orange-600 dark:text-orange-300 mb-2">
+                <div className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-red-500 mb-2">
                   {stats?.scam_images?.toLocaleString() || 0}
                 </div>
-                <p className="text-sm text-orange-700/70 dark:text-orange-300/70">
+                <p className="text-sm text-muted-foreground">
                    {stats ? ((stats.scam_images / (stats.total_images || 1)) * 100).toFixed(1) : 0}% ของรูปภาพ
                 </p>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Detection Rate - Gray/Mixed */}
-            <Card className="bg-slate-50 dark:bg-slate-800 backdrop-blur-xl border-2 border-slate-200 dark:border-slate-700 shadow-xl hover:-translate-y-1 transition-all duration-200">
+            <GlassCard className="border-slate-200/30 dark:border-slate-700/30 hover:-translate-y-1 transition-all duration-200">
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-2xl pointer-events-none" />
                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                 <CardTitle className="text-lg font-semibold text-slate-700 dark:text-slate-300">Overall Risk</CardTitle>
-                 <TrendingUp className="h-6 w-6 text-slate-600 dark:text-slate-400" />
-               </CardHeader>
-               <CardContent>
-                 <div className="text-5xl font-black text-slate-700 dark:text-slate-300 mb-2">
-                   {stats?.scam_percentage?.toFixed(1) || 0}%
-                 </div>
-                 <p className="text-sm text-slate-700/70 dark:text-slate-300/70">
-                   Average Risk Score
-                 </p>
-               </CardContent>
-            </Card>
+                  <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">Overall Risk</CardTitle>
+                  <TrendingUp className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-5xl font-black text-slate-900 dark:text-white mb-2">
+                    {stats?.scam_percentage?.toFixed(1) || 0}%
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Average Risk Score
+                  </p>
+                </CardContent>
+            </GlassCard>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
-            <Card className="col-span-1 lg:col-span-4 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card">
+            <GlassCard className="col-span-1 lg:col-span-4 shadow-2xl">
               <CardHeader>
                 <CardTitle className="text-xl font-bold">Overview</CardTitle>
                 <CardDescription>
@@ -190,8 +197,8 @@ export default function AdminDashboard() {
                   }))} 
                 />
               </CardContent>
-            </Card>
-            <Card className="col-span-1 lg:col-span-3 bg-card/50 backdrop-blur-xl border-border shadow-2xl glass-card relative overflow-hidden">
+            </GlassCard>
+            <GlassCard className="col-span-1 lg:col-span-3 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-50 pointer-events-none">
                     <ScanningRadar />
                 </div>
@@ -209,12 +216,12 @@ export default function AdminDashboard() {
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10 pointer-events-none h-full" />
                     <ActivityTicker />
                 </CardContent>
-            </Card>
+            </GlassCard>
           </div>
           
           <div className="grid grid-cols-1 gap-6">
             {stats?.top_categories && stats.top_categories.length > 0 && (
-              <Card className="bg-card/95 backdrop-blur-xl border-2 border-border shadow-2xl">
+              <GlassCard className="shadow-2xl">
                 <CardHeader>
                   <CardTitle className="text-2xl font-black">Top Scam Categories</CardTitle>
                   <CardDescription className="text-base mt-1">ประเภทการหลอกลวงที่พบบ่อยที่สุด</CardDescription>
@@ -243,7 +250,7 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 </CardContent>
-              </Card>
+              </GlassCard>
             )}
           </div>
     </div>

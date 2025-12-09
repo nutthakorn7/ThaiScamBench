@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Shield, Lock, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import { GlassCard } from "@/components/ui/glass-card";
 
 export default function PartnerLoginPage() {
   const [email, setEmail] = useState("");
@@ -60,16 +61,16 @@ export default function PartnerLoginPage() {
         }}
         className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4"
       >
-        <Card className="w-full max-w-4xl shadow-2xl bg-card/95 backdrop-blur-xl border-2 border-border">          
+        <GlassCard className="w-full max-w-4xl shadow-2xl border-white/20">          
           <CardHeader className="text-center space-y-4 pb-5 pt-6">
             <div className="mx-auto bg-blue-600/10 dark:bg-blue-600/20 p-3 rounded-xl w-fit mb-1 ring-2 ring-blue-600/20">
-              <Shield className="h-8 w-8 text-blue-600" />
+              <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <CardTitle className="text-5xl md:text-6xl font-black mb-3 text-slate-900 dark:text-white">
+              <CardTitle className="text-4xl font-black mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-blue-600 animate-gradient">
                 Partner Portal
               </CardTitle>
-              <CardDescription className="mt-2 text-xl md:text-2xl text-muted-foreground">
+              <CardDescription className="mt-2 text-lg text-muted-foreground font-medium">
                 ระบบจัดการสำหรับพาร์ทเนอร์และหน่วยงาน
               </CardDescription>
               <div className="mt-4 flex justify-center">
@@ -132,7 +133,7 @@ export default function PartnerLoginPage() {
               </div>
             </form>
           </CardContent>
-        </Card>
+        </GlassCard>
       </motion.div>
     </AuroraBackground>
   );

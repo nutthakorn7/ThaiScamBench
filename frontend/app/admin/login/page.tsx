@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import { GlassCard } from "@/components/ui/glass-card";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -74,16 +75,16 @@ export default function AdminLoginPage() {
         }}
         className="relative flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4"
       >
-        <Card className="w-full max-w-md shadow-xl bg-card/60 backdrop-blur-xl border-border/50">
+        <GlassCard className="w-full max-w-md shadow-xl border-white/20">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto bg-red-500/10 p-4 rounded-full w-fit mb-2 ring-1 ring-red-500/20">
               <Lock className="h-8 w-8 text-red-500" />
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">
+              <CardTitle className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-600 dark:from-red-400 dark:to-orange-400">
                 Admin Portal
               </CardTitle>
-              <CardDescription className="mt-2 text-base">
+              <CardDescription className="mt-2 text-lg">
                 ระบบจัดการส่วนกลางสำหรับผู้ดูแลระบบ
               </CardDescription>
             </div>
@@ -146,7 +147,7 @@ export default function AdminLoginPage() {
               </div>
             </form>
           </CardContent>
-        </Card>
+        </GlassCard>
       </motion.div>
     </AuroraBackground>
   );

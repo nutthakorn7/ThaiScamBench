@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, ChevronLeft, ChevronRight, Loader2, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { GlassCard } from "@/components/ui/glass-card";
 
 interface Column<T> {
   header: string;
@@ -82,7 +83,7 @@ export function PremiumTable<T extends { id: string | number }>({
       </div>
 
       {/* Table Container */}
-      <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-xl overflow-hidden shadow-sm">
+      <GlassCard className="overflow-hidden shadow-lg border-white/20">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
@@ -137,7 +138,7 @@ export function PremiumTable<T extends { id: string | number }>({
             )}
           </TableBody>
         </Table>
-      </div>
+      </GlassCard>
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-2">

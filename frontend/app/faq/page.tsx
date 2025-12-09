@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -267,7 +268,7 @@ export default function FAQPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Search */}
-            <Card className="mb-8 border-2 shadow-lg">
+            <GlassCard className="mb-8 border-2 shadow-lg">
               <CardContent className="p-6">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -284,7 +285,7 @@ export default function FAQPage() {
                   </p>
                 )}
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Categories */}
             <div className="mb-8 flex flex-wrap gap-3">
@@ -310,7 +311,7 @@ export default function FAQPage() {
 
             {/* FAQs */}
             {filteredFAQs.length > 0 ? (
-              <Card className="border-2 shadow-lg">
+              <GlassCard className="border-2 shadow-lg">
                 <CardContent className="p-6">
                   <Accordion type="single" collapsible className="space-y-4">
                     {filteredFAQs.map((faq) => (
@@ -358,9 +359,9 @@ export default function FAQPage() {
                     ))}
                   </Accordion>
                 </CardContent>
-              </Card>
+              </GlassCard>
             ) : (
-              <Card className="border-2 shadow-lg">
+              <GlassCard className="border-2 shadow-lg">
                 <CardContent className="p-12 text-center">
                   <Search className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-2xl font-bold mb-2">ไม่พบคำถามที่คุณหา</h3>
@@ -371,11 +372,11 @@ export default function FAQPage() {
                     ดูทั้งหมด
                   </Button>
                 </CardContent>
-              </Card>
+              </GlassCard>
             )}
 
             {/* Contact Card */}
-            <Card className="mt-8 border-2 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
+            <GlassCard className="mt-8 border-2 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
               <CardContent className="p-8 text-center">
                 <h3 className="text-2xl font-black mb-3">ยังหาคำตอบไม่เจอ?</h3>
                 <p className="text-muted-foreground mb-6">
@@ -399,7 +400,7 @@ export default function FAQPage() {
                   </Button>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
           </motion.div>
         </div>
       </main>

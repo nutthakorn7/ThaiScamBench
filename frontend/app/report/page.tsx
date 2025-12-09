@@ -5,6 +5,7 @@ import { Send, AlertTriangle, CheckCircle2, MessageSquare, Image as ImageIcon, X
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { submitReport } from "@/lib/api";
@@ -134,7 +135,7 @@ export default function ReportPage() {
           </p>
         </div>
 
-      <Card className="border-primary/20 shadow-lg shadow-primary/5">
+      <GlassCard className="border-primary/20 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-primary" />
@@ -262,7 +263,7 @@ export default function ReportPage() {
             </Button>
           </form>
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {success && (
         <Alert className="mt-8 border-green-500/50 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 animate-in fade-in slide-in-from-bottom-4">

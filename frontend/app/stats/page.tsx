@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { Users, AlertTriangle, Shield } from "lucide-react";
 import { getStats } from "@/lib/api";
 import { StatsCharts } from "@/components/stats-charts";
@@ -32,41 +33,44 @@ export default async function StatsPage() {
 
         {/* Top KPI Cards (Server Rendered for speed) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-blue-700/20 bg-blue-700/5 backdrop-blur-sm">
+          <GlassCard className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl pointer-events-none" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-blue-700">
-                <Users className="h-6 w-6" /> ตรวจสอบทั้งหมด
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+                <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" /> ตรวจสอบทั้งหมด
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 mb-4">{stats.total_detections.toLocaleString()}</div>
               <p className="text-lg text-muted-foreground font-semibold">รายการ</p>
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-red-500/20 bg-red-500/5 backdrop-blur-sm">
+          <GlassCard className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl pointer-events-none" />
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-red-600">
-                <AlertTriangle className="h-6 w-6" /> พบความเสี่ยงสูง
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" /> พบความเสี่ยงสูง
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-7xl md:text-8xl font-black text-red-600 mb-4">{stats.scam_percentage.toFixed(1)}%</div>
+              <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-500 mb-4">{stats.scam_percentage.toFixed(1)}%</div>
               <p className="text-lg text-muted-foreground font-semibold">ของข้อความทั้งหมด</p>
             </CardContent>
-          </Card>
+          </GlassCard>
 
-          <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-green-500/20 bg-green-500/5 backdrop-blur-sm">
+          <GlassCard className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-green-600/5 rounded-2xl pointer-events-none" />
             <CardHeader className="pb-4">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-green-600">
-                <Shield className="h-6 w-6" /> ปลอดภัย
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900 dark:text-white">
+                <Shield className="h-6 w-6 text-green-600 dark:text-green-400" /> ปลอดภัย
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-7xl md:text-8xl font-black text-green-600 mb-4">{(100 - stats.scam_percentage).toFixed(1)}%</div>
+              <div className="text-7xl md:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-teal-500 mb-4">{(100 - stats.scam_percentage).toFixed(1)}%</div>
               <p className="text-lg text-muted-foreground font-semibold">ตรวจสอบแล้วปกติ</p>
             </CardContent>
-          </Card>
+          </GlassCard>
         </div>
 
         {/* Image Stats Section */}
@@ -76,31 +80,33 @@ export default async function StatsPage() {
                 สถิติการตรวจสอบรูปภาพ
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300 border-2 border-purple-500/20 bg-purple-500/5">
+                <GlassCard className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-2xl pointer-events-none" />
                     <CardHeader>
-                        <CardTitle className="text-purple-700 dark:text-purple-400 flex items-center gap-2">
-                             ตรวจสอบสลิป/รูปภาพ
+                        <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2">
+                             <span className="text-purple-600 dark:text-purple-400">📸</span> ตรวจสอบสลิป/รูปภาพ
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-4">
-                            <div className="text-6xl font-black text-purple-600 dark:text-purple-400">
+                            <div className="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-purple-400">
                                 {(stats.total_images || 0).toLocaleString()}
                             </div>
                             <div className="text-xl text-muted-foreground">ใบ</div>
                         </div>
                     </CardContent>
-                </Card>
+                </GlassCard>
 
-                <Card className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300 border-2 border-orange-500/20 bg-orange-500/5">
+                <GlassCard className="group hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl pointer-events-none" />
                     <CardHeader>
-                        <CardTitle className="text-orange-700 dark:text-orange-400 flex items-center gap-2">
-                             พบสลิปปลอม
+                        <CardTitle className="text-slate-900 dark:text-white flex items-center gap-2">
+                             <span className="text-orange-600 dark:text-orange-400">⚠️</span> พบสลิปปลอม
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                          <div className="flex items-baseline gap-4">
-                            <div className="text-6xl font-black text-orange-600 dark:text-orange-400">
+                            <div className="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-red-500">
                                 {(stats.scam_slips || 0).toLocaleString()}
                             </div>
                             <div className="text-xl text-muted-foreground">ใบ</div>
@@ -109,7 +115,7 @@ export default async function StatsPage() {
                             คิดเป็น {((stats.scam_slips / (stats.total_images || 1)) * 100).toFixed(1)}% ของรูปภาพทั้งหมด
                         </p>
                     </CardContent>
-                </Card>
+                </GlassCard>
             </div>
         </div>
 

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { BlogPost } from "@/lib/blog-data";
 
@@ -163,7 +164,7 @@ export default function BlogList({ initialPosts }: BlogListProps) {
               transition={{ delay: index * 0.1 }}
             >
               <Link href={`/blog/${post.slug}`}>
-                <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 group bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                <GlassCard className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 group">
                   <div className="relative h-48 overflow-hidden">
                     <Image
                       src={post.coverImage} 
@@ -201,7 +202,7 @@ export default function BlogList({ initialPosts }: BlogListProps) {
                       อ่านบทความ <ChevronRight className="ml-1 h-3 w-3" />
                     </div>
                   </CardFooter>
-                </Card>
+                </GlassCard>
               </Link>
             </motion.div>
           ))}

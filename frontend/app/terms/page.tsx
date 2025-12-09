@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { FileText, AlertTriangle, Scale, Shield, Users, Bell } from "lucide-react";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
@@ -41,7 +42,7 @@ export default function TermsPage() {
             className="space-y-8"
           >
             {/* Introduction */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <FileText className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -57,10 +58,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Service Description */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <Shield className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -102,10 +103,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* User Responsibilities */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <Users className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -152,10 +153,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Limitations */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <AlertTriangle className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -208,10 +209,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* API Terms */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">5. เงื่อนไขการใช้ API (สำหรับ Partner)</h2>
 
@@ -261,10 +262,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Changes */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <div className="flex items-start gap-4 mb-4">
                   <Bell className="h-8 w-8 text-blue-600 flex-shrink-0" />
@@ -291,10 +292,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Termination */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">7. การยกเลิกบริการ</h2>
 
@@ -320,10 +321,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Governing Law */}
-            <Card className="border-2 shadow-lg">
+            <GlassCard className="shadow-lg">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">8. กฎหมายที่ใช้บังคับ</h2>
 
@@ -353,10 +354,10 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Contact */}
-            <Card className="border-2 shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
+            <GlassCard className="shadow-lg bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-950 dark:to-teal-950">
               <CardContent className="p-8">
                 <h2 className="text-3xl font-black mb-4">9. ติดต่อเรา</h2>
 
@@ -381,7 +382,7 @@ export default function TermsPage() {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </GlassCard>
 
             {/* Footer Note */}
             <div className="text-center text-sm text-muted-foreground mt-8 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">

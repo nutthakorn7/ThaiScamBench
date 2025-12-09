@@ -12,6 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 import { TrendingScams } from "@/components/ui/trending-scams";
+import { ScanningRadar } from "@/components/ui/scanning-radar";
+import { LiveBadge } from "@/components/ui/live-badge";
+import { GlassCard } from "@/components/ui/glass-card";
 
 export default function Home() {
   return (
@@ -29,10 +32,7 @@ export default function Home() {
           }}
           className="relative flex flex-col gap-4 items-center justify-center px-4 md:px-10"
         >
-          <Badge variant="outline" className="mb-6 py-2 px-5 text-sm font-semibold border-blue-700/20 bg-blue-700/10 text-blue-700 dark:text-blue-400 dark:border-blue-400/30 backdrop-blur-md rounded-full inline-flex items-center gap-2">
-            <span className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_10px_theme(colors.blue.500)]" />
-            พัฒนาโดยทีม AI Research
-          </Badge>
+          <LiveBadge className="mb-6" />
           
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black mb-4 leading-[1.1] tracking-tight text-slate-900 dark:text-white font-heading text-center">
@@ -76,8 +76,12 @@ export default function Home() {
           </div>
         </motion.div>
 
-        {/* Floating Icons */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {/* Central Radar Pulse */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-30 dark:opacity-20 scale-[2.5]">
+             <ScanningRadar />
+          </div>
+
           <motion.div
              animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -114,41 +118,35 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
-              <CardContent className="pt-10 pb-10 px-10">
+            <GlassCard className="group">
                 <div className="mb-8 h-20 w-20 rounded-2xl bg-gradient-to-br from-blue-700/10 to-teal-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ShieldCheck className="h-10 w-10 text-blue-700" />
+                  <ShieldCheck className="h-10 w-10 text-blue-700 dark:text-blue-400" />
                 </div>
-                <h3 className="text-3xl font-black mb-6">วิเคราะห์รูปภาพ</h3>
+                <h3 className="text-3xl font-black mb-6 text-slate-900 dark:text-white">วิเคราะห์รูปภาพ</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
                   ตรวจสอบสลิปโอนเงินปลอม รูปตัดต่อ และแคปหน้าจอแชท ด้วยเทคโนโลยีค้นหาร่องรอยการปลอมแปลงภาพ
                 </p>
-              </CardContent>
-            </Card>
+            </GlassCard>
 
-            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
-              <CardContent className="pt-10 pb-10 px-10">
+            <GlassCard className="group">
                 <div className="mb-8 h-20 w-20 rounded-2xl bg-orange-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <AlertTriangle className="h-10 w-10 text-orange-500" />
                 </div>
-                <h3 className="text-3xl font-black mb-6">รู้ทันทุกกลโกง</h3>
+                <h3 className="text-3xl font-black mb-6 text-slate-900 dark:text-white">รู้ทันทุกกลโกง</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
                   ไม่ว่าจะเป็น SMS หลอกกู้เงิน, แก๊งคอลเซ็นเตอร์, เว็บพนัน หรือหลอกขายของออนไลน์
                 </p>
-              </CardContent>
-            </Card>
+            </GlassCard>
 
-            <Card className="group hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-border bg-card">
-              <CardContent className="pt-10 pb-10 px-10">
+            <GlassCard className="group">
                 <div className="mb-8 h-20 w-20 rounded-2xl bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                   <TrendingUp className="h-10 w-10 text-green-500" />
                 </div>
-                <h3 className="text-3xl font-black mb-6">อัปเดตตลอดเวลา</h3>
+                <h3 className="text-3xl font-black mb-6 text-slate-900 dark:text-white">อัปเดตตลอดเวลา</h3>
                 <p className="text-muted-foreground leading-relaxed text-xl">
                   ฐานข้อมูลของเราอัปเดตแบบ Real-time จากการแจ้งเบาะแสของผู้ใช้งานจริงทั่วประเทศ
                 </p>
-              </CardContent>
-            </Card>
+            </GlassCard>
           </div>
         </div>
       </section>

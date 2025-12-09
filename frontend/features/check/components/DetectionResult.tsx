@@ -14,6 +14,8 @@ import { useState, useEffect } from "react";
 import { ForensicsCard } from "./ForensicsCard";
 import { SlipVerificationCard } from "./SlipVerificationCard";
 import { OCRTextDisplay } from "./OCRTextDisplay";
+import { GlassCard } from "@/components/ui/glass-card";
+import { CircularProgress } from "@/components/ui/circular-progress";
 
 interface DetectionResultProps {
   result: DetectionResponse | null;
@@ -96,9 +98,14 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
         <div className="absolute -inset-4 bg-red-500/10 rounded-3xl blur-2xl animate-pulse pointer-events-none z-0" />
       )}
 
-      <Card
+import { GlassCard } from "@/components/ui/glass-card";
+import { CircularProgress } from "@/components/ui/circular-progress";
+
+// ...
+
+    <GlassCard
         className={cn(
-          "glass-card overflow-hidden border-2 duration-500 relative z-10",
+          "overflow-hidden border-2 duration-500 relative z-10",
           result.risk_score >= 0.7
             ? "border-red-500/50 bg-red-500/5 shadow-[0_0_30px_-10px_rgba(220,38,38,0.3)]"
             : result.risk_score >= 0.4
@@ -108,22 +115,19 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
       >
         <CardHeader className="pb-8 pt-10">
           <div className="flex flex-col items-center gap-6 text-center">
-            {/* HUGE Icon */}
-            <motion.div variants={item}
-              className={cn(
-                "text-9xl font-black drop-shadow-2xl filter",
-                result.risk_score >= 0.7
-                  ? "text-red-600"
-                  : result.risk_score >= 0.4
-                  ? "text-orange-600"
-                  : "text-green-600"
-              )}
-            >
-              {result.risk_score >= 0.7
-                ? "⚠️"
-                : result.risk_score >= 0.4
-                ? "⚠"
-                : "✓"}
+            
+            {/* Circular Progress Gauge */}
+            <motion.div variants={item}>
+                <CircularProgress 
+                    percentage={result.risk_score * 100}
+                    size={180}
+                    strokeWidth={15}
+                    color={
+                        result.risk_score >= 0.7 ? "#ef4444" : // red-500
+                        result.risk_score >= 0.4 ? "#f97316" : // orange-500
+                        "#22c55e" // green-500
+                    }
+                />
             </motion.div>
 
             {/* Big Status */}
@@ -132,40 +136,31 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
                 className={cn(
                   "text-5xl md:text-6xl font-black mb-4 font-heading tracking-tight",
                   result.risk_score >= 0.7
-                    ? "text-red-600"
+                    ? "bg-clip-text text-transparent bg-gradient-to-br from-red-500 to-red-700"
                     : result.risk_score >= 0.4
-                    ? "text-orange-600"
-                    : "text-green-600"
+                    ? "bg-clip-text text-transparent bg-gradient-to-br from-orange-500 to-orange-700"
+                    : "bg-clip-text text-transparent bg-gradient-to-br from-green-500 to-green-700"
                 )}
               >
+                <span className="inline-block mr-2">
+                  {result.risk_score >= 0.7
+                    ? "⚠️"
+                    : result.risk_score >= 0.4
+                    ? "⚠"
+                    : "✓"}
+                </span>
+                <span className="inline-block">
                 {result.risk_score >= 0.7
                   ? "ระวัง! ความเสี่ยงสูง"
                   : result.risk_score >= 0.4
                   ? "ควรระวัง"
                   : "ปลอดภัย"}
+                </span>
               </h2>
               <div className="flex items-center justify-center gap-4">
-                <div
-                  className={cn(
-                    "text-7xl md:text-8xl font-black font-heading",
-                    result.risk_score >= 0.7
-                      ? "text-red-600"
-                      : result.risk_score >= 0.4
-                      ? "text-orange-600"
-                      : "text-green-600"
-                  )}
-                >
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    transition={{ duration: 1 }}
-                  >
-                     {(result.risk_score * 100).toFixed(0)}%
-                  </motion.span>
-                </div>
                 <div className="text-left">
                   <p className="text-xl font-semibold text-muted-foreground font-sans">
-                    ความเสี่ยง
+                    ความเสี่ยง {Math.round(result.risk_score * 100)}%
                   </p>
                 </div>
               </div>
@@ -289,7 +284,7 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
             )}
           </motion.div>
         </CardContent>
-      </Card>
+      </GlassCard>
 
       {/* OCR Text Display */}
       {result.extracted_text && (

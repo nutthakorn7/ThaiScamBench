@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { 
   Table, 
   TableBody, 
@@ -59,7 +60,7 @@ export default function DetectionsPage() {
           </div>
         </div>
 
-        <Card>
+        <GlassCard>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>ล่าสุด 20 รายการ</CardTitle>
@@ -194,7 +195,7 @@ export default function DetectionsPage() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </GlassCard>
       </div>
     </AdminLayout>
   );

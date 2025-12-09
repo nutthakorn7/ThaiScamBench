@@ -47,6 +47,14 @@ def test_analyze(image_path: str):
             print(f"  • JPEG: Quality={jpeg.get('estimated_quality')}, Tables={jpeg.get('quantization_tables_count')}")
             if jpeg.get("is_photoshop_qt"):
                 print("    ⚠ Photoshop Quantization Table detected")
+                
+        if "noise_analysis" in result["features"]:
+            noise = result["features"]["noise_analysis"]
+            print(f"  • Noise: Variance={noise.get('noise_variance', 0):.4f}, Ratio={noise.get('local_noise_ratio', 0):.2f}")
+            if noise.get("is_too_smooth"):
+                print("    ⚠ Image is unnaturally smooth (AI-like)")
+            if noise.get("has_inconsistent_noise"):
+                print("    ⚠ Inconsistent noise levels detected (Splicing)")
         
         return True
     except Exception as e:

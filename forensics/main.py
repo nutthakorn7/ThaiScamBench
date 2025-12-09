@@ -11,6 +11,7 @@ from datetime import datetime
 
 from analyzers.file_metadata import FileMetadataAnalyzer
 from analyzers.jpeg_forensics import JpegForensicsAnalyzer
+from analyzers.noise_residual import NoiseResidualAnalyzer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,12 +21,13 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Thai Scam Bench - Image Forensics API",
     description="Digital forensics analysis for detecting AI-generated and manipulated images",
-    version="0.2.0"
+    version="0.3.0"
 )
 
 # Initialize analyzers
 metadata_analyzer = FileMetadataAnalyzer()
 jpeg_analyzer = JpegForensicsAnalyzer()
+noise_analyzer = NoiseResidualAnalyzer()
 
 # Track metrics
 metrics = {
@@ -66,17 +68,28 @@ async def analyze_image(file: UploadFile = File(...)):
         # Phase 2: JPEG Forensics
         jpeg_result = jpeg_analyzer.analyze(image_bytes)
         
+        # Phase 3: Noise Residual Analysis
+        noise_result = noise_analyzer.analyze(image_bytes)
+        
         # Combine results
         all_features = {
             "file_metadata": metadata_result["features"],
-            "jpeg_forensics": jpeg_result["features"]
+            "jpeg_forensics": jpeg_result["features"],
+            "noise_analysis": noise_result["features"]
         }
         
-        all_warnings = metadata_result["warnings"] + jpeg_result["warnings"]
+        all_warnings = (
+            metadata_result["warnings"] + 
+            jpeg_result["warnings"] +
+            noise_result["warnings"]
+        )
         
-        # Calculate final score (Weighted average or Max)
-        # Using Max for now to capture any strong signal
-        final_score = max(metadata_result["score"], jpeg_result["score"])
+        # Calculate final score using MAX for strong signals
+        final_score = max(
+            metadata_result["score"], 
+            jpeg_result["score"],
+            noise_result["score"]
+        )
         
         # Determine result category
         if final_score >= 0.7:

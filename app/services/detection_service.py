@@ -434,6 +434,65 @@ class DetectionService:
             logger.error(f"Manual report error: {e}", exc_info=True)
             raise ServiceError(f"Report failed: {str(e)}")
 
+    async def submit_feedback(
+        self,
+        request_id: str,
+        feedback_type: str,
+        comment: Optional[str] = None
+    ):
+        """
+        Process user feedback (Adaptive Learning Trigger)
+        """
+        logger.info(f"Processing feedback for {request_id}: {feedback_type}")
+        
+        # 1. Update Detection Record (Audit Log)
+        detection = self.detection_repo.get_by_id(request_id)
+        if not detection:
+            logger.warning(f"Feedback received for unknown request: {request_id}")
+            raise ValidationError("Request ID not found")
+
+        # Update metadata in detection record
+        # Note: In a real DB we might have a specific column, but metadata is flexible
+        if not detection.metadata:
+            detection.metadata = {}
+        
+        # Merge new feedback
+        new_metadata = dict(detection.metadata)
+        new_metadata["user_feedback"] = feedback_type
+        new_metadata["feedback_comment"] = comment
+        new_metadata["feedback_timestamp"] = datetime.now().isoformat()
+        
+        # Update metadata directly (using SQLAlchemy session to track change)
+        detection.metadata = new_metadata
+        self.db.add(detection) # Mark as dirty
+        
+        # 2. Update Training Dataset (The Core Adaptive Part)
+        # If user says "Incorrect", we should flip the label in the Dataset table
+        dataset_entry = self.db.query(Dataset).filter(Dataset.request_id == request_id).first()
+        
+        if dataset_entry:
+            # Logic: If feedback is "incorrect", user disagrees with AI.
+            # So if AI said "Scam" and user says "Incorrect", verified label becomes "Safe".
+            # If AI said "Safe" -> "Incorrect" -> "Scam".
+            
+            verified_is_scam = dataset_entry.is_scam
+            if feedback_type == "incorrect":
+                verified_is_scam = not verified_is_scam
+                logger.info(f"🔄 Adaptive Learning: Correcting label for {request_id} -> {verified_is_scam}")
+            
+            # Since Dataset model doesn't have is_verified column in this codebase version yet,
+            # We will use 'labeled_category' or add a special prefix.
+            # Assuming we can just update the label for now as "Ground Truth"
+            dataset_entry.is_scam = verified_is_scam
+            # Optional: Add verified tag to category
+            if not dataset_entry.labeled_category.startswith("verified_"):
+                dataset_entry.labeled_category = f"verified_{dataset_entry.labeled_category}"
+                
+            self.db.add(dataset_entry)
+        
+        self.db.commit()
+        logger.info(f"✅ Feedback processed and dataset updated for {request_id}")
+
     def _build_response_from_detection(self, detection) -> DetectionResponse:
         """Build response from cached detection record"""
         return DetectionResponse(

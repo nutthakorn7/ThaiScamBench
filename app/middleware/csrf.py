@@ -60,11 +60,12 @@ class CSRFProtection(BaseHTTPMiddleware):
         
         # Exempt all public API endpoints (no CSRF needed for stateless API)
         if (
-            request.url.path in exempt_paths
-            or request.url.path.startswith("/v1/public/")
-            or request.url.path.startswith("/v1/feedback")  
+            "/public/" in request.url.path
+            or "/feedback" in request.url.path
+            or request.url.path in exempt_paths
             or request.method in ["GET", "HEAD", "OPTIONS"]
-        ):    return await call_next(request)
+        ):
+            return await call_next(request)
         
         # Skip CSRF for exempt paths
         if request.url.path in self.EXEMPT_PATHS:

@@ -1,5 +1,7 @@
 """Public API endpoints"""
+from typing import Optional
 from fastapi import APIRouter, Depends, Request, HTTPException, UploadFile, File, Form
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.schemas import PublicDetectRequest, PublicDetectResponse, PublicReportRequest
@@ -117,8 +119,21 @@ async def detect_scam_image(
         detect_request = DetectionRequest(
             message=extracted_text,
             channel="image_ocr",
-            user_ref=None
+            user_ref=None,
         )
+        # Pass hash in a slightly hacky way via user_ref or we need to update DetectionRequest
+        # Better: Update DetectionRequest to support metadata? Or just pass it in user_ref as a JSON string?
+        # Standard way: The service method signature doesn't take extra metadata easily without changing interface.
+        # Quick hack for "Low Resource": Append it to user_ref with a prefix, or use a new argument.
+        # Let's inspect DetectionRequest definition again. It has user_ref (Optional[str]).
+        # customized: user_ref="img_hash:abc12345"
+        
+        # 3. Calculate Image Hash (Adaptive Learning)
+        from app.utils.image_processing import calculate_image_hash
+        img_hash = calculate_image_hash(contents)
+        
+        if img_hash:
+             detect_request.user_ref = f"img_hash:{img_hash}"
         
         # 4. Call Detection Service (Text Analysis on OCR result)
         result = await service.detect_scam(
@@ -225,6 +240,21 @@ async def report_scam(
         # Combine info for storage (keep very short due to JSON Unicode expansion)
         final_details = ((additional_info or "") + ocr_result_info)[:200]
         
+        # Calculate Image Hash for Adaptive Learning
+        img_hash_details = ""
+        if file and contents:
+             try:
+                 from app.utils.image_processing import calculate_image_hash
+                 # We need to seek back to 0 if we read it? No, await file.read() returns bytes, we still have it in 'contents'.
+                 h = calculate_image_hash(contents)
+                 if h:
+                     # Store in details for now as we can't easily change signature of submit_manual_report
+                     img_hash_details = f" [Hash:{h}]"
+             except Exception as e:
+                 logger.warning(f"Failed to hash image in report: {e}")
+
+        final_details += img_hash_details
+        
         # Call service to submit report
         return await service.submit_manual_report(
             message=text, # Main text input
@@ -240,3 +270,36 @@ async def report_scam(
             status_code=500,
             detail=f"ไม่สามารถบันทึกข้อมูลได้: {str(e)}"
         )
+
+
+class FeedbackRequest(BaseModel):
+    request_id: str
+    feedback_type: str  # correct, incorrect
+    comment: Optional[str] = None
+
+@router.post(
+    "/feedback",
+    summary="ส่งผลตอบรับ (Feedback)",
+    description="ให้ผู้ใช้แจ้งว่าผลการตรวจสอบถูกต้องหรือไม่ (เพื่อ Adaptive Learning)"
+)
+@limiter.limit("20/minute")
+async def submit_feedback(
+    request: Request,
+    body: FeedbackRequest,
+    service: DetectionService = Depends(get_detection_service)
+):
+    """
+    Submit feedback for a detection result.
+    If 'incorrect', it counts as a high-value negative sample.
+    """
+    try:
+        await service.submit_feedback(
+             request_id=body.request_id,
+             feedback_type=body.feedback_type,
+             comment=body.comment
+        )
+        return {"status": "success", "message": "ขอบคุณสำหรับข้อมูลครับ"}
+    except Exception as e:
+        logger.error(f"Feedback error: {e}", exc_info=True)
+        # Don't fail the UI, just log
+        return {"status": "error", "message": str(e)}

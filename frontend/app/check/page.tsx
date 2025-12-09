@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { ResultOverlay } from "@/components/ui/ResultOverlay";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import dynamic from 'next/dynamic';
@@ -16,6 +18,8 @@ const FeedbackDialog = dynamic(() => import('@/components/FeedbackDialog').then(
   loading: () => null,
   ssr: false
 });
+
+// ... existing imports
 
 export default function CheckPage() {
   const {
@@ -35,6 +39,16 @@ export default function CheckPage() {
     handleFileSelect,
     handleRemoveFile
   } = useScamDetection();
+
+  // State for the Grand Popup
+  const [resultOverlayOpen, setResultOverlayOpen] = useState(false);
+
+  // Trigger popup when result arrives
+  useEffect(() => {
+    if (result) {
+      setResultOverlayOpen(true);
+    }
+  }, [result]);
 
   return (
     <>
@@ -75,6 +89,7 @@ export default function CheckPage() {
             </Alert>
           )}
 
+          {/* Normal Result Display (Still kept for reference below the form) */}
           <DetectionResult 
             result={result}
             setFeedbackOpen={setFeedbackOpen}
@@ -88,6 +103,15 @@ export default function CheckPage() {
               requestId={result.request_id}
             />
           )}
+
+          {/* Grand Result Overlay */}
+          <ResultOverlay
+            isOpen={resultOverlayOpen}
+            result={result}
+            imageSrc={preview}
+            textInput={input}
+            onClose={() => setResultOverlayOpen(false)}
+          />
         </div>
       </div>
     </>

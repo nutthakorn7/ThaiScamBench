@@ -10,6 +10,7 @@ import logging
 from datetime import datetime
 
 from analyzers.file_metadata import FileMetadataAnalyzer
+from analyzers.jpeg_forensics import JpegForensicsAnalyzer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,11 +20,12 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Thai Scam Bench - Image Forensics API",
     description="Digital forensics analysis for detecting AI-generated and manipulated images",
-    version="0.1.0"
+    version="0.2.0"
 )
 
 # Initialize analyzers
 metadata_analyzer = FileMetadataAnalyzer()
+jpeg_analyzer = JpegForensicsAnalyzer()
 
 # Track metrics
 metrics = {
@@ -32,36 +34,7 @@ metrics = {
     "start_time": datetime.now()
 }
 
-
-class ForensicsResponse(BaseModel):
-    """Response schema for forensics analysis"""
-    forensic_result: str = Field(..., description="FAKE_LIKELY | SUSPICIOUS | REAL_LIKE")
-    score: float = Field(..., ge=0.0, le=1.0, description="Suspicion score (0=genuine, 1=fake)")
-    reasons: List[str] = Field(default_factory=list, description="List of suspicious indicators")
-    features: Dict = Field(default_factory=dict, description="Detailed forensics features")
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "image-forensics",
-        "version": "0.1.0",
-        "uptime_seconds": (datetime.now() - metrics["start_time"]).total_seconds()
-    }
-
-
-@app.get("/metrics")
-async def get_metrics():
-    """Get service metrics"""
-    return {
-        "service": "api-img",
-        "requests_total": metrics["requests_total"],
-        "requests_by_result": metrics["requests_by_result"],
-        "uptime_seconds": (datetime.now() - metrics["start_time"]).total_seconds()
-    }
-
+# ... (Previous code) ...
 
 @app.post("/forensics/analyze", response_model=ForensicsResponse)
 async def analyze_image(file: UploadFile = File(...)):
@@ -90,17 +63,20 @@ async def analyze_image(file: UploadFile = File(...)):
         # Phase 1: File & Metadata Analysis
         metadata_result = metadata_analyzer.analyze(image_bytes)
         
-        # TODO: Add other analyzers (JPEG, Noise, FFT) in next phase
+        # Phase 2: JPEG Forensics
+        jpeg_result = jpeg_analyzer.analyze(image_bytes)
         
         # Combine results
         all_features = {
-            "file_metadata": metadata_result["features"]
+            "file_metadata": metadata_result["features"],
+            "jpeg_forensics": jpeg_result["features"]
         }
         
-        all_warnings = metadata_result["warnings"]
+        all_warnings = metadata_result["warnings"] + jpeg_result["warnings"]
         
-        # Calculate final score (currently only metadata)
-        final_score = metadata_result["score"]
+        # Calculate final score (Weighted average or Max)
+        # Using Max for now to capture any strong signal
+        final_score = max(metadata_result["score"], jpeg_result["score"])
         
         # Determine result category
         if final_score >= 0.7:

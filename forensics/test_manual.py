@@ -36,6 +36,18 @@ def test_analyze(image_path: str):
         print(f"  Result: {result['forensic_result']}")
         print(f"  Score: {result['score']:.2f}")
         print(f"  Reasons: {result['reasons']}")
+        
+        print("\n  [Features]")
+        if "file_metadata" in result["features"]:
+            meta = result["features"]["file_metadata"]
+            print(f"  • Metadata: Software={meta.get('software_tag')}, Entropy={meta.get('file_entropy', 0):.2f}")
+            
+        if "jpeg_forensics" in result["features"]:
+            jpeg = result["features"]["jpeg_forensics"]
+            print(f"  • JPEG: Quality={jpeg.get('estimated_quality')}, Tables={jpeg.get('quantization_tables_count')}")
+            if jpeg.get("is_photoshop_qt"):
+                print("    ⚠ Photoshop Quantization Table detected")
+        
         return True
     except Exception as e:
         print(f"✗ Failed: {e}")

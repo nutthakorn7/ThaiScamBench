@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
 from app.routes import health, detection, public, partner, admin, feedback, partner_management, admin_auth, csrf, auth
-from app.api.v1.endpoints import image
+
 from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 from app.database import init_db
 import logging
@@ -234,7 +234,7 @@ logger.info("✅ CSRF protection middleware enabled")
 app.include_router(health.router)
 app.include_router(csrf.router)  # CSRF token endpoint
 app.include_router(detection.router)
-app.include_router(image.router) # Public Image Detection - MUST BE BEFORE public.router!
+
 app.include_router(public.router)
 app.include_router(partner.router)
 app.include_router(partner_management.router)

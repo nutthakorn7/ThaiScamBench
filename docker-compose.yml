@@ -19,6 +19,8 @@ services:
       retries: 5
     networks:
       - thaiscam-network
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7-alpine
@@ -34,6 +36,8 @@ services:
       retries: 5
     networks:
       - thaiscam-network
+    ports:
+      - "6379:6379"
 
   api:
     build:
@@ -67,6 +71,8 @@ services:
       start_period: 40s
     networks:
       - thaiscam-network
+    ports:
+      - "8000:8000"
 
   forensics:
     build:
@@ -82,6 +88,8 @@ services:
       retries: 3
     networks:
       - thaiscam-network
+    ports:
+      - "8001:8001"
 
 
   nginx:

@@ -89,19 +89,63 @@ export interface DetectionResponse {
 
 export const detectScam = async (data: DetectionRequest): Promise<DetectionResponse> => {
   if (data.file) {
-    // Image detection flow
+    // Image detection flow (New Forensics Service)
     const formData = new FormData();
     formData.append('file', data.file);
     
-    const response = await api.post<DetectionResponse>('/public/detect/image', formData, {
+    // Call the new independently hosted forensics service (via Nginx proxy)
+    // Map /api/v1/forensics/analyze -> Forensics Service
+    const response = await api.post('/forensics/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    
+    // Map new service response to UI compatible format
+    const forensicsData = response.data;
+    
+    return {
+        request_id: `img_${Date.now()}`,
+        is_scam: forensicsData.forensic_result === 'FAKE_LIKELY' || forensicsData.forensic_result === 'SUSPICIOUS',
+        risk_score: forensicsData.score * 100, // Convert 0-1 to 0-100
+        category: forensicsData.forensic_result === 'FAKE_LIKELY' ? 'manipulated_slip' : 'suspicious_image',
+        reason: forensicsData.reasons.length > 0 ? forensicsData.reasons[0] : "Suspicious image patterns detected",
+        advice: "โปรดตรวจสอบความถูกต้องของภาพอีกครั้ง หรือติดต่อหน่วยงานที่เกี่ยวข้อง",
+        model_version: "v4.0 (Forensics)",
+        
+        // Map to complex object structure used by frontend components
+        visual_analysis: {
+            visual_risk_score: forensicsData.score * 100,
+            is_suspicious: forensicsData.score >= 0.4,
+            slip_verification: {
+                // Fill with safe defaults or mapped data
+                trust_score: 100 - (forensicsData.score * 100),
+                is_likely_genuine: forensicsData.score < 0.4,
+                checks_passed: 0,
+                total_checks: 0,
+                warnings: forensicsData.reasons,
+                checks: []
+            },
+            forensics: {
+                enabled: true,
+                is_manipulated: forensicsData.score >= 0.4,
+                confidence: forensicsData.score,
+                details: "Advanced Forensics Analysis",
+                techniques: {
+                    // Map feature flags if available, otherwise default
+                    ela: { suspicious: false, score: 0, variance: 0, reason: "" },
+                    metadata: { tampered: false, confidence: 0 },
+                    compression: { edited: false, confidence: 0, estimated_saves: 0, reason: "" },
+                    cloning: { detected: false, confidence: 0, clone_regions: 0, reason: "" }
+                }
+            }
+        },
+        risk_level: forensicsData.score >= 0.7 ? 'high_risk' : (forensicsData.score >= 0.4 ? 'suspicious' : 'safe')
+    };
+    
   } else {
-    // Text detection flow
-    const response = await api.post<DetectionResponse>('/public/detect/text', {
+    // Text detection flow (Main API)
+    const response = await api.post<DetectionResponse>('/v1/public/detect/text', {
       message: data.text, // Backend expects "message" not "text"
     });
     return response.data;
@@ -257,16 +301,65 @@ export interface PublicBatchResponse {
     summary: BatchSummary;
 }
 
+// Client-side batch processing (since /batch endpoint removed)
 export const detectBatchImages = async (files: File[]): Promise<PublicBatchResponse> => {
-    const formData = new FormData();
-    files.forEach((file) => {
-        formData.append('files', file);
+    const results: BatchImageResponse[] = [];
+    let successful = 0;
+    let failed = 0;
+    let scam_count = 0;
+    
+    // Process files concurrently with a limit could be better, but Promise.all is simple for now
+    const promises = files.map(async (file, index) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await api.post('/forensics/analyze', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            const data = response.data;
+            
+            const isScam = data.forensic_result === 'FAKE_LIKELY' || data.forensic_result === 'SUSPICIOUS';
+            if (isScam) scam_count++;
+            successful++;
+
+            return {
+                filename: file.name,
+                index: index,
+                success: true,
+                is_scam: isScam,
+                risk_score: data.score * 100,
+                category: isScam ? 'manipulated' : 'clean',
+                reason: data.reasons[0] || "",
+                forensics: { score: data.score, details: data.features }
+            } as BatchImageResponse;
+            
+        } catch (error: any) {
+            failed++;
+            return {
+                filename: file.name,
+                index: index,
+                success: false,
+                error: error.message || "Upload failed"
+            } as BatchImageResponse;
+        }
     });
 
-    const response = await api.post<PublicBatchResponse>('/public/detect/image/batch', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
-    return response.data;
+    const processedResults = await Promise.all(promises);
+
+    return {
+        batch_id: `batch_${Date.now()}`,
+        total_images: files.length,
+        results: processedResults,
+        summary: {
+            successful,
+            failed,
+            scam_count,
+            safe_count: successful - scam_count,
+            average_risk_score: 0, // Calculate if needed
+            categories: {},
+            manipulated_images: scam_count,
+            errors: []
+        }
+    };
 };

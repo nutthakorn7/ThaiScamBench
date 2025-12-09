@@ -136,48 +136,11 @@ async def report_scam(
     Supports both text and image evidence.
     """
     try:
-        from app.services.ocr_service import OCRService
+        # Combine info for storage
+        final_details = additional_info or ""
         
-        extracted_text = ""
-        ocr_result_info = ""
-
-        # Process Image if provided
-        if file:
-            # Validate Image
-            if not file.content_type.startswith('image/'):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Invalid file type. Only images are allowed."
-                )
-            
-            # Read and Scan
-            contents = await file.read()
-            ocr_service = OCRService()
-            extracted_text = ocr_service.extract_text(contents)
-            
-            if extracted_text:
-                # Truncate OCR text aggressively - Thai chars expand to ~6 chars each in JSON (\u0e2b)
-                # 150 Thai chars * 6 = 900 chars JSON, which leaves room for other metadata
-                truncated_ocr = extracted_text[:150] if len(extracted_text) > 150 else extracted_text
-                ocr_result_info = f"\n\n[OCR]: {truncated_ocr}"
-
-        # Combine info for storage (keep very short due to JSON Unicode expansion)
-        final_details = ((additional_info or "") + ocr_result_info)[:200]
-        
-        # Calculate Image Hash for Adaptive Learning
-        img_hash_details = ""
-        if file and contents:
-             try:
-                 from app.utils.image_processing import calculate_image_hash
-                 # We need to seek back to 0 if we read it? No, await file.read() returns bytes, we still have it in 'contents'.
-                 h = calculate_image_hash(contents)
-                 if h:
-                     # Store in details for now as we can't easily change signature of submit_manual_report
-                     img_hash_details = f" [Hash:{h}]"
-             except Exception as e:
-                 logger.warning(f"Failed to hash image in report: {e}")
-
-        final_details += img_hash_details
+        # Image processing removed as per "Text Only" refactor.
+        # Future: Send image to new docker service if needed.
         
         # Call service to submit report
         return await service.submit_manual_report(

@@ -14,6 +14,9 @@ from app.utils.image_utils import validate_image_content, generate_image_hash, g
 
 logger = logging.getLogger(__name__)
 
+# Cache Version Control - Increment when detection logic changes
+CACHE_VERSION = "v2.0_3layer"
+
 router = APIRouter()
 
 # Response model extending DetectTextResponse to include extracted text
@@ -103,7 +106,8 @@ async def detect_image_public(
              )
 
         # 4. Slip Verification (NEW Layer 🆕)
-        logger.info(f"🔧 DEBUG: About to run Slip Verification. Text length: {len(extracted_text)}")
+        logger.info("📍 Route: /v1/public/detect/image (image.router - 3-Layer Detection)")
+        logger.info(f"🔧 Image Processing: {img_info.get('format')}, {img_info.get('width')}x{img_info.get('height')}")
         from app.utils.slip_verification import verify_thai_bank_slip, get_slip_verification_advice
         slip_result = verify_thai_bank_slip(extracted_text)
         logger.info(f"🏦 Slip Verification: trust_score={slip_result.trust_score:.2f}, genuine={slip_result.is_likely_genuine}")
@@ -129,6 +133,7 @@ async def detect_image_public(
             # If Slip Verification says "Genuine", heavily trust it
             final_risk_score = (text_risk * 0.3) + (visual_risk * 0.2) + (slip_risk * 0.5)
             fusion_reason = f"✅ Slip Verification (Trust: {slip_result.trust_score:.0%}) | {result.reason}"
+            logger.info(f"🎯 3-Layer Fusion: Final={final_risk_score:.2f} (Text={text_risk:.2f}, Visual={visual_risk:.2f}, Slip={slip_risk:.2f})")
             logger.info(f"🏦 High-confidence genuine slip detected, risk reduced")
         else:
             # Standard fusion for non-slip or suspicious slip

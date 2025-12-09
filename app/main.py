@@ -163,13 +163,13 @@ logger.info("✅ CSRF protection middleware enabled")
 app.include_router(health.router)
 app.include_router(csrf.router)  # CSRF token endpoint
 app.include_router(detection.router)
+app.include_router(image.router) # Public Image Detection - MUST BE BEFORE public.router!
 app.include_router(public.router)
 app.include_router(partner.router)
 app.include_router(partner_management.router)
 app.include_router(admin_auth.router)  # Auth endpoints (no auth required)
 app.include_router(admin.router)  # Admin endpoints (auth required)
 app.include_router(feedback.router)
-app.include_router(image.router) # Public Image Detection
 app.include_router(auth.router)  # Unified Auth (NextAuth backend)
 
 # Mount static files for frontend (if directory exists)

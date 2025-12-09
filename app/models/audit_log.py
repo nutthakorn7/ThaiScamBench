@@ -1,7 +1,7 @@
 """Audit log database model"""
 from sqlalchemy import Column, String, Integer, DateTime, Text
 from app.database import Base
-from datetime import datetime
+from datetime import datetime, UTC
 import uuid
 
 
@@ -16,7 +16,7 @@ class AuditLog(Base):
     __table_args__ = {'extend_existing': True}
     
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True)
     endpoint = Column(String(255), nullable=False, index=True)
     method = Column(String(10), nullable=False)
     status_code = Column(Integer, nullable=False)

@@ -3,7 +3,7 @@ Feedback repository
 
 Handles all database operations related to user feedback.
 """
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from sqlalchemy.orm import Session
 
@@ -47,7 +47,7 @@ class FeedbackRepository(BaseRepository[Feedback]):
             request_id=detection_id,  # This is the actual field name!
             feedback_type="correct" if is_correct else "incorrect",
             comment=comment,
-            created_at=datetime.utcnow()
+            created_at=datetime.now(UTC)
         )
     
     def get_by_detection(self, detection_id: str) -> Optional[Feedback]:

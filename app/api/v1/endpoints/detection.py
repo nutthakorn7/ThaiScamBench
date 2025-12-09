@@ -28,6 +28,8 @@ class DetectTextRequest(BaseModel):
 
 class DetectTextResponse(BaseModel):
     """Response model for detection results"""
+    model_config = {"from_attributes": True} # Enable ORM mode for SimpleNamespace/mock objects
+
     is_scam: bool = Field(..., description="Whether message is classified as scam")
     risk_score: float = Field(..., ge=0.0, le=1.0, description="Risk score (0.0-1.0)")
     category: str = Field(..., description="Detected scam category")

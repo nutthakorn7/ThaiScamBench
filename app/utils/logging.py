@@ -8,7 +8,7 @@ import logging
 import time
 import functools
 from typing import Any, Dict, Optional, Callable
-from datetime import datetime
+from datetime import datetime, UTC
 import json
 
 
@@ -34,7 +34,7 @@ class StructuredLogger:
     def _format_message(self, level: str, message: str, **extra) -> Dict[str, Any]:
         """Format log message as structured JSON"""
         log_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": level,
             "message": message,
             "logger": self.logger.name,

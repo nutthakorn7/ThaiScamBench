@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, Foreig
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import relationship
 from app.database import Base
-from datetime import datetime
+from datetime import datetime, UTC
 import uuid
 import enum
 
@@ -42,7 +42,7 @@ class User(Base):
     role = Column(String(20), nullable=False, default=UserRole.partner.value)
     partner_id = Column(String(36), ForeignKey("partners.id"), nullable=True, index=True)
     is_active = Column(Boolean, nullable=False, default=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     last_login = Column(DateTime, nullable=True)
     
     # Relationship to partner (for partner users)
@@ -63,7 +63,7 @@ class Partner(Base):
     last_rotated_at = Column(DateTime, nullable=True)  # Track key rotation
     status = Column(String(20), nullable=False, default=PartnerStatus.active.value)
     rate_limit_per_min = Column(Integer, nullable=False, default=100)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     
     # Relationship to detections
     detections = relationship("Detection", back_populates="partner")
@@ -77,7 +77,7 @@ class Detection(Base):
     __tablename__ = "detections"
     
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC), index=True)
     source = Column(String(20), nullable=False, index=True)
     partner_id = Column(String(36), ForeignKey("partners.id"), nullable=True, index=True)
     channel = Column(String(50), nullable=True)
@@ -110,7 +110,7 @@ class Feedback(Base):
     request_id = Column(String(36), ForeignKey("detections.request_id"), nullable=False, index=True)
     feedback_type = Column(String(20), nullable=False)  # 'correct' or 'incorrect'
     comment = Column(String(1000), nullable=True)  # Optional user comment
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     user_agent = Column(String(500), nullable=True)
     ip_address = Column(String(45), nullable=True)
     
@@ -128,7 +128,7 @@ class Dataset(Base):
     content = Column(String, nullable=False)  # Raw content (Text)
     labeled_category = Column(String(50), nullable=False)
     is_scam = Column(Boolean, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=lambda: datetime.now(UTC))
     
     # Relationship to detection
     detection = relationship("Detection", foreign_keys=[request_id], primaryjoin="Detection.request_id == Dataset.request_id", backref="dataset_entry")

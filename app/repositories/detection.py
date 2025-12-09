@@ -3,7 +3,7 @@ Detection repository
 
 Handles all database operations related to scam detection records.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -73,9 +73,28 @@ class DetectionRepository(BaseRepository[Detection]):
             partner_id=partner_id,
             extra_data=extra_data_str,
             request_id=str(uuid.uuid4()),
-            created_at=datetime.utcnow()
+            created_at=datetime.now(UTC)
         )
     
+    def get_by_id(self, request_id: str) -> Optional[Detection]:
+        """
+        Get detection by request_id (public ID)
+        
+        Args:
+            request_id: Public request ID
+            
+        Returns:
+            Detection record or None
+        """
+        try:
+            return (
+                self.db.query(Detection)
+                .filter(Detection.request_id == request_id)
+                .first()
+            )
+        except Exception as e:
+            raise DatabaseError(f"Failed to get detection by ID: {str(e)}")
+
     def get_by_hash(self, message_hash: str, days: int = 7) -> Optional[Detection]:
         """
         Get recent detection by message hash (for deduplication)
@@ -88,7 +107,7 @@ class DetectionRepository(BaseRepository[Detection]):
             Detection record if found within period
         """
         try:
-            since = datetime.utcnow() - timedelta(days=days)
+            since = datetime.now(UTC) - timedelta(days=days)
             return (
                 self.db.query(Detection)
                 .filter(

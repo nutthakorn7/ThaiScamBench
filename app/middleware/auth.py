@@ -63,8 +63,14 @@ async def verify_partner_token(
     
     # Check if API key has expired
     if partner.api_key_expires_at:
-        from datetime import datetime
-        if datetime.utcnow() > partner.api_key_expires_at:
+        from datetime import datetime, UTC
+        
+        # Ensure comparison between aware datetimes
+        expires_at = partner.api_key_expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=UTC)
+            
+        if datetime.now(UTC) > expires_at:
             logger.warning(f"Expired API key for partner: {partner.name}")
             from app.models.error_responses import ErrorCode, create_error_response
             error_response = create_error_response(

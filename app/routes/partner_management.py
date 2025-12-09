@@ -6,7 +6,7 @@ from app.database import get_db
 from app.models.database import Partner
 from app.middleware.auth import verify_partner_token
 from app.services.partner_service import rotate_partner_api_key
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 import logging
 
 logger = logging.getLogger(__name__)
@@ -77,7 +77,7 @@ async def rotate_api_key(
         )
     
     # Calculate expiration
-    expires_at = datetime.utcnow() + timedelta(days=request.validity_days)
+    expires_at = datetime.now(UTC) + timedelta(days=request.validity_days)
     
     # Rotate key
     new_api_key = rotate_partner_api_key(db, partner.id, expires_at)

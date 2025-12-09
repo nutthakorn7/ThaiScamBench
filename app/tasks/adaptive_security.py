@@ -1,7 +1,7 @@
 
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -23,7 +23,7 @@ def run_promote_threats_task():
     session = SessionLocal()
     try:
         # 1. Find frequent scams
-        cutoff = datetime.utcnow() - timedelta(days=LOOKBACK_DAYS)
+        cutoff = datetime.now(UTC) - timedelta(days=LOOKBACK_DAYS)
         
         results = (
              session.query(
@@ -74,14 +74,12 @@ def run_promote_threats_task():
                 if clean_item not in existing_blacklist:
                     new_threats.append(clean_item)
                     existing_blacklist.add(clean_item)
-
-
         
         # 4. Update Blacklist
         if new_threats:
             logger.warning(f"🚨 PROMOTING {len(new_threats)} THREATS to Layer 1: {new_threats}")
             with open(blacklist_path, "a") as f:
-                f.write(f"\n# Auto-Promoted {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}\n")
+                f.write(f"\n# Auto-Promoted {datetime.now(UTC).strftime('%Y-%m-%d %H:%M')}\n")
                 for threat in new_threats:
                     f.write(f"{threat}\n")
         else:

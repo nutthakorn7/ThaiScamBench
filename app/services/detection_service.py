@@ -200,15 +200,16 @@ class DetectionService:
             final_risk_score = class_result.risk_score
             
             # 7. Save to DB
+            saved_record = None
             try:
-                self.detection_repo.create_detection(
+                saved_record = self.detection_repo.create_detection(
                     message_hash=message_hash,
                     category=class_result.category,
                     risk_score=final_risk_score,
                     is_scam=class_result.is_scam,
-                    reason=explain_result.explanation, # Use explanation as reason
+                    reason=explain_result.reason,
                     advice=explain_result.advice,
-                    model_version=class_result.model_version,
+                    model_version=self.classifier.get_version(),
                     source=source,
                     partner_id=partner_id
                 )
@@ -217,15 +218,18 @@ class DetectionService:
                 # Don't fail the request, just log
             
             # 8. Return response
+            # Use ID from DB if saved, otherwise generate transient ID
+            req_id = saved_record.request_id if saved_record else "req_" + datetime.now().strftime("%Y%m%d%H%M%S")
+            
             return DetectionResponse(
                 is_scam=class_result.is_scam,
                 risk_score=final_risk_score,
                 category=class_result.category,
-                reason=explain_result.explanation,
+                reason=explain_result.reason,
                 advice=explain_result.advice,
-                model_version=class_result.model_version,
-                llm_version="gemini-pro" if "Gemini" in explain_result.explanation else "N/A",
-                request_id="req_" + datetime.now().strftime("%Y%m%d%H%M%S") # Simple ID
+                model_version=self.classifier.get_version(),
+                llm_version="gemini-pro" if "Gemini" in explain_result.reason else "N/A",
+                request_id=req_id
             )
             
         except ValidationError as ve:
@@ -533,19 +537,22 @@ class DetectionService:
             logger.warning(f"Feedback received for unknown request: {request_id}")
             raise ValidationError("Request ID not found")
 
-        # Update metadata in detection record
-        # Note: In a real DB we might have a specific column, but metadata is flexible
-        if not detection.metadata:
-            detection.metadata = {}
+        # Update metadata (stored in extra_data column as JSON string)
+        import json
+        extra_data = {}
+        if detection.extra_data:
+            try:
+                extra_data = json.loads(detection.extra_data)
+            except Exception:
+                extra_data = {}
         
         # Merge new feedback
-        new_metadata = dict(detection.metadata)
-        new_metadata["user_feedback"] = feedback_type
-        new_metadata["feedback_comment"] = comment
-        new_metadata["feedback_timestamp"] = datetime.now().isoformat()
+        extra_data["user_feedback"] = feedback_type
+        extra_data["feedback_comment"] = comment
+        extra_data["feedback_timestamp"] = datetime.now().isoformat()
         
-        # Update metadata directly (using SQLAlchemy session to track change)
-        detection.metadata = new_metadata
+        # Update extra_data
+        detection.extra_data = json.dumps(extra_data)
         self.db.add(detection) # Mark as dirty
         
         # 2. Update Training Dataset (The Core Adaptive Part)

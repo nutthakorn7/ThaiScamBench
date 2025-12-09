@@ -160,7 +160,7 @@ def rotate_partner_api_key(
     Raises:
         ValueError: If partner not found
     """
-    from datetime import datetime
+    from datetime import datetime, UTC
     
     partner = get_partner_by_id(db, partner_id)
     if not partner:
@@ -173,7 +173,7 @@ def rotate_partner_api_key(
     # Update partner
     partner.api_key_hash = new_api_key_hash
     partner.api_key_expires_at = expires_at
-    partner.last_rotated_at = datetime.utcnow()
+    partner.last_rotated_at = datetime.now(UTC)
     
     db.commit()
     db.refresh(partner)

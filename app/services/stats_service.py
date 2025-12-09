@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from app.models.database import Detection, Partner, DetectionSource
 from app.models.pagination import PaginationParams, PaginatedResponse, paginate_query
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import List, Dict, Any, Optional
 import logging
 
@@ -22,7 +22,7 @@ def get_summary_stats(db: Session, days: int = 7) -> Dict[str, Any]:
         Dictionary with summary stats
     """
     # Calculate date range
-    end_date = datetime.utcnow()
+    end_date = datetime.now(UTC)
     start_date = end_date - timedelta(days=days)
     
     # Total requests

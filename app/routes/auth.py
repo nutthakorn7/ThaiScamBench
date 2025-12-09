@@ -10,14 +10,14 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, status, Request
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session
-from passlib.hash import bcrypt
+# from passlib.hash import bcrypt  <-- REMOVED
 from app.utils.audit import log_action
 
 from app.database import get_db
 from app.models.database import User, UserRole
 from app.config import settings
 from app.middleware.auth import verify_admin_token
-from app.utils.jwt_utils import create_access_token
+from app.utils.jwt_utils import create_access_token, verify_password, hash_password
 
 logger = logging.getLogger(__name__)
 
@@ -76,12 +76,7 @@ class UpdateUserRequest(BaseModel):
     is_active: Optional[bool] = None
 
 
-# Password helpers
-def verify_password(plain_password, hashed_password):
-    return bcrypt.verify(plain_password, hashed_password)
-
-def hash_password(password):
-    return bcrypt.hash(password)
+# Password helpers imported from app.utils.jwt_utils
 
 
 @router.post("/login", response_model=LoginResponse)

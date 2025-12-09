@@ -7,7 +7,7 @@ import time
 import asyncio
 from typing import Dict, List, Optional
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from collections import defaultdict
 import statistics
 
@@ -51,7 +51,7 @@ class PerformanceMonitor:
         metric = PerformanceMetric(
             name=name,
             duration_ms=duration_ms,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(UTC),
             tags=tags or {}
         )
         
@@ -145,7 +145,7 @@ class PerformanceMonitor:
     
     async def cleanup_old_metrics(self, older_than_hours: int = 24):
         """Remove old metrics to prevent memory issues"""
-        cutoff = datetime.utcnow() - timedelta(hours=older_than_hours)
+        cutoff = datetime.now(UTC) - timedelta(hours=older_than_hours)
         
         async with self._lock:
             before_count = len(self.metrics)

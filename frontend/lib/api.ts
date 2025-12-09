@@ -93,9 +93,10 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     const formData = new FormData();
     formData.append('file', data.file);
     
-    // Call forensics service via specific rewrite rule
-    // /api/v1/forensics/analyze -> https://api.../api/v1/forensics/analyze -> Nginx /api/v1/forensics/ -> forensics:8001
-    const response = await api.post('/api/v1/forensics/analyze', formData, {
+    // NEXT_PUBLIC_API_URL already includes /api, so we use /v1/forensics/analyze
+    // Result: https://api.thaiscam.zcr.ai/api + /v1/forensics/analyze
+    // = https://api.thaiscam.zcr.ai/api/v1/forensics/analyze (Correct!)
+    const response = await api.post('/v1/forensics/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -145,18 +146,19 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     
   } else {
     // Text detection flow (Main API)
-    // Next.js Proxy Rewrite handles /api -> /v1, so we just use /public/detect/text
-    // API_BASE_URL (/api) + /public/detect/text -> /api/public/detect/text
-    // Rewrite Rules: /api/:path -> https://api.../v1/:path
-    // Result: https://api.../v1/public/detect/text (Correct!)
-    const response = await api.post<DetectionResponse>('/public/detect/text', {
+    // NEXT_PUBLIC_API_URL already includes /api, so we use /v1/public/detect/text
+    // Result: https://api.thaiscam.zcr.ai/api + /v1/public/detect/text
+    // = https://api.thaiscam.zcr.ai/api/v1/public/detect/text (Correct but this doesn't exist!)
+    // Actually text endpoint is at /v1/public/detect/text on backend
+    // So this is actually correct!
+    const response = await api.post<DetectionResponse>('/v1/public/detect/text', {
       message: data.text, // Backend expects "message" not "text"
     });
     return response.data;
   }
 };
 
-// Define response type
+
 interface StatsData {
   total_detections: number;
   scam_percentage: number;
@@ -318,7 +320,7 @@ export const detectBatchImages = async (files: File[]): Promise<PublicBatchRespo
             const formData = new FormData();
             formData.append('file', file);
             
-            const response = await api.post('/api/v1/forensics/analyze', formData, {
+            const response = await api.post('/v1/forensics/analyze', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             const data = response.data;

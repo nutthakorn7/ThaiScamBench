@@ -47,7 +47,7 @@ services:
       - REDIS_URL=redis://:Jsv4AgkQTffkjvswEm8gR7JXcxqOGjeM@redis:6379/0
       - JWT_SECRET_KEY=ILifekMf/w4xXmG5rrtSnppIVF7fH7ONdW4K8pCnHqQ=
       - ADMIN_PASSWORD_HASH=b2
-      - ADMIN_ALLOWED_IPS=172.104.171.16
+      - ADMIN_ALLOWED_IPS=172.104.171.16,127.0.0.1
       - LOG_LEVEL=INFO
       # Google API Key for Vision OCR and Gemini (same key works for both)
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-your-api-key-here}

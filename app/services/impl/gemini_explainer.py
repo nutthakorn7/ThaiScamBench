@@ -114,8 +114,14 @@ class GeminiExplainer(IExplainer):
 
         except Exception as e:
             logger.error(f"Gemini explanation error: {e}", exc_info=True)
-            # Ideally user of this class catches execution and falls back to Mock
-            raise ServiceError(f"Gemini Analysis Failed: {str(e)}")
+            # Graceful Fallback for Demo/Production Stability
+            # Do NOT raise ServiceError, return a fallback result
+            return ExplanationResult(
+                reason="AI Analysis Unavailable (Server Error)",
+                advice="Please exercise caution. Verification system is under load.",
+                confidence=0.5,
+                llm_used=False  # Indicate fallback
+            )
 
     def _build_prompt(self, message: str, initial_category: str) -> str:
         return f"""

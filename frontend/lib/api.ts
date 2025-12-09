@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/api$/, '');
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -95,7 +95,8 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     
     // Call the new independently hosted forensics service (via Nginx proxy)
     // Map /api/v1/forensics/analyze -> Forensics Service
-    const response = await api.post('/forensics/analyze', formData, {
+    // Note: Must use /api/v1/forensics prefix to match Nginx location block
+    const response = await api.post('/api/v1/forensics/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -314,7 +315,7 @@ export const detectBatchImages = async (files: File[]): Promise<PublicBatchRespo
             const formData = new FormData();
             formData.append('file', file);
             
-            const response = await api.post('/forensics/analyze', formData, {
+            const response = await api.post('/api/v1/forensics/analyze', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             const data = response.data;

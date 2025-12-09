@@ -103,6 +103,7 @@ async def detect_image_public(
              )
 
         # 4. Slip Verification (NEW Layer 🆕)
+        logger.info(f"🔧 DEBUG: About to run Slip Verification. Text length: {len(extracted_text)}")
         from app.utils.slip_verification import verify_thai_bank_slip, get_slip_verification_advice
         slip_result = verify_thai_bank_slip(extracted_text)
         logger.info(f"🏦 Slip Verification: trust_score={slip_result.trust_score:.2f}, genuine={slip_result.is_likely_genuine}")

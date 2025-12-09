@@ -126,27 +126,49 @@ async def detect_scam_image(
         # Standard way: The service method signature doesn't take extra metadata easily without changing interface.
         # Quick hack for "Low Resource": Append it to user_ref with a prefix, or use a new argument.
         # Let's inspect DetectionRequest definition again. It has user_ref (Optional[str]).
-        # customized: user_ref="img_hash:abc12345"
-        
         # 3. Calculate Image Hash (Adaptive Learning)
         from app.utils.image_processing import calculate_image_hash
         img_hash = calculate_image_hash(contents)
         
-        if img_hash:
-             detect_request.user_ref = f"img_hash:{img_hash}"
+        # 3.5. 🏦 Slip Verification (NEW 3-Layer Detection)
+        from app.utils.slip_verification import verify_thai_bank_slip
+        slip_result = verify_thai_bank_slip(extracted_text)
+        logger.info(f"🏦 Slip Verification: trust_score={slip_result.trust_score:.2f}, genuine={slip_result.is_likely_genuine}")
         
-        # 4. Call Detection Service (Text Analysis on OCR result)
+        # 4. Create Detection Request with IMAGE HASH PREFIX
+        # Key Fix: Each image gets unique hash → No DB cache collision!
+        unique_message = f"[IMG:{img_hash}] {extracted_text}" if img_hash else extracted_text
+        
+        detect_request = DetectionRequest(
+            message=unique_message,  # Use Image Hash prefix
+            channel="image_ocr",
+            user_ref=f"img_hash:{img_hash}" if img_hash else None,
+        )
+        
+        # 4.5. Call Detection Service (Text Analysis on OCR result)
         result = await service.detect_scam(
             request=detect_request,
             source="public"
         )
         
+        # 4.5. Apply Slip Verification Adjustment
+        final_risk = result.risk_score
+        final_reason = result.reason
+        
+        if slip_result.is_likely_genuine and slip_result.trust_score > 0.7:
+            # Reduce risk significantly for genuine slips
+            slip_risk = 1.0 - slip_result.trust_score
+            final_risk = (result.risk_score * 0.3) + (slip_risk * 0.7)
+            final_reason = f"✅ Slip Verification (Trust: {slip_result.trust_score:.0%}) | {result.reason}"
+            logger.info(f"🏦 High-confidence genuine slip detected, risk reduced from {result.risk_score:.2f} to {final_risk:.2f}")
+        
+        
         return PublicDetectResponse(
             request_id=result.request_id,
-            is_scam=result.is_scam,
-            risk_score=result.risk_score,
+            is_scam=final_risk >= 0.5,  # Use final_risk for determination
+            risk_score=final_risk,
             category=result.category,
-            reason=result.reason,
+            reason=final_reason,
             advice=result.advice,
             model_version=result.model_version
         )

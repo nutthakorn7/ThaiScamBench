@@ -25,7 +25,7 @@ class GeminiExplainer(IExplainer):
     
     def __init__(self, api_key: Optional[str] = None):
         self._provider = "gemini"
-        self._version = "gemini-1.5-flash-latest"  # Use Flash model (faster & supported)
+        self._version = "gemini-pro"  # Stable model
         self._api_key = api_key or os.getenv("GOOGLE_API_KEY")
         
         if self._api_key:
@@ -37,7 +37,7 @@ class GeminiExplainer(IExplainer):
                 HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
                 HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
             }
-            self._model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            self._model = genai.GenerativeModel('gemini-pro')
             logger.info(f"Initialized {self._provider} explainer with model {self._version}")
         else:
             logger.warning("GOOGLE_API_KEY not found. GeminiExplainer will fail or needs fallback.")

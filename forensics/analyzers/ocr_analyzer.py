@@ -65,24 +65,59 @@ class OCRAnalyzer:
             }
             
     def _detect_bank(self, text: str) -> str:
+        # Check simple patterns first
         for bank, patterns in self.bank_patterns.items():
             for pattern in patterns:
                 if re.search(pattern, text):
                     return bank
+        
+        # Add logo/color detection logic here in future if needed
         return None
         
     def _detect_amount(self, text: str) -> str:
-        # Regex for currency: 100.00, 1,000.00, 50.50
-        # Look for patterns like "Amount 100.00", "xxx.xx Baht", or just numbers near keywords
+        lines = text.split('\n')
+        amount_candidates = []
         
-        # Simple regex for amount format with 2 decimals
-        # matches: 100.00, 1,500.25
-        amount_pattern = r'[\d,]+\.\d{2}'
-        matches = re.findall(amount_pattern, text)
+        # Context keywords for amount
+        keywords = ['amount', 'karn', 'money', 'bath', 'baht', 'thb', 'จำนวน', 'จำนวนเงิน', 'ยอดเงิน', 'โอน', 'จาก']
         
-        if matches:
-            # Return the last match as it's often the total at bottom
-            # or try to find one associated with "amount" or "bath"
-            return matches[-1].replace(',', '')
+        for line in lines:
+            line_lower = line.lower().strip()
             
-        return None
+            # 1. Find numbers in format xx.xx or x,xxx.xx
+            # Regex for amounts like 100.00, 1,000.00
+            matches = re.findall(r'(\d{1,3}(?:,\d{3})*\.\d{2})', line)
+            
+            if matches:
+                val = matches[0].replace(',', '')
+                # Filter out likely dates/times (e.g. 2023.01, 14.30) if they are not near amount keywords
+                # But typically dates use / or - or :
+                
+                # Check if this line also has a keyword
+                has_keyword = any(k in line_lower for k in keywords)
+                
+                # Assign confidence
+                confidence = 2 if has_keyword else 1
+                amount_candidates.append((float(val), confidence, val))
+                
+        if not amount_candidates:
+            # Fallback: simple search in full text if line splitting failed
+            matches = re.findall(r'(\d{1,3}(?:,\d{3})*\.\d{2})', text)
+            if matches:
+                # Return logical max (often total) or last found?
+                # Usually transfer amount is prominent. Let's take specific logic.
+                # Assuming valid amounts > 0
+                valid = [m for m in matches if float(m.replace(',','')) > 0]
+                if valid:
+                    # Heuristic: The transfer amount is often not the largest (balance) but is significant
+                    # For now return the one found last (often 'Amount: xxx')
+                    return valid[-1].replace(',', '')
+                    
+            return None
+            
+        # Sort candidates by confidence (desc) then by value?
+        # Usually we want the explicitly labeled amount.
+        amount_candidates.sort(key=lambda x: x[1], reverse=True)
+        
+        # Return best candidate string
+        return amount_candidates[0][2]

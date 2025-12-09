@@ -172,8 +172,8 @@ async def detect_image_public(
         else:
             advice = result.advice
         
-        # 7. Return Enhanced Result
-        return DetectImageResponse(
+        # 7. Create Enhanced Result
+        response = DetectImageResponse(
             is_scam=is_scam_final,
             risk_score=final_risk_score,
             category=result.category,
@@ -201,7 +201,7 @@ async def detect_image_public(
             } if visual_analysis else None
         )
         
-        # 7. Cache the result (24 hours)
+        # 8. Cache the result (24 hours)
         response_dict = response.model_dump()
         cache_success = redis_client.set(cache_key, response_dict, ttl=86400)
         if cache_success:

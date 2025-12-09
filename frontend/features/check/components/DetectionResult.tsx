@@ -98,12 +98,7 @@ export function DetectionResult({ result, setFeedbackOpen }: DetectionResultProp
         <div className="absolute -inset-4 bg-red-500/10 rounded-3xl blur-2xl animate-pulse pointer-events-none z-0" />
       )}
 
-import { GlassCard } from "@/components/ui/glass-card";
-import { CircularProgress } from "@/components/ui/circular-progress";
-
-// ...
-
-    <GlassCard
+      <GlassCard
         className={cn(
           "overflow-hidden border-2 duration-500 relative z-10",
           result.risk_score >= 0.7

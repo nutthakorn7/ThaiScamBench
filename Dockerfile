@@ -1,7 +1,7 @@
 # ==============================================================================
 # Layer 1: Base Python Image
 # ==============================================================================
-FROM python:3.9-slim AS base
+FROM python:3.12-slim AS base
 
 # Set environment variables for Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -54,7 +54,7 @@ RUN useradd -m -u 1000 -s /bin/bash appuser
 FROM runtime AS production
 
 # Copy installed Python packages from python-deps stage
-COPY --from=python-deps /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=python-deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=python-deps /usr/local/bin /usr/local/bin
 
 # Copy application code

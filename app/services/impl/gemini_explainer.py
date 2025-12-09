@@ -69,11 +69,20 @@ class GeminiExplainer(IExplainer):
         try:
             prompt = self._build_prompt(message, category)
             
-            # Using generate_content_async if available, else sync runs in thread pool ideally
-            # The library supports async in newer versions
-            response = await self._model.generate_content_async(
-                prompt, 
-                safety_settings=self._safety_settings
+            # Use synchronous call in thread pool to avoid specific gRPC async bugs on Linux/Docker
+            import asyncio
+            from functools import partial
+            
+            loop = asyncio.get_event_loop()
+            
+            # Run sync generate_content in thread pool
+            response = await loop.run_in_executor(
+                None, 
+                partial(
+                    self._model.generate_content, 
+                    prompt, 
+                    safety_settings=self._safety_settings
+                )
             )
             
             text_response = response.text

@@ -38,11 +38,17 @@ class JpegForensicsAnalyzer:
             if image.format != "JPEG":
                 return {
                     "is_jpeg": False,
+                    "features": {"is_jpeg": False},
                     "warnings": [],
                     "score": 0.0
                 }
         except:
-             return {"is_jpeg": False, "warnings": ["invalid_image"], "score": 0.0}
+             return {
+                 "is_jpeg": False, 
+                 "features": {"is_jpeg": False},
+                 "warnings": ["invalid_image"], 
+                 "score": 0.0
+             }
 
         features["is_jpeg"] = True
         

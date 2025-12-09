@@ -74,6 +74,76 @@ async def detect_scam_public(
         )
 
 
+@router.post(
+    "/detect/image",
+    response_model=PublicDetectResponse,
+    summary="ตรวจสอบรูปภาพสลิป/แชท (Public)",
+    description="ตรวจสอบรูปภาพ (OCR + AI Analysis) สำหรับผู้ใช้ทั่วไป"
+)
+@limiter.limit(f"{settings.rate_limit_requests}/{settings.rate_limit_window} seconds")
+async def detect_scam_image(
+    request: Request,
+    file: UploadFile = File(..., description="รูปภาพที่ต้องการตรวจสอบ"),
+    service: DetectionService = Depends(get_detection_service)
+) -> PublicDetectResponse:
+    """
+    Public endpoint for image scam detection (OCR -> Text Analysis)
+    """
+    try:
+        # 1. Validate Image
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="Invalid file type. Only images are allowed.")
+        
+        # 2. Perform OCR
+        from app.services.ocr_service import OCRService
+        contents = await file.read()
+        ocr_service = OCRService()
+        extracted_text = ocr_service.extract_text(contents)
+        
+        if not extracted_text or not extracted_text.strip():
+            # If OCR fails to find text, return a soft error analysis
+            return PublicDetectResponse(
+                request_id="img_failed",
+                is_scam=False,
+                risk_score=0.0,
+                category="unknown",
+                reason="ไม่สามารถอ่านข้อความจากรูปภาพได้ หรือรูปภาพไม่ชัดเจน",
+                advice="โปรดลองใหม่อีกครั้งด้วยรูปที่ชัดเจนขึ้น หรือพิมพ์ข้อความโดยตรง",
+                model_version="ocr-v1"
+            )
+
+        # 3. Create Text Detection Request from OCR
+        # We assume the user wants to check the CONTENT of the image
+        detect_request = DetectionRequest(
+            message=extracted_text,
+            channel="image_ocr",
+            user_ref=None
+        )
+        
+        # 4. Call Detection Service (Text Analysis on OCR result)
+        result = await service.detect_scam(
+            request=detect_request,
+            source="public"
+        )
+        
+        return PublicDetectResponse(
+            request_id=result.request_id,
+            is_scam=result.is_scam,
+            risk_score=result.risk_score,
+            category=result.category,
+            reason=result.reason,
+            advice=result.advice,
+            model_version=result.model_version
+        )
+
+    except Exception as e:
+        logger.error(f"Image detection error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"เกิดข้อผิดพลาดในการตรวจสอบรูปภาพ: {str(e)}"
+        )
+
+
 @router.get("/wiki/{keyword}")
 async def get_wiki_data(
     keyword: str,

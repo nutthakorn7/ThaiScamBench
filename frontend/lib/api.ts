@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || '/api').replace(/\/api$/, '');
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -69,10 +69,10 @@ export interface DetectionResponse {
           reason: string;
         };
         cloning: {
-          detected: boolean;
-          confidence: number;
-          clone_regions: number;
-          reason: string;
+          detected: false,
+          confidence: 0,
+          clone_regions: 0,
+          reason: ""
         };
       };
     };
@@ -94,9 +94,11 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     formData.append('file', data.file);
     
     // Call the new independently hosted forensics service (via Nginx proxy)
-    // Map /api/v1/forensics/analyze -> Forensics Service
-    // Note: Must use /api/v1/forensics prefix to match Nginx location block
-    const response = await api.post('/api/v1/forensics/analyze', formData, {
+    // Next.js Proxy Rewrite handles /api -> /v1, so we just use /forensics/analyze
+    // API_BASE_URL (/api) + /forensics/analyze -> /api/forensics/analyze
+    // Rewrite Rules: /api/:path -> https://api.../v1/:path
+    // Result: https://api.../v1/forensics/analyze (Correct!)
+    const response = await api.post('/forensics/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -146,7 +148,11 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     
   } else {
     // Text detection flow (Main API)
-    const response = await api.post<DetectionResponse>('/v1/public/detect/text', {
+    // Next.js Proxy Rewrite handles /api -> /v1, so we just use /public/detect/text
+    // API_BASE_URL (/api) + /public/detect/text -> /api/public/detect/text
+    // Rewrite Rules: /api/:path -> https://api.../v1/:path
+    // Result: https://api.../v1/public/detect/text (Correct!)
+    const response = await api.post<DetectionResponse>('/public/detect/text', {
       message: data.text, // Backend expects "message" not "text"
     });
     return response.data;
@@ -315,7 +321,7 @@ export const detectBatchImages = async (files: File[]): Promise<PublicBatchRespo
             const formData = new FormData();
             formData.append('file', file);
             
-            const response = await api.post('/api/v1/forensics/analyze', formData, {
+            const response = await api.post('/forensics/analyze', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             const data = response.data;

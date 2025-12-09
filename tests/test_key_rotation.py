@@ -3,7 +3,7 @@ Integration tests for API key rotation
 """
 import pytest
 from fastapi.testclient import TestClient
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from app.main import app
 from app.models.database import Partner
 from app.services.partner_service import hash_api_key
@@ -99,7 +99,7 @@ class TestKeyRotation:
     def test_expired_key_rejection(self, test_db):
         """Test that expired keys are rejected"""
         # Create partner with expired key
-        expired_date = datetime.utcnow() - timedelta(days=1)
+        expired_date = datetime.now(UTC) - timedelta(days=1)
         partner = Partner(
             name="Expired Partner",
             api_key_hash=hash_api_key("expired_key"),

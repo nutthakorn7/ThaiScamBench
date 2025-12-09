@@ -188,7 +188,7 @@ class DetectionRepository(BaseRepository[Detection]):
             Dictionary with stats (total, scam_count, etc.)
         """
         try:
-            since = datetime.utcnow() - timedelta(days=days)
+            since = datetime.now(UTC) - timedelta(days=days)
             
             total = self.db.query(func.count(Detection.id)).scalar()
             total_period = (

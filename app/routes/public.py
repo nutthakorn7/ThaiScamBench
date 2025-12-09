@@ -196,37 +196,7 @@ async def report_scam(
         )
 
 
-class FeedbackRequest(BaseModel):
-    request_id: str
-    feedback_type: str  # correct, incorrect
-    comment: Optional[str] = None
 
-@router.post(
-    "/feedback",
-    summary="ส่งผลตอบรับ (Feedback)",
-    description="ให้ผู้ใช้แจ้งว่าผลการตรวจสอบถูกต้องหรือไม่ (เพื่อ Adaptive Learning)"
-)
-@limiter.limit("20/minute")
-async def submit_feedback(
-    request: Request,
-    body: FeedbackRequest,
-    service: DetectionService = Depends(get_detection_service)
-):
-    """
-    Submit feedback for a detection result.
-    If 'incorrect', it counts as a high-value negative sample.
-    """
-    try:
-        await service.submit_feedback(
-             request_id=body.request_id,
-             feedback_type=body.feedback_type,
-             comment=body.comment
-        )
-        return {"status": "success", "message": "ขอบคุณสำหรับข้อมูลครับ"}
-    except Exception as e:
-        logger.error(f"Feedback error: {e}", exc_info=True)
-        # Don't fail the UI, just log
-        return {"status": "error", "message": str(e)}
 
 @router.get(
     "/stats",

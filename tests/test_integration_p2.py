@@ -30,7 +30,7 @@ class TestP2Integration:
         assert "csrf_token" in data
         assert "expires_in" in data
 
-    @patch("app.routes.public.redis_client")
+    @patch("app.services.detection_service.redis_client")
     def test_caching_behavior(self, mock_redis, client):
         """Test Redis caching behavior (mocked)"""
         # Setup mock
@@ -57,6 +57,7 @@ class TestP2Integration:
             "reason": "Cached response",
             "advice": "Cached advice",
             "model_version": "mock-v1.0",
+            "llm_version": "mock-v1.0",
             "request_id": "cached-request-id"
         }
         mock_redis.get.return_value = cached_data

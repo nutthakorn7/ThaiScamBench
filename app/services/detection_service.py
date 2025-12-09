@@ -187,13 +187,41 @@ class DetectionService:
             # If we need strict thresholding, we might check class_result.risk_score >= threshold
             
             # 5. Generate explanation
+            # 5. Generate explanation (Optimize: Skip AI if confident)
             logger.debug(f"Generating explanation for category: {class_result.category}")
-            explain_result = await self.explainer.explain(
-                message=clean_message,
-                category=class_result.category,
-                risk_score=class_result.risk_score,
-                is_scam=class_result.is_scam
-            )
+            
+            # Optimization: If confidence is high (>0.8 or <0.3) AND we are using Gemini (slow), 
+            # skip the expensive API call unless it's explicitly required.
+            # We assume "gemini" provider is expensive.
+            is_confident_scam = class_result.risk_score > 0.8
+            is_confident_safe = class_result.risk_score < 0.3
+            
+            if (is_confident_scam or is_confident_safe) and self.explainer.provider == "gemini":
+                logger.info(f"⚡ Fast path: Skipping AI explanation for confident result (score={class_result.risk_score:.2f})")
+                from app.services.interfaces.explainer import ExplanationResult
+                
+                # Dynamic Template Response
+                if is_confident_scam:
+                    reason = f"ตรวจพบรูปแบบที่มีความเสี่ยงสูง ({class_result.category}) ตรงกับฐานข้อมูลมิจฉาชีพ"
+                    advice = "ไม่ควรโอนเงินหรือให้ข้อมูลส่วนตัวเด็ดขาด หากไม่มั่นใจให้โทรตรวจสอบกับหน่วยงานโดยตรง"
+                else:
+                    reason = "ไม่พบคำสำคัญหรือรูปแบบที่น่าสงสัยในข้อความนี้"
+                    advice = "อย่างไรก็ตาม ควรตรวจสอบแหล่งที่มาให้แน่ใจก่อนทำธุรกรรม"
+                    
+                explain_result = ExplanationResult(
+                    reason=reason,
+                    advice=advice,
+                    confidence=1.0, # High confidence because classifier was sure
+                    llm_used=False
+                )
+            else:
+                # Uncertain case or cheap explainer -> Run full explanation
+                explain_result = await self.explainer.explain(
+                    message=clean_message,
+                    category=class_result.category,
+                    risk_score=class_result.risk_score,
+                    is_scam=class_result.is_scam
+                )
             
             # 6. Hybrid Logic Override (Layer 2 - AI)
             # If Explainer used LLM, use its judgement for final verdict
@@ -221,7 +249,7 @@ class DetectionService:
             # Use ID from DB if saved, otherwise generate transient ID
             req_id = saved_record.request_id if saved_record else "req_" + datetime.now().strftime("%Y%m%d%H%M%S")
             
-            return DetectionResponse(
+            response = DetectionResponse(
                 is_scam=class_result.is_scam,
                 risk_score=final_risk_score,
                 category=class_result.category,
@@ -231,6 +259,11 @@ class DetectionService:
                 llm_version="gemini-pro" if "Gemini" in explain_result.reason else "N/A",
                 request_id=req_id
             )
+            
+            # 8. Cache result
+            self._cache_result(cache_key, response)
+            
+            return response
             
         except ValidationError as ve:
             raise ve

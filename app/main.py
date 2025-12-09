@@ -1,6 +1,7 @@
 """Thai Scam Detection API - Main Application"""
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
@@ -126,6 +127,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Enable Gzip Compression (Level 4 is a good balance of speed/compression)
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=4)
 
 # Add rate limiter state
 app.state.limiter = limiter

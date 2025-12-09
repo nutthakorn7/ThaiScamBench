@@ -44,93 +44,122 @@ FAKE_SLIP_INDICATORS = [
 
 @dataclass
 class SlipVerificationResult:
-    """Result of bank slip verification."""
     is_likely_genuine: bool
-    trust_score: float  # 0.0 - 1.0
-    checks_passed: Dict[str, bool]
-    detected_bank: Optional[str]
-    detected_amount: Optional[str]
-    detected_account: Optional[str]
-    warnings: List[str]
-    confidence: float  # How confident we are in this verification
+    trust_score: float
+    detected_bank: Optional[str] = None
+    detected_amount: Optional[str] = None
+    checks_passed: int = 0
+    total_checks: int = 6
+    warnings: List[str] = None
+    checks: List[str] = None
+    advice: str = ""
+    # New QR fields
+    qr_data: Optional[str] = None
+    qr_valid: bool = False
 
-
-def verify_thai_bank_slip(extracted_text: str) -> SlipVerificationResult:
+def scan_qr_code(image_content: bytes) -> Optional[str]:
     """
-    Verify if extracted text appears to be from a genuine Thai bank slip.
+    Scan for QR code in image bytes using cv2/pyzbar.
+    Returns decoded string if found.
+    """
     
-    Args:
-        extracted_text: OCR extracted text from image
+    try:
+        # Convert bytes to numpy array
+        nparr = np.frombuffer(image_content, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-    Returns:
-        SlipVerificationResult with verification details
+        if img is None:
+            return None
+            
+        # Try pyzbar first (robust)
+        decoded_objects = decode(img)
+        if decoded_objects:
+            return decoded_objects[0].data.decode('utf-8')
+            
+        # Fallback to OpenCV detector
+        detector = cv2.QRCodeDetector()
+        data, _, _ = detector.detectAndDecode(img)
+        if data:
+            return data
+            
+        return None
+    except Exception as e:
+        logger.warning(f"QR Scan failed: {e}")
+        return None
+
+def parse_promptpay_amount(qr_data: str) -> Optional[float]:
     """
-    text_lower = extracted_text.lower()
-    text_thai = extracted_text
-    
-    checks = {
-        "has_valid_bank_name": False,
-        "has_valid_account_format": False,
-        "has_valid_amount_format": False,
-        "has_valid_datetime": False,
-        "has_ref_number": False,
-        "no_fake_indicators": True
-    }
-    
+    Extract amount from PromptPay QR Payload (EMVCo)
+    Tag 54 is Transaction Amount.
+    """
+    try:
+        if not qr_data or len(qr_data) < 20: 
+            return None
+        
+        # Simple parser for checking Tag 54 (Amount)
+        # Format: ID(2) Length(2) Value(L)
+        i = 0
+        while i < len(qr_data):
+            tag = qr_data[i:i+2]
+            if not tag.isdigit(): break
+            length = int(qr_data[i+2:i+4])
+            value = qr_data[i+4:i+4+length]
+            
+            if tag == "54": # Transaction Amount
+                return float(value)
+            
+            i += 4 + length
+            
+        return None
+    except Exception:
+        return None
+
+def verify_thai_bank_slip(ocr_text: str, image_bytes: Optional[bytes] = None) -> SlipVerificationResult:
+    """
+    Verify checks:
+    1. Bank Name Detection
+    2. Account Pattern
+    3. Amount Format
+    4. Date/Time Format
+    5. Reference Number
+    6. Fake Indicators (Negative)
+    7. QR Code Validation (New!)
+    """
+    text_lower = ocr_text.lower()
+    total_checks = 7 # Increased to 7
+    checks_passed = 0
     warnings = []
+    checks_list = []
+    
+    # 1. Bank Detection
     detected_bank = None
-    detected_amount = None
-    detected_account = None
-    
-    # Check 1: Bank name detection
-    for bank_code, bank_names in THAI_BANKS.items():
-        for name in bank_names:
-            if name in text_lower or name in text_thai:
-                checks["has_valid_bank_name"] = True
-                detected_bank = bank_code
-                logger.debug(f"Detected bank: {bank_code}")
-                break
-        if detected_bank:
+    for bank_code, keywords in THAI_BANKS.items():
+        if any(kw in text_lower for kw in keywords):
+            detected_bank = bank_code
+            checks_passed += 1
+            checks_list.append(f"Bank Found: {bank_code.upper()}")
             break
-    
-    if not checks["has_valid_bank_name"]:
-        warnings.append("ไม่พบชื่อธนาคารที่รู้จัก")
-    
-    # Check 2: Account number format (10-12 digits, may have dashes)
-    account_patterns = [
-        r'\d{3}-?\d{1}-?\d{5}-?\d{1}',  # XXX-X-XXXXX-X (common format)
-        r'\d{10,12}',  # Simple 10-12 digits
-    ]
-    
-    for pattern in account_patterns:
-        match = re.search(pattern, extracted_text)
-        if match:
-            checks["has_valid_account_format"] = True
-            detected_account = match.group(0)
-            logger.debug(f"Detected account: {detected_account}")
-            break
-    
-    if not checks["has_valid_account_format"]:
-        warnings.append("ไม่พบเลขบัญชีที่ถูกต้อง")
-    
-    # Check 3: Amount format (Thai baht with comma)
-    amount_patterns = [
-        r'(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)\s*(?:บาท|baht|thb)',  # With บาท
-        r'(?:amount|จำนวน)[:\s]*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)',  # With label
-        r'(\d{1,3}(?:,\d{3})*\.\d{2})'  # Simple format with decimals
-    ]
-    
-    for pattern in amount_patterns:
-        match = re.search(pattern, text_lower)
-        if match:
-            checks["has_valid_amount_format"] = True
-            detected_amount = match.group(1) if match.groups() else match.group(0)
-            logger.debug(f"Detected amount: {detected_amount}")
-            break
-    
-    if not checks["has_valid_amount_format"]:
+            
+    if not detected_bank:
+        warnings.append("ไม่พบชื่อธนาคารในสลิป")
+
+    # 2. Account Pattern
+    has_account = bool(re.search(r'\d{3}[-\s]?\d{1}[-\s]?\d{5}[-\s]?\d{1}', ocr_text) or
+                      re.search(r'xxx-x-x\d{4}-x', text_lower))
+    if has_account:
+        checks_passed += 1
+        checks_list.append("Account Pattern Valid")
+    else:
+        warnings.append("ไม่พบเลขบัญชีหรือรูปแบบไม่ถูกต้อง")
+
+    # 3. Amount Format
+    amounts = re.findall(r'[\d,]+\.\d{2}', ocr_text)
+    detected_amount = amounts[0] if amounts else None
+    if detected_amount:
+        checks_passed += 1
+        checks_list.append(f"Amount Found: {detected_amount}")
+    else:
         warnings.append("ไม่พบจำนวนเงินที่ถูกต้อง")
-    
     # Check 4: Date/time format
     datetime_patterns = [
         r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}',  # DD/MM/YYYY or DD-MM-YYYY

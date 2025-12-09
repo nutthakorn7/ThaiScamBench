@@ -17,6 +17,8 @@ interface SlipVerificationData {
   warnings: string[];
   checks: string[]; // Passed checks list
   advice?: string;
+  qr_valid?: boolean;
+  qr_data?: string;
 }
 
 interface SlipVerificationCardProps {
@@ -63,7 +65,17 @@ export function SlipVerificationCard({ slip }: SlipVerificationCardProps) {
               Slip Verification System
             </span>
           </div>
-          <div className="ml-auto">
+          <div className="ml-auto flex gap-2">
+             {/* QR Badge */}
+             {slip.qr_data && (
+                <Badge variant="secondary" className={cn("text-base px-3 py-1 gap-1", 
+                    slip.qr_valid ? "bg-green-100 text-green-700 border-green-200" : "bg-yellow-100 text-yellow-700 border-yellow-200"
+                )}>
+                  <span className="text-xs">QR</span> 
+                  {slip.qr_valid ? "✅ ยืนยันยอด" : "⚠️ ตรวจสอบไม่ได้"}
+                </Badge>
+             )}
+             
              <Badge 
               variant={slip.is_likely_genuine ? "outline" : "destructive"}
               className={cn(

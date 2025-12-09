@@ -108,12 +108,22 @@ async def detect_image_public(
                 visual_analysis=None
              )
 
-        # 4. Slip Verification (NEW Layer 🆕)
+        # 4. Slip Verification (with QR Check 🆕)
         logger.info("📍 Route: /v1/public/detect/image (image.router - 3-Layer Detection)")
         logger.info(f"🔧 Image Processing: {img_info.get('format')}, {img_info.get('width')}x{img_info.get('height')}")
         from app.utils.slip_verification import verify_thai_bank_slip, get_slip_verification_advice
-        slip_result = verify_thai_bank_slip(extracted_text)
+        
+        # Read image bytes for QR scanning
+        file.file.seek(0)
+        img_bytes = file.file.read()
+        file.file.seek(0) # Reset pointer
+        
+        slip_result = verify_thai_bank_slip(extracted_text, img_bytes)
         logger.info(f"🏦 Slip Verification: trust_score={slip_result.trust_score:.2f}, genuine={slip_result.is_likely_genuine}")
+        if slip_result.qr_valid:
+             logger.info(f"✅ QR Code Verified: Amount matched!")
+        elif slip_result.qr_data:
+             logger.info(f"⚠️ QR Finding: {slip_result.qr_data}")
         
         # 5. Analyze Extracted Text (Keyword + AI)
         det_request = DetectionRequest(

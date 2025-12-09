@@ -40,6 +40,8 @@ export interface DetectionResponse {
       warnings: string[];
       checks: string[]; // List of passed check names
       advice?: string;
+      qr_valid?: boolean;
+      qr_data?: string;
     };
     forensics: {
       enabled: boolean;

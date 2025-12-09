@@ -104,6 +104,7 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     
     // Map new service response to UI compatible format
     const forensicsData = response.data;
+    const ocrData = forensicsData.ocr_result || { extracted_data: {}, raw_text: "" };
     
     return {
         request_id: `img_${Date.now()}`,
@@ -112,7 +113,8 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
         category: forensicsData.forensic_result === 'FAKE_LIKELY' ? 'manipulated_slip' : 'suspicious_image',
         reason: forensicsData.reasons.length > 0 ? forensicsData.reasons[0] : "Suspicious image patterns detected",
         advice: "โปรดตรวจสอบความถูกต้องของภาพอีกครั้ง หรือติดต่อหน่วยงานที่เกี่ยวข้อง",
-        model_version: "v4.0 (Forensics)",
+        model_version: "v4.0 (Forensics + OCR)",
+        extracted_text: ocrData.raw_text,
         
         // Map to complex object structure used by frontend components
         visual_analysis: {
@@ -122,6 +124,8 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
                 // Fill with safe defaults or mapped data
                 trust_score: 1.0 - forensicsData.score, // Return raw 0-1 score
                 is_likely_genuine: forensicsData.score < 0.4,
+                detected_bank: ocrData.extracted_data?.bank,
+                detected_amount: ocrData.extracted_data?.amount,
                 checks_passed: 0,
                 total_checks: 0,
                 warnings: forensicsData.reasons,

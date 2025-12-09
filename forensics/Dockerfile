@@ -4,9 +4,13 @@ WORKDIR /app
 
 # Install system dependencies for image processing
 RUN apt-get update && apt-get install -y \
-    libgl1 \
     libglib2.0-0 \
-    curl \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    tesseract-ocr \
+    libtesseract-dev \
+    tesseract-ocr-tha \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies

@@ -13,6 +13,7 @@ from analyzers.file_metadata import FileMetadataAnalyzer
 from analyzers.jpeg_forensics import JpegForensicsAnalyzer
 from analyzers.noise_residual import NoiseResidualAnalyzer
 from analyzers.frequency_domain import FrequencyDomainAnalyzer
+from analyzers.ocr_analyzer import OCRAnalyzer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +31,7 @@ metadata_analyzer = FileMetadataAnalyzer()
 jpeg_analyzer = JpegForensicsAnalyzer()
 noise_analyzer = NoiseResidualAnalyzer()
 fft_analyzer = FrequencyDomainAnalyzer()
+ocr_analyzer = OCRAnalyzer()
 
 # Track metrics
 metrics = {
@@ -45,6 +47,7 @@ class ForensicsResponse(BaseModel):
     score: float = Field(..., ge=0.0, le=1.0, description="Suspicion score (0=genuine, 1=fake)")
     reasons: List[str] = Field(default_factory=list, description="List of suspicious indicators")
     features: Dict = Field(default_factory=dict, description="Detailed forensics features")
+    ocr_result: Optional[Dict] = Field(None, description="Extracted text and data from OCR")
 
 
 @app.get("/health")
@@ -63,6 +66,7 @@ async def analyze_image(file: UploadFile = File(...)):
     - JPEG compression forensics
     - Noise residual analysis
     - Frequency domain analysis
+    - Tesseract OCR extraction
     
     Returns suspicion score and detailed reasons.
     """
@@ -88,6 +92,9 @@ async def analyze_image(file: UploadFile = File(...)):
         
         # Phase 4: Frequency Domain Analysis
         fft_result = fft_analyzer.analyze(image_bytes)
+
+        # Phase 5: OCR Extraction
+        ocr_result = ocr_analyzer.analyze(image_bytes)
         
         # Combine results
         all_features = {
@@ -129,7 +136,8 @@ async def analyze_image(file: UploadFile = File(...)):
             forensic_result=result,
             score=final_score,
             reasons=all_warnings,
-            features=all_features
+            features=all_features,
+            ocr_result=ocr_result
         )
         
     except HTTPException:
@@ -147,7 +155,7 @@ async def root():
     """Root endpoint"""
     return {
         "service": "Thai Scam Bench - Image Forensics API",
-        "version": "0.1.0",
+        "version": "0.4.0",
         "status": "operational",
         "endpoints": {
             "analyze": "/forensics/analyze",

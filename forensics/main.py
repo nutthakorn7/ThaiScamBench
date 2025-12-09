@@ -38,7 +38,20 @@ metrics = {
     "start_time": datetime.now()
 }
 
-# ... (Previous code) ...
+
+class ForensicsResponse(BaseModel):
+    """Response schema for forensics analysis"""
+    forensic_result: str = Field(..., description="FAKE_LIKELY | SUSPICIOUS | REAL_LIKE")
+    score: float = Field(..., ge=0.0, le=1.0, description="Suspicion score (0=genuine, 1=fake)")
+    reasons: List[str] = Field(default_factory=list, description="List of suspicious indicators")
+    features: Dict = Field(default_factory=dict, description="Detailed forensics features")
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "ok", "version": app.version}
+
 
 @app.post("/forensics/analyze", response_model=ForensicsResponse)
 async def analyze_image(file: UploadFile = File(...)):

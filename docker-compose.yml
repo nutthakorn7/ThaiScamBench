@@ -68,6 +68,21 @@ services:
     networks:
       - thaiscam-network
 
+  forensics:
+    build:
+      context: ./forensics
+      dockerfile: Dockerfile
+    image: thaiscam-forensics:latest
+    container_name: thaiscam-forensics-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - thaiscam-network
+
 
   nginx:
     image: nginx:alpine

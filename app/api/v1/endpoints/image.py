@@ -131,14 +131,42 @@ async def detect_image_public(
             channel="Image/OCR"
         )
         
-        result = await detection_service.detect_scam(
-            request=det_request,
-            source="public"
-        )
+        # Parallel Execution: Scam Detection + Forensics
+        import httpx
+        
+        async def call_forensics():
+            try:
+                async with httpx.AsyncClient() as client:
+                    resp = await client.post(
+                        "http://thaiscam-forensics-prod:8001/forensics/analyze",
+                        files={"file": (file.filename, image_content, file.content_type or "image/jpeg")},
+                        timeout=5.0
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()
+            except Exception as e:
+                logger.error(f"Forensics service failed: {e}")
+            return None
+
+        # Run both tasks
+        import asyncio
+        text_detect_task = detection_service.detect_scam(request=det_request, source="public")
+        forensics_task = call_forensics()
+        
+        result, forensics_data = await asyncio.gather(text_detect_task, forensics_task)
+        
+        # Map Forensics to Visual Analysis
+        if forensics_data:
+            logger.info(f"🕵️ Forensics: {forensics_data.get('forensic_result')} (Score: {forensics_data.get('score', 0):.2f})")
+            visual_analysis = {
+                "visual_risk_score": forensics_data.get('score', 0.0),
+                "forensics_result": forensics_data,
+                "summary": f"Forensics: {forensics_data.get('forensic_result')}"
+            }
         
         # 6. 🎯 MULTI-LAYER FUSION (Text + Visual + Slip)
         text_risk = result.risk_score
-        visual_risk = visual_analysis.visual_risk_score if visual_analysis else 0.0
+        visual_risk = visual_analysis["visual_risk_score"] if visual_analysis else 0.0
         slip_risk = 1.0 - slip_result.trust_score  # Invert: High trust = Low risk
         
         # Smart Weighted Fusion
@@ -146,12 +174,21 @@ async def detect_image_public(
             # If Slip Verification says "Genuine", heavily trust it
             final_risk_score = (text_risk * 0.3) + (visual_risk * 0.2) + (slip_risk * 0.5)
             fusion_reason = f"✅ Slip Verification (Trust: {slip_result.trust_score:.0%}) | {result.reason}"
-            logger.info(f"🎯 3-Layer Fusion: Final={final_risk_score:.2f} (Text={text_risk:.2f}, Visual={visual_risk:.2f}, Slip={slip_risk:.2f})")
-            logger.info(f"🏦 High-confidence genuine slip detected, risk reduced")
+        if slip_result.is_likely_genuine and slip_result.trust_score > 0.7:
+             logger.info(f"🏦 High-confidence genuine slip detected, risk reduced")
         else:
-            # Standard fusion for non-slip or suspicious slip
-            final_risk_score = (text_risk * 0.4) + (visual_risk * 0.3) + (slip_risk * 0.3)
-            fusion_reason = result.reason
+             # Standard Fusion: Text (40%), Visual/Forensics (40%), Slip (20%)
+             # If forensics is high, it should pull the score up significantly
+             final_risk_score = (text_risk * 0.4) + (visual_risk * 0.4) + (slip_risk * 0.2)
+             
+             # Boost risk if forensics is very confident it's FAKE
+             if visual_risk > 0.7: 
+                 final_risk_score = max(final_risk_score, visual_risk)
+                 fusion_reason = f"⚠️ Image Forensics Alert: {forensics_data.get('forensic_result') if forensics_data else 'Suspicious'} | {result.reason}"
+             else:
+                 fusion_reason = f"{result.reason}"
+
+        logger.info(f"🎯 3-Layer Fusion: Final={final_risk_score:.2f} (Text={text_risk:.2f}, Visual={visual_risk:.2f}, Slip={slip_risk:.2f})")
         
         # Enhance reason with all layers
         if visual_analysis and visual_analysis.is_suspicious:

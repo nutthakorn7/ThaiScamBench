@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -47,6 +49,8 @@ interface ForensicsCardProps {
 }
 
 export function ForensicsCard({ forensics }: ForensicsCardProps) {
+  const [showHeatmap, setShowHeatmap] = useState(false);
+
   if (!forensics?.enabled) return null;
 
   return (
@@ -117,12 +121,9 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
               
               {/* ELA Toggle - Only show if image is available */}
               {forensics.techniques.ela.ela_image && (
-                 <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded cursor-pointer hover:bg-blue-100" 
-                      onClick={() => {
-                        const img = document.getElementById('ela-heatmap-img');
-                        if(img) img.classList.toggle('hidden');
-                      }}>
-                    👁️ เปิด Heatmap
+                 <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded cursor-pointer hover:bg-blue-100 select-none" 
+                      onClick={() => setShowHeatmap(!showHeatmap)}>
+                    {showHeatmap ? "👁️ ปิด Heatmap" : "👁️ เปิด Heatmap"}
                  </div>
               )}
             </div>
@@ -144,9 +145,9 @@ export function ForensicsCard({ forensics }: ForensicsCardProps) {
               {forensics.techniques.ela.max_difference && ` (MaxDiff: ${forensics.techniques.ela.max_difference})`}
             </p>
 
-            {/* Hidden ELA Heatmap Image */}
-            {forensics.techniques.ela.ela_image && (
-                <div id="ela-heatmap-img" className="hidden mt-3 p-1 bg-black rounded">
+            {/* ELA Heatmap Image */}
+            {forensics.techniques.ela.ela_image && showHeatmap && (
+                <div className="mt-3 p-1 bg-black rounded animate-in fade-in zoom-in duration-300">
                     <p className="text-[10px] text-white text-center mb-1">ELA Heatmap (จุดสีขาว = มีการแก้ไข)</p>
                     <img src={forensics.techniques.ela.ela_image} alt="ELA Heatmap" className="w-full rounded" />
                 </div>

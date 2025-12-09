@@ -1,7 +1,7 @@
 """Partner API key management endpoints"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.database import get_db
 from app.models.database import Partner
 from app.middleware.auth import verify_partner_token
@@ -18,12 +18,12 @@ class RotateKeyRequest(BaseModel):
     """Request to rotate API key"""
     validity_days: int = 365  # Default 1 year
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "validity_days": 365
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "validity_days": 365
         }
+    })
 
 
 class RotateKeyResponse(BaseModel):
@@ -32,14 +32,14 @@ class RotateKeyResponse(BaseModel):
     expires_at: str
     message: str
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "new_api_key": "sk_live_abc123...",
-                "expires_at": "2025-12-05T00:00:00",
-                "message": "API key rotated successfully. Please update your integration."
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "new_api_key": "sk_live_abc123...",
+            "expires_at": "2025-12-05T00:00:00",
+            "message": "API key rotated successfully. Please update your integration."
         }
+    })
 
 
 @router.post(

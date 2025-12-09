@@ -1,7 +1,7 @@
 """Feedback endpoints for user feedback collection"""
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from app.database import get_db
 from app.models.database import Feedback, Detection
@@ -19,14 +19,14 @@ class FeedbackRequest(BaseModel):
     feedback_type: str = Field(..., description="Feedback type: 'correct' or 'incorrect'")
     comment: Optional[str] = Field(None, max_length=1000, description="Optional comment")
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "request_id": "550e8400-e29b-41d4-a716-446655440000",
-                "feedback_type": "incorrect",
-                "comment": "ข้อความนี้เป็นข้อความปกติจากเพื่อน"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "request_id": "550e8400-e29b-41d4-a716-446655440000",
+            "feedback_type": "incorrect",
+            "comment": "ข้อความนี้เป็นข้อความปกติจากเพื่อน"
         }
+    })
 
 
 class FeedbackResponse(BaseModel):
@@ -35,14 +35,14 @@ class FeedbackResponse(BaseModel):
     message: str
     feedback_id: str
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "success": True,
-                "message": "ขอบคุณสำหรับ feedback ของคุณ",
-                "feedback_id": "abc123..."
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "success": True,
+            "message": "ขอบคุณสำหรับ feedback ของคุณ",
+            "feedback_id": "abc123..."
         }
+    })
 
 
 @router.post(

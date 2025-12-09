@@ -1,5 +1,5 @@
 """Pydantic schemas for API request/response models"""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Literal
 
 
@@ -12,12 +12,12 @@ class ScamCheckRequest(BaseModel):
         max_length=5000
     )
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "คุณมีพัสดุค้างชำระ กรุณาคลิกลิงก์เพื่อชำระเงิน: https://fake-site.com"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "message": "คุณมีพัสดุค้างชำระ กรุณาคลิกลิงก์เพื่อชำระเงิน: https://fake-site.com"
         }
+    })
 
 
 class ScamCheckResponse(BaseModel):
@@ -45,16 +45,16 @@ class ScamCheckResponse(BaseModel):
         description="คำแนะนำในการป้องกัน (Safety advice)"
     )
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "is_scam": True,
-                "risk_score": 0.85,
-                "category": "parcel_scam",
-                "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง พบคำว่า 'พัสดุ' และมีลิงก์น่าสงสัย",
-                "advice": "ไม่ควรคลิกลิงก์ หรือให้ข้อมูลส่วนตัว ควรติดต่อบริษัทขนส่งโดยตรงเพื่อยืนยัน"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "is_scam": True,
+            "risk_score": 0.85,
+            "category": "parcel_scam",
+            "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง พบคำว่า 'พัสดุ' และมีลิงก์น่าสงสัย",
+            "advice": "ไม่ควรคลิกลิงก์ หรือให้ข้อมูลส่วนตัว ควรติดต่อบริษัทขนส่งโดยตรงเพื่อยืนยัน"
         }
+    })
 
 
 class PublicDetectRequest(BaseModel):
@@ -70,13 +70,13 @@ class PublicDetectRequest(BaseModel):
         description="ช่องทางที่ได้รับข้อความ (Channel where message was received)"
     )
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "คุณมีพัสดุค้างชำระ กรุณาคลิกลิงก์: https://fake.com",
-                "channel": "SMS"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "message": "คุณมีพัสดุค้างชำระ กรุณาคลิกลิงก์: https://fake.com",
+            "channel": "SMS"
         }
+    })
 
 
 class PublicDetectResponse(BaseModel):
@@ -89,17 +89,17 @@ class PublicDetectResponse(BaseModel):
     advice: str = Field(..., description="คำแนะนำในการป้องกัน")
     model_version: str = Field(..., description="เวอร์ชันของโมเดล")
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "is_scam": True,
-                "risk_score": 0.85,
-                "category": "parcel_scam",
-                "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง...",
-                "advice": "🚫 ไม่ควรคลิกลิงก์...",
-                "model_version": "mock-v1.0"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "is_scam": True,
+            "risk_score": 0.85,
+            "category": "parcel_scam",
+            "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง...",
+            "advice": "🚫 ไม่ควรคลิกลิงก์...",
+            "model_version": "mock-v1.0"
         }
+    })
 
 
 class PartnerDetectRequest(BaseModel):
@@ -120,14 +120,14 @@ class PartnerDetectRequest(BaseModel):
         description="Partner's user reference for tracking"
     )
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "message": "คุณมีพัสดุค้างชำระ กรุณาคลิก https://fake.com",
-                "channel": "SMS",
-                "user_ref": "user_12345"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "message": "คุณมีพัสดุค้างชำระ กรุณาคลิก https://fake.com",
+            "channel": "SMS",
+            "user_ref": "user_12345"
         }
+    })
 
 
 class PartnerDetectResponse(BaseModel):
@@ -141,19 +141,19 @@ class PartnerDetectResponse(BaseModel):
     model_version: str = Field(..., description="เวอร์ชันของโมเดล")
     llm_version: str = Field(..., description="เวอร์ชันของ LLM")
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "request_id": "550e8400-e29b-41d4-a716-446655440000",
-                "is_scam": True,
-                "risk_score": 0.85,
-                "category": "parcel_scam",
-                "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง...",
-                "advice": "🚫 ไม่ควรคลิกลิงก์...",
-                "model_version": "mock-v1.0",
-                "llm_version": "mock-v1.0"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "request_id": "550e8400-e29b-41d4-a716-446655440000",
+            "is_scam": True,
+            "risk_score": 0.85,
+            "category": "parcel_scam",
+            "reason": "ข้อความมีลักษณะของการแอบอ้างเป็นบริษัทขนส่ง...",
+            "advice": "🚫 ไม่ควรคลิกลิงก์...",
+            "model_version": "mock-v1.0",
+            "llm_version": "mock-v1.0"
         }
+    })
 
 
 class HealthCheckResponse(BaseModel):
@@ -164,16 +164,16 @@ class HealthCheckResponse(BaseModel):
     llm_version: str = Field(..., description="LLM explainer version")
     environment: str = Field(..., description="Running environment")
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "status": "healthy",
-                "version": "0.1.0",
-                "model_version": "mock-v1.0",
-                "llm_version": "mock-v1.0",
-                "environment": "dev"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "status": "healthy",
+            "version": "0.1.0",
+            "model_version": "mock-v1.0",
+            "llm_version": "mock-v1.0",
+            "environment": "dev"
         }
+    })
 
 
 class PublicReportRequest(BaseModel):

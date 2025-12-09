@@ -160,69 +160,112 @@ def verify_thai_bank_slip(ocr_text: str, image_bytes: Optional[bytes] = None) ->
         checks_list.append(f"Amount Found: {detected_amount}")
     else:
         warnings.append("ไม่พบจำนวนเงินที่ถูกต้อง")
-    # Check 4: Date/time format
+    # Check 4: Date/Time Format
     datetime_patterns = [
         r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}',  # DD/MM/YYYY or DD-MM-YYYY
         r'\d{4}[/-]\d{1,2}[/-]\d{1,2}',  # YYYY/MM/DD
         r'\d{2}:\d{2}(?::\d{2})?',  # HH:MM or HH:MM:SS
+        r'\d{1,2}\s+(?:ม\.ค\.|ก\.พ\.|มี\.ค\.|เม\.ย\.|พ\.ค\.|มิ\.ย\.|ก\.ค\.|ส\.ค\.|ก\.ย\.|ต\.ค\.|พ\.ย\.|ธ\.ค\.)\s+\d{2,4}'
     ]
     
-    datetime_found = False
+    has_datetime = False
     for pattern in datetime_patterns:
-        if re.search(pattern, extracted_text):
-            datetime_found = True
+        if re.search(pattern, ocr_text):
+            has_datetime = True
             break
-    
-    checks["has_valid_datetime"] = datetime_found
-    
-    if not datetime_found:
+            
+    if has_datetime:
+        checks_passed += 1
+        checks_list.append("Date/Time Found")
+    else:
         warnings.append("ไม่พบวันที่/เวลาที่ชัดเจน")
-    
-    # Check 5: Reference number (transaction ID)
+
+    # Check 5: Reference Number
     ref_patterns = [
         r'(?:ref|อ้างอิง|เลขที่)[:\s]*([A-Z0-9]{10,20})',
         r'[A-Z]{2}\d{10,}',  # Common format: AB1234567890
         r'\d{6,}-\d{4,}',  # Format: 123456-7890
     ]
     
+    has_ref = False
     for pattern in ref_patterns:
-        if re.search(pattern, extracted_text, re.IGNORECASE):
-            checks["has_ref_number"] = True
-            logger.debug("Found reference number")
+        if re.search(pattern, ocr_text, re.IGNORECASE):
+            has_ref = True
             break
-    
-    if not checks["has_ref_number"]:
+            
+    if has_ref:
+        checks_passed += 1
+        checks_list.append("Ref Number Found")
+    else:
         warnings.append("ไม่พบเลขอ้างอิงธุรกรรม")
     
-    # Check 6: Fake slip indicators
-    for indicator in FAKE_SLIP_INDICATORS:
-        if indicator in text_lower:
-            checks["no_fake_indicators"] = False
-            warnings.append(f"พบข้อความน่าสงสัย: {indicator}")
-            logger.warning(f"Fake slip indicator detected: {indicator}")
-            break
+    # Check 6: Fake Indicators
+    found_fake = [cw for cw in FAKE_SLIP_INDICATORS if cw in text_lower]
+    if not found_fake:
+        checks_passed += 1
+        checks_list.append("No Fake Indicators")
+    else:
+        warnings.append(f"พบคำต้องสงสัย: {', '.join(found_fake)}")
+        
     
-    # Calculate trust score
-    passed_count = sum(1 for check in checks.values() if check)
-    trust_score = passed_count / len(checks)
+    # 7. QR Code Validation (New!)
+    qr_matches = False
+    qr_decoded = None
     
-    # Determine if likely genuine (need at least 4/6 checks)
-    is_likely_genuine = trust_score >= 0.65 and checks["no_fake_indicators"]
+    if image_bytes:
+        qr_decoded = scan_qr_code(image_bytes)
+        if qr_decoded:
+            qr_amount = parse_promptpay_amount(qr_decoded)
+            if qr_amount and detected_amount:
+                try:
+                    ocr_val = float(detected_amount.replace(',', ''))
+                    if abs(qr_amount - ocr_val) < 0.01:
+                        qr_matches = True
+                        checks_passed += 1
+                        checks_list.append("QR Code Amount Verified")
+                    else:
+                        warnings.append(f"QR ยอดเงิน ({qr_amount}) ไม่ตรงกับสลิป ({ocr_val})")
+                except:
+                    pass
+            elif qr_decoded:
+                # Found QR but couldn't verify amount (maybe URL or other format)
+                # Still pass if standard checks passed
+                checks_passed += 0.5 # Partial credit
+                checks_list.append("QR Code Found")
+
+    # Calculate Trust Score
+    # Base score from passed checks (Max 7.5 possible with QR partial)
+    # total_checks is 7
+    trust_score = min(checks_passed / total_checks, 1.0)
     
-    # Confidence based on completeness of information
-    confidence = min(trust_score + (0.2 if detected_bank else 0), 1.0)
+    # Fake indicator penalty
+    if found_fake:
+        trust_score = 0.0
     
-    return SlipVerificationResult(
-        is_likely_genuine=is_likely_genuine,
+    # Critical QR Mismatch penalty
+    if qr_decoded and detected_amount and not qr_matches and "QR ยอดเงิน" in "".join(warnings):
+        trust_score = 0.0 # Instant fail if amounts verify but mismatch
+    
+    is_genuine = trust_score > 0.7
+
+    result = SlipVerificationResult(
+        is_likely_genuine=is_genuine,
         trust_score=trust_score,
-        checks_passed=checks,
         detected_bank=detected_bank,
         detected_amount=detected_amount,
-        detected_account=detected_account,
+        checks_passed=int(checks_passed), # Use int for display
+        total_checks=total_checks,
         warnings=warnings,
-        confidence=confidence
+        checks=checks_list,
+        advice="", # Will be set below
+        qr_data=qr_decoded if qr_decoded and len(qr_decoded) < 50 else ("Hidden data" if qr_decoded else None),
+        qr_valid=qr_matches
     )
-
+    
+    # Generate advice based on the full result
+    result.advice = get_slip_verification_advice(result)
+    
+    return result
 
 def analyze_amount_anomalies(amount_str: Optional[str]) -> List[str]:
     """
@@ -265,7 +308,6 @@ def analyze_amount_anomalies(amount_str: Optional[str]) -> List[str]:
         anomalies.append("รูปแบบจำนวนเงินไม่ถูกต้อง")
     
     return anomalies
-
 
 def get_slip_verification_advice(result: SlipVerificationResult) -> str:
     """

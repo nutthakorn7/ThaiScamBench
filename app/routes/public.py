@@ -227,3 +227,19 @@ async def submit_feedback(
         logger.error(f"Feedback error: {e}", exc_info=True)
         # Don't fail the UI, just log
         return {"status": "error", "message": str(e)}
+
+@router.get(
+    "/stats",
+    summary="ดูสถิติการตรวจสอบ (Statistics)",
+    description="แสดงสถิติรวมของระบบ (Total detections, scam %, top categories)"
+)
+@limiter.limit("60/minute")
+async def get_public_stats(
+    request: Request,
+    service: DetectionService = Depends(get_detection_service)
+):
+    """
+    Get public system statistics for the dashboard.
+    Cached for 60 seconds by frontend/CDN usually, but here just rate limited.
+    """
+    return await service.get_system_stats()

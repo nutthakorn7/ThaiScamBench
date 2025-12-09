@@ -10,6 +10,7 @@ from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 from app.database import init_db
 import logging
 import os
+from contextlib import asynccontextmanager
 
 # Configure logging
 logging.basicConfig(
@@ -18,6 +19,71 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+# Import scheduler and tasks early for lifespan
+from apscheduler.schedulers.background import BackgroundScheduler
+from app.tasks.adaptive_security import run_promote_threats_task
+
+# Initialize Scheduler
+scheduler = BackgroundScheduler()
+
+# Admin User Creation
+def create_default_admin():
+    from app.database import SessionLocal
+    from app.models.database import User, UserRole
+    from app.routes.auth import hash_password
+    import os as local_os
+    
+    db = SessionLocal()
+    try:
+        admin_email = "admin@thaiscam.zcr.ai"
+        existing = db.query(User).filter(User.email == admin_email).first()
+        if not existing:
+            logger.info("Creating default admin user...")
+            admin_password = local_os.getenv("ADMIN_PASSWORD", "admin123")
+            admin_user = User(
+                email=admin_email,
+                password_hash=hash_password(admin_password),
+                name="System Admin",
+                role=UserRole.admin.value,
+                is_active=True
+            )
+            db.add(admin_user)
+            db.commit()
+            logger.info(f"✅ Default admin created: {admin_email}")
+    except Exception as e:
+        logger.error(f"Failed to create default admin: {e}")
+    finally:
+        db.close()
+
+@asynccontextmanager
+async def lifespan(app):
+    """Application lifespan event handler (replaces on_event)"""
+    # Startup
+    logger.info(f"🚀 Starting {settings.api_title} v{settings.api_version}")
+    logger.info(f"📝 Environment: {settings.environment}")
+    logger.info(f"🤖 Model Version: {settings.model_version}")
+    logger.info(f"🧠 LLM Version: {settings.llm_version}")
+    logger.info(f"📊 Log Level: {settings.log_level}")
+    
+    logger.info("💾 Initializing database...")
+    init_db()
+    logger.info("✅ Database initialized")
+    
+    create_default_admin()
+    
+    if settings.environment in ("dev", "prod"):
+        scheduler.add_job(run_promote_threats_task, 'interval', minutes=60)
+        scheduler.start()
+        logger.info("⏰ Adaptive Security Scheduler started (Every 60 mins)")
+    
+    yield
+    
+    # Shutdown
+    logger.info("👋 Shutting down Thai Scam Detection API")
+    if scheduler.running:
+        scheduler.shutdown()
+        logger.info("⏰ Scheduler shut down")
 
 # Create FastAPI application
 app = FastAPI(
@@ -44,7 +110,8 @@ app = FastAPI(
     - 👮 **Impersonation Scam** - การแอบอ้างเป็นเจ้าหน้าที่
     """,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS - Allow frontend to access API
@@ -176,77 +243,6 @@ app.include_router(auth.router)  # Unified Auth (NextAuth backend)
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.exists(frontend_dir):
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
-
-
-from apscheduler.schedulers.background import BackgroundScheduler
-from app.tasks.adaptive_security import run_promote_threats_task
-
-# Initialize Scheduler
-scheduler = BackgroundScheduler()
-
-# Admin User Creation
-def create_default_admin():
-    from app.database import SessionLocal
-    from app.models.database import User, UserRole
-    from app.routes.auth import hash_password
-    import os
-    
-    db = SessionLocal()
-    try:
-        admin_email = "admin@thaiscam.zcr.ai"
-        # Check if admin exists
-        existing = db.query(User).filter(User.email == admin_email).first()
-        if not existing:
-            logger.info("Creating default admin user...")
-            # Use ADMIN_PASSWORD env var or default
-            admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
-            admin_user = User(
-                email=admin_email,
-                password_hash=hash_password(admin_password),
-                name="System Admin",
-                role=UserRole.admin.value,
-                is_active=True
-            )
-            db.add(admin_user)
-            db.commit()
-            logger.info(f"✅ Default admin created: {admin_email}")
-    except Exception as e:
-        logger.error(f"Failed to create default admin: {e}")
-    finally:
-        db.close()
-
-@app.on_event("startup")
-async def startup_event():
-    """Application startup event"""
-    logger.info(f"🚀 Starting {settings.api_title} v{settings.api_version}")
-    logger.info(f"📝 Environment: {settings.environment}")
-    logger.info(f"🤖 Model Version: {settings.model_version}")
-    logger.info(f"🧠 LLM Version: {settings.llm_version}")
-    logger.info(f"📊 Log Level: {settings.log_level}")
-    
-    # Initialize database
-    logger.info("💾 Initializing database...")
-    init_db()
-    logger.info("✅ Database initialized")
-    
-    # Create default admin user
-    create_default_admin()
-    
-    # Start Scheduler (Adaptive Security)
-    if settings.environment == "dev" or settings.environment == "prod":  # Run in both for now
-        scheduler.add_job(run_promote_threats_task, 'interval', minutes=60)
-        scheduler.start()
-        logger.info("⏰ Adaptive Security Scheduler started (Every 60 mins)")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Application shutdown event"""
-    logger.info("👋 Shutting down Thai Scam Detection API")
-    if scheduler.running:
-        scheduler.shutdown()
-        logger.info("⏰ Scheduler shut down")
-
 
 # Root endpoint
 @app.get("/", tags=["Root"])

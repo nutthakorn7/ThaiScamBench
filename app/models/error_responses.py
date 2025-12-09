@@ -1,5 +1,5 @@
 """Standardized error response models"""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Dict, Any
 from enum import Enum
 
@@ -28,18 +28,18 @@ class ErrorDetail(BaseModel):
     message: str = Field(..., description="Human-readable error message")
     details: Optional[Dict[str, Any]] = Field(None, description="Additional error details")
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "code": "VALIDATION_ERROR",
-                "message": "Message too long. Maximum 5000 characters allowed",
-                "details": {
-                    "field": "message",
-                    "max_length": 5000,
-                    "actual_length": 6000
-                }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "code": "VALIDATION_ERROR",
+            "message": "Message too long. Maximum 5000 characters allowed",
+            "details": {
+                "field": "message",
+                "max_length": 5000,
+                "actual_length": 6000
             }
         }
+    })
 
 
 class ErrorResponse(BaseModel):

@@ -193,8 +193,10 @@ async def detect_image_public(
                     "is_genuine": slip_result.is_likely_genuine,
                     "detected_bank": slip_result.detected_bank,
                     "detected_amount": slip_result.detected_amount,
-                    "checks_passed": sum(slip_result.checks_passed.values()),
-                    "total_checks": len(slip_result.checks_passed)
+                    "checks_passed": slip_result.checks_passed,
+                    "total_checks": slip_result.total_checks,
+                    "qr_valid": slip_result.qr_valid,
+                    "qr_data": slip_result.qr_data
                 }
             } if visual_analysis else None
         )

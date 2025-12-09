@@ -1,6 +1,6 @@
 """Admin authentication endpoints with JWT"""
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.utils.jwt_utils import (
     create_access_token,
     create_refresh_token,
@@ -21,13 +21,13 @@ class LoginRequest(BaseModel):
     username: str
     password: str
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "username": "admin",
-                "password": "your-password"
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "username": "admin",
+            "password": "your-password"
         }
+    })
 
 
 class TokenResponse(BaseModel):
@@ -37,15 +37,15 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     expires_in: int  # seconds
     
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer",
-                "expires_in": 1800
-            }
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "token_type": "bearer",
+            "expires_in": 1800
         }
+    })
 
 
 class RefreshRequest(BaseModel):

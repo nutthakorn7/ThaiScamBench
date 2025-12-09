@@ -1,0 +1,827 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.4.2, pluggy-1.6.0 -- /Users/pop7/Code/ThaiScamBench/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/pop7/Code/ThaiScamBench
+configfile: pytest.ini
+plugins: asyncio-0.23.5, anyio-4.12.0, cov-7.0.0
+asyncio: mode=strict
+collecting ... collected 1 item
+
+tests/test_slip_verification.py::TestSlipVerification::test_real_slip_low_risk FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________ TestSlipVerification.test_real_slip_low_risk _________________
+app/api/v1/endpoints/image.py:196: in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+E   AttributeError: 'int' object has no attribute 'values'
+
+During handling of the above exception, another exception occurred:
+venv/lib/python3.9/site-packages/fastapi/routing.py:106: in app
+    response = await f(request)
+venv/lib/python3.9/site-packages/fastapi/routing.py:430: in app
+    raw_response = await run_endpoint_function(
+venv/lib/python3.9/site-packages/fastapi/routing.py:316: in run_endpoint_function
+    return await dependant.call(**values)
+venv/lib/python3.9/site-packages/slowapi/extension.py:734: in async_wrapper
+    response = await func(*args, **kwargs)  # type: ignore
+app/api/v1/endpoints/image.py:214: in detect_image_public
+    raise HTTPException(
+E   fastapi.exceptions.HTTPException: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+
+The above exception was the direct cause of the following exception:
+tests/test_slip_verification.py:113: in test_real_slip_low_risk
+    response = client.post("/v1/public/detect/image", files={"file": ("test.jpg", f, "image/jpeg")})
+venv/lib/python3.9/site-packages/starlette/testclient.py:552: in post
+    return super().post(
+venv/lib/python3.9/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+venv/lib/python3.9/site-packages/starlette/testclient.py:451: in request
+    return super().request(
+venv/lib/python3.9/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+venv/lib/python3.9/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+venv/lib/python3.9/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+venv/lib/python3.9/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+venv/lib/python3.9/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+venv/lib/python3.9/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+venv/lib/python3.9/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+venv/lib/python3.9/site-packages/anyio/from_thread.py:326: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:445: in result
+    return self.__get_result()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/concurrent/futures/_base.py:390: in __get_result
+    raise self._exception
+venv/lib/python3.9/site-packages/anyio/from_thread.py:257: in _call_func
+    retval = await retval_or_awaitable
+venv/lib/python3.9/site-packages/fastapi/applications.py:1139: in __call__
+    await super().__call__(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+venv/lib/python3.9/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:196: in __call__
+    recv_stream.close()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:135: in __exit__
+    self.gen.throw(type, value, traceback)
+venv/lib/python3.9/site-packages/starlette/_utils.py:85: in collapse_excgroups
+    raise exc
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+app/middleware/csrf.py:68: in dispatch
+    return await call_next(request)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:196: in __call__
+    recv_stream.close()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:135: in __exit__
+    self.gen.throw(type, value, traceback)
+venv/lib/python3.9/site-packages/starlette/_utils.py:85: in collapse_excgroups
+    raise exc
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+app/middleware/cache_control.py:16: in dispatch
+    response = await call_next(request)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:196: in __call__
+    recv_stream.close()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:135: in __exit__
+    self.gen.throw(type, value, traceback)
+venv/lib/python3.9/site-packages/starlette/_utils.py:85: in collapse_excgroups
+    raise exc
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+app/middleware/monitoring.py:36: in dispatch
+    response: Response = await call_next(request)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:196: in __call__
+    recv_stream.close()
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:135: in __exit__
+    self.gen.throw(type, value, traceback)
+venv/lib/python3.9/site-packages/starlette/_utils.py:85: in collapse_excgroups
+    raise exc
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+app/middleware/security.py:56: in dispatch
+    response = await call_next(request)
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+venv/lib/python3.9/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+venv/lib/python3.9/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.9/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+venv/lib/python3.9/site-packages/fastapi/routing.py:120: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+venv/lib/python3.9/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+venv/lib/python3.9/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+venv/lib/python3.9/site-packages/fastapi/routing.py:109: in app
+    response_awaited = True
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:651: in __aexit__
+    raise exc_details[1]
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:634: in __aexit__
+    cb_suppress = await cb(*exc_details)
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:193: in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+venv/lib/python3.9/site-packages/fastapi/concurrency.py:30: in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py:2525: in run_sync_in_worker_thread
+    return await future
+venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py:986: in run
+    result = context.run(func, *args)
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py:135: in __exit__
+    self.gen.throw(type, value, traceback)
+app/core/dependencies.py:31: in get_db
+    raise DatabaseError(f"Database operation failed: {str(e)}")
+E   app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+---------------------------- Captured stdout setup -----------------------------
+2025-12-09 13:21:44,476 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-09 13:21:44,476 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2025-12-09 13:21:44,476 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("partners")
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("detections")
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("feedback")
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("datasets")
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("audit_logs")
+2025-12-09 13:21:44,477 INFO sqlalchemy.engine.Engine [raw sql] ()
+2025-12-09 13:21:44,478 INFO sqlalchemy.engine.Engine COMMIT
+2025-12-09 13:21:44,483 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2025-12-09 13:21:44,484 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.name AS users_name, users.role AS users_role, users.partner_id AS users_partner_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.last_login AS users_last_login 
+FROM users 
+WHERE users.email = ?
+ LIMIT ? OFFSET ?
+2025-12-09 13:21:44,484 INFO sqlalchemy.engine.Engine [generated in 0.00009s] ('admin@thaiscam.zcr.ai', 1, 0)
+2025-12-09 13:21:44,484 INFO sqlalchemy.engine.Engine ROLLBACK
+---------------------------- Captured stderr setup -----------------------------
+2025-12-09 13:21:44,475 - app.main - INFO - 🚀 Starting Thai Scam Detection API v0.1.0
+2025-12-09 13:21:44,476 - app.main - INFO - 📝 Environment: dev
+2025-12-09 13:21:44,476 - app.main - INFO - 🤖 Model Version: mock-v1.0
+2025-12-09 13:21:44,476 - app.main - INFO - 🧠 LLM Version: mock-v1.0
+2025-12-09 13:21:44,476 - app.main - INFO - 📊 Log Level: INFO
+2025-12-09 13:21:44,476 - app.main - INFO - 💾 Initializing database...
+2025-12-09 13:21:44,476 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-12-09 13:21:44,476 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("users")
+2025-12-09 13:21:44,476 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("partners")
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("detections")
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("feedback")
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("datasets")
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - PRAGMA main.table_info("audit_logs")
+2025-12-09 13:21:44,477 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-12-09 13:21:44,478 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-12-09 13:21:44,478 - app.main - INFO - ✅ Database initialized
+2025-12-09 13:21:44,483 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-12-09 13:21:44,484 - sqlalchemy.engine.Engine - INFO - SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.name AS users_name, users.role AS users_role, users.partner_id AS users_partner_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.last_login AS users_last_login 
+FROM users 
+WHERE users.email = ?
+ LIMIT ? OFFSET ?
+2025-12-09 13:21:44,484 - sqlalchemy.engine.Engine - INFO - [generated in 0.00009s] ('admin@thaiscam.zcr.ai', 1, 0)
+2025-12-09 13:21:44,484 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-12-09 13:21:44,485 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-12-09 13:21:44,485 - apscheduler.scheduler - INFO - Added job "run_promote_threats_task" to job store "default"
+2025-12-09 13:21:44,485 - apscheduler.scheduler - INFO - Scheduler started
+2025-12-09 13:21:44,485 - app.main - INFO - ⏰ Adaptive Security Scheduler started (Every 60 mins)
+------------------------------ Captured log setup ------------------------------
+INFO     app.main:main.py:221 🚀 Starting Thai Scam Detection API v0.1.0
+INFO     app.main:main.py:222 📝 Environment: dev
+INFO     app.main:main.py:223 🤖 Model Version: mock-v1.0
+INFO     app.main:main.py:224 🧠 LLM Version: mock-v1.0
+INFO     app.main:main.py:225 📊 Log Level: INFO
+INFO     app.main:main.py:228 💾 Initializing database...
+INFO     sqlalchemy.engine.Engine:base.py:1094 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("users")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("partners")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("detections")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("feedback")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("datasets")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1899 PRAGMA main.table_info("audit_logs")
+INFO     sqlalchemy.engine.Engine:base.py:1904 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1143 COMMIT
+INFO     app.main:main.py:230 ✅ Database initialized
+INFO     sqlalchemy.engine.Engine:base.py:1094 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1899 SELECT users.id AS users_id, users.email AS users_email, users.password_hash AS users_password_hash, users.name AS users_name, users.role AS users_role, users.partner_id AS users_partner_id, users.is_active AS users_is_active, users.created_at AS users_created_at, users.last_login AS users_last_login 
+FROM users 
+WHERE users.email = ?
+ LIMIT ? OFFSET ?
+INFO     sqlalchemy.engine.Engine:base.py:1904 [generated in 0.00009s] ('admin@thaiscam.zcr.ai', 1, 0)
+INFO     sqlalchemy.engine.Engine:base.py:1126 ROLLBACK
+INFO     apscheduler.scheduler:base.py:507 Adding job tentatively -- it will be properly scheduled when the scheduler starts
+INFO     apscheduler.scheduler:base.py:1090 Added job "run_promote_threats_task" to job store "default"
+INFO     apscheduler.scheduler:base.py:214 Scheduler started
+INFO     app.main:main.py:239 ⏰ Adaptive Security Scheduler started (Every 60 mins)
+----------------------------- Captured stderr call -----------------------------
+2025-12-09 13:21:44,493 - app.services.impl.keyword_classifier - INFO - Initialized keyword_classifier v1.1-hybrid (BL:5, WL:6)
+2025-12-09 13:21:44,493 - app.services.impl.mock_explainer - INFO - Initialized mock explainer v1.0
+2025-12-09 13:21:44,493 - app.services.detection_service - INFO - DetectionService initialized with classifier=keyword_classifier, explainer=mock
+2025-12-09 13:21:44,493 - app.api.v1.endpoints.image - INFO - 🚀 ENTRY POINT: /v1/public/detect/image called with file: test.jpg
+2025-12-09 13:21:44,494 - app.api.v1.endpoints.image - INFO - 🔍 Image cache MISS: c7584c779f2130f4... Processing image...
+2025-12-09 13:21:44,503 - app.api.v1.endpoints.image - INFO - 📸 Processing image: JPEG, 800x600
+2025-12-09 13:21:44,503 - app.api.v1.endpoints.image - INFO - Processing OCR + Vision for file: test.jpg
+2025-12-09 13:21:44,527 - app.services.ocr_service - WARNING - ⚠️ No Google credentials found, using mock OCR
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - OCR Result: โอนเงิน 150.00 บาท ธนาคารกสิกรไทย
+วันที่ 10 พ.ย. 66 12:30
+Ref: 20231110ABCD...
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 📍 Route: /v1/public/detect/image (image.router - 3-Layer Detection)
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 🔧 Image Processing: JPEG, 800x600
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 🏦 Slip Verification: trust_score=0.90, genuine=True
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - ✅ QR Code Verified: Amount matched!
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 🎯 3-Layer Fusion: Final=0.10 (Text=0.10, Visual=0.10, Slip=0.10)
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 🏦 High-confidence genuine slip detected, risk reduced
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - INFO - 📊 3-Layer Fusion: Text=0.10, Visual=0.10, Slip=0.10 → Final=0.10
+2025-12-09 13:21:44,527 - app.api.v1.endpoints.image - ERROR - Image detection error: 'int' object has no attribute 'values'
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+2025-12-09 13:21:44,528 - app.middleware.monitoring - ERROR - request_error
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/slowapi/extension.py", line 734, in async_wrapper
+    response = await func(*args, **kwargs)  # type: ignore
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 214, in detect_image_public
+    raise HTTPException(
+fastapi.exceptions.HTTPException: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/monitoring.py", line 36, in dispatch
+    response: Response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/security.py", line 56, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 109, in app
+    response_awaited = True
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 651, in __aexit__
+    raise exc_details[1]
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 634, in __aexit__
+    cb_suppress = await cb(*exc_details)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 193, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/concurrency.py", line 30, in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/app/core/dependencies.py", line 31, in get_db
+    raise DatabaseError(f"Database operation failed: {str(e)}")
+app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+2025-12-09 13:21:44,546 - app.main - ERROR - Unhandled exception: DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/slowapi/extension.py", line 734, in async_wrapper
+    response = await func(*args, **kwargs)  # type: ignore
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 214, in detect_image_public
+    raise HTTPException(
+fastapi.exceptions.HTTPException: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/csrf.py", line 68, in dispatch
+    return await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/cache_control.py", line 16, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/monitoring.py", line 36, in dispatch
+    response: Response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/security.py", line 56, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 109, in app
+    response_awaited = True
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 651, in __aexit__
+    raise exc_details[1]
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 634, in __aexit__
+    cb_suppress = await cb(*exc_details)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 193, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/concurrency.py", line 30, in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/app/core/dependencies.py", line 31, in get_db
+    raise DatabaseError(f"Database operation failed: {str(e)}")
+app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+------------------------------ Captured log call -------------------------------
+INFO     app.services.impl.keyword_classifier:keyword_classifier.py:70 Initialized keyword_classifier v1.1-hybrid (BL:5, WL:6)
+INFO     app.services.impl.mock_explainer:mock_explainer.py:60 Initialized mock explainer v1.0
+INFO     app.services.detection_service:detection_service.py:79 DetectionService initialized with classifier=keyword_classifier, explainer=mock
+INFO     app.api.v1.endpoints.image:image.py:49 🚀 ENTRY POINT: /v1/public/detect/image called with file: test.jpg
+INFO     app.api.v1.endpoints.image:image.py:65 🔍 Image cache MISS: c7584c779f2130f4... Processing image...
+INFO     app.api.v1.endpoints.image:image.py:77 📸 Processing image: JPEG, 800x600
+INFO     app.api.v1.endpoints.image:image.py:80 Processing OCR + Vision for file: test.jpg
+WARNING  app.services.ocr_service:ocr_service.py:84 ⚠️ No Google credentials found, using mock OCR
+INFO     app.api.v1.endpoints.image:image.py:93 OCR Result: โอนเงิน 150.00 บาท ธนาคารกสิกรไทย
+วันที่ 10 พ.ย. 66 12:30
+Ref: 20231110ABCD...
+INFO     app.api.v1.endpoints.image:image.py:112 📍 Route: /v1/public/detect/image (image.router - 3-Layer Detection)
+INFO     app.api.v1.endpoints.image:image.py:113 🔧 Image Processing: JPEG, 800x600
+INFO     app.api.v1.endpoints.image:image.py:122 🏦 Slip Verification: trust_score=0.90, genuine=True
+INFO     app.api.v1.endpoints.image:image.py:124 ✅ QR Code Verified: Amount matched!
+INFO     app.api.v1.endpoints.image:image.py:149 🎯 3-Layer Fusion: Final=0.10 (Text=0.10, Visual=0.10, Slip=0.10)
+INFO     app.api.v1.endpoints.image:image.py:150 🏦 High-confidence genuine slip detected, risk reduced
+INFO     app.api.v1.endpoints.image:image.py:164 📊 3-Layer Fusion: Text=0.10, Visual=0.10, Slip=0.10 → Final=0.10
+ERROR    app.api.v1.endpoints.image:image.py:213 Image detection error: 'int' object has no attribute 'values'
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+ERROR    app.middleware.monitoring:monitoring.py:62 request_error
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/slowapi/extension.py", line 734, in async_wrapper
+    response = await func(*args, **kwargs)  # type: ignore
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 214, in detect_image_public
+    raise HTTPException(
+fastapi.exceptions.HTTPException: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/monitoring.py", line 36, in dispatch
+    response: Response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/security.py", line 56, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 109, in app
+    response_awaited = True
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 651, in __aexit__
+    raise exc_details[1]
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 634, in __aexit__
+    cb_suppress = await cb(*exc_details)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 193, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/concurrency.py", line 30, in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/app/core/dependencies.py", line 31, in get_db
+    raise DatabaseError(f"Database operation failed: {str(e)}")
+app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+ERROR    app.main:main.py:80 Unhandled exception: DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 196, in detect_image_public
+    "checks_passed": sum(slip_result.checks_passed.values()),
+AttributeError: 'int' object has no attribute 'values'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 106, in app
+    response = await f(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 430, in app
+    raw_response = await run_endpoint_function(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 316, in run_endpoint_function
+    return await dependant.call(**values)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/slowapi/extension.py", line 734, in async_wrapper
+    response = await func(*args, **kwargs)  # type: ignore
+  File "/Users/pop7/Code/ThaiScamBench/app/api/v1/endpoints/image.py", line 214, in detect_image_public
+    raise HTTPException(
+fastapi.exceptions.HTTPException: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/csrf.py", line 68, in dispatch
+    return await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/cache_control.py", line 16, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/monitoring.py", line 36, in dispatch
+    response: Response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 196, in __call__
+    recv_stream.close()
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_utils.py", line 85, in collapse_excgroups
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+  File "/Users/pop7/Code/ThaiScamBench/app/middleware/security.py", line 56, in dispatch
+    response = await call_next(request)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 120, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/routing.py", line 109, in app
+    response_awaited = True
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 651, in __aexit__
+    raise exc_details[1]
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 634, in __aexit__
+    cb_suppress = await cb(*exc_details)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 193, in __aexit__
+    await self.gen.athrow(typ, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/concurrency.py", line 30, in contextmanager_in_threadpool
+    await anyio.to_thread.run_sync(
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 2525, in run_sync_in_worker_thread
+    return await future
+  File "/Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/anyio/_backends/_asyncio.py", line 986, in run
+    result = context.run(func, *args)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/contextlib.py", line 135, in __exit__
+    self.gen.throw(type, value, traceback)
+  File "/Users/pop7/Code/ThaiScamBench/app/core/dependencies.py", line 31, in get_db
+    raise DatabaseError(f"Database operation failed: {str(e)}")
+app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+--------------------------- Captured stderr teardown ---------------------------
+2025-12-09 13:21:44,836 - app.main - INFO - 👋 Shutting down Thai Scam Detection API
+2025-12-09 13:21:44,836 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-12-09 13:21:44,836 - app.main - INFO - ⏰ Scheduler shut down
+---------------------------- Captured log teardown -----------------------------
+INFO     app.main:main.py:245 👋 Shutting down Thai Scam Detection API
+INFO     apscheduler.scheduler:base.py:245 Scheduler has been shut down
+INFO     app.main:main.py:248 ⏰ Scheduler shut down
+=============================== warnings summary ===============================
+app/database.py:19
+  /Users/pop7/Code/ThaiScamBench/app/database.py:19: MovedIn20Warning: The ``declarative_base()`` function is now available as sqlalchemy.orm.declarative_base(). (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+    Base = declarative_base()
+
+app/models/schemas.py:6
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:6: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ScamCheckRequest(BaseModel):
+
+app/models/schemas.py:23
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:23: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ScamCheckResponse(BaseModel):
+
+app/models/schemas.py:60
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:60: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PublicDetectRequest(BaseModel):
+
+app/models/schemas.py:82
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PublicDetectResponse(BaseModel):
+
+app/models/schemas.py:105
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:105: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PartnerDetectRequest(BaseModel):
+
+app/models/schemas.py:133
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:133: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class PartnerDetectResponse(BaseModel):
+
+app/models/schemas.py:159
+  /Users/pop7/Code/ThaiScamBench/app/models/schemas.py:159: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class HealthCheckResponse(BaseModel):
+
+venv/lib/python3.9/site-packages/google/api_core/_python_version_support.py:252
+  /Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/google/api_core/_python_version_support.py:252: FutureWarning: You are using a Python version (3.9.6) past its end of life. Google will update google.api_core with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+    warnings.warn(message, FutureWarning)
+
+venv/lib/python3.9/site-packages/urllib3/__init__.py:35
+  /Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+    warnings.warn(
+
+app/routes/feedback.py:16
+  /Users/pop7/Code/ThaiScamBench/app/routes/feedback.py:16: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class FeedbackRequest(BaseModel):
+
+app/routes/feedback.py:32
+  /Users/pop7/Code/ThaiScamBench/app/routes/feedback.py:32: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class FeedbackResponse(BaseModel):
+
+app/routes/partner_management.py:17
+  /Users/pop7/Code/ThaiScamBench/app/routes/partner_management.py:17: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class RotateKeyRequest(BaseModel):
+
+app/routes/partner_management.py:29
+  /Users/pop7/Code/ThaiScamBench/app/routes/partner_management.py:29: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class RotateKeyResponse(BaseModel):
+
+app/routes/admin_auth.py:19
+  /Users/pop7/Code/ThaiScamBench/app/routes/admin_auth.py:19: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class LoginRequest(BaseModel):
+
+app/routes/admin_auth.py:33
+  /Users/pop7/Code/ThaiScamBench/app/routes/admin_auth.py:33: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class TokenResponse(BaseModel):
+
+app/models/error_responses.py:25
+  /Users/pop7/Code/ThaiScamBench/app/models/error_responses.py:25: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ErrorDetail(BaseModel):
+
+app/main.py:218
+  /Users/pop7/Code/ThaiScamBench/app/main.py:218: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+venv/lib/python3.9/site-packages/fastapi/applications.py:4580
+venv/lib/python3.9/site-packages/fastapi/applications.py:4580
+  /Users/pop7/Code/ThaiScamBench/venv/lib/python3.9/site-packages/fastapi/applications.py:4580: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+app/main.py:242
+  /Users/pop7/Code/ThaiScamBench/app/main.py:242: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("shutdown")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_slip_verification.py::TestSlipVerification::test_real_slip_low_risk - app.core.exceptions.DatabaseError: Database operation failed: 500: เกิดข้อผิดพลาดในการประมวลผลรูปภาพ
+======================== 1 failed, 21 warnings in 0.38s ========================

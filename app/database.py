@@ -1,6 +1,6 @@
 """Database setup and configuration"""
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from app.config import settings
 from typing import Generator

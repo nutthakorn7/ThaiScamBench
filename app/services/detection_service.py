@@ -198,6 +198,88 @@ class DetectionService:
             # 6. Hybrid Logic Override (Layer 2 - AI)
             # If Explainer used LLM, use its judgement for final verdict
             final_risk_score = class_result.risk_score
+            
+            # 7. Save to DB
+            try:
+                self.detection_repo.create_detection(
+                    message_hash=message_hash,
+                    category=class_result.category,
+                    risk_score=final_risk_score,
+                    is_scam=class_result.is_scam,
+                    reason=explain_result.explanation, # Use explanation as reason
+                    advice=explain_result.advice,
+                    model_version=class_result.model_version,
+                    source=source,
+                    partner_id=partner_id
+                )
+            except Exception as e:
+                logger.error(f"Failed to save detection record: {e}")
+                # Don't fail the request, just log
+            
+            # 8. Return response
+            return DetectionResponse(
+                is_scam=class_result.is_scam,
+                risk_score=final_risk_score,
+                category=class_result.category,
+                reason=explain_result.explanation,
+                advice=explain_result.advice,
+                model_version=class_result.model_version,
+                llm_version="gemini-pro" if "Gemini" in explain_result.explanation else "N/A",
+                request_id="req_" + datetime.now().strftime("%Y%m%d%H%M%S") # Simple ID
+            )
+            
+        except ValidationError as ve:
+            raise ve
+        except Exception as e:
+            logger.error(f"Detection failed: {e}", exc_info=True)
+            raise ServiceError(f"Detection service error: {str(e)}")
+
+    async def get_system_stats(self) -> Dict[str, Any]:
+        """
+        Get public-facing system statistics.
+        Aggregates data from repository for the dashboard.
+        """
+        try:
+            # 1. Get raw counts (Last 7 days default)
+            summary = self.detection_repo.get_stats_summary(days=7)
+            
+            # 2. Get top categories
+            categories = self.detection_repo.get_category_stats()
+            
+            # 3. Calculate percentages
+            total_period = summary["requests_period"] or 1 # Avoid div by zero
+            scam_count = summary["scam_detected"]
+            scam_pct = (scam_count / total_period) * 100 if total_period > 0 else 0
+            
+            # 4. Format Categories
+            formatted_cats = []
+            for cat in categories:
+                count = cat["count"]
+                cat_pct = (count / total_period) * 100
+                formatted_cats.append({
+                    "category": cat["category"],
+                    "count": count,
+                    "percentage": round(cat_pct, 1)
+                })
+            
+            # 5. Construct Response
+            return {
+                "total_detections": summary["total_requests"],
+                "scam_percentage": round(scam_pct, 1),
+                "total_images": 0, # Placeholder until ImageRepo is ready
+                "scam_slips": 0,   # Placeholder
+                "top_categories": formatted_cats,
+                "period": "Last 7 Days"
+            }
+        except Exception as e:
+            logger.error(f"Failed to get system stats: {e}")
+            # Return empty stats structure rather than failing
+            return {
+                "total_detections": 0,
+                "scam_percentage": 0,
+                "top_categories": [],
+                "period": "System Maintenance"
+            }
             final_is_scam = class_result.is_scam
             
             if getattr(explain_result, 'llm_used', False):

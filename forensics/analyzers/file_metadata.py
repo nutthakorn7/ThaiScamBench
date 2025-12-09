@@ -48,7 +48,7 @@ class FileMetadataAnalyzer:
         features["exif_exists"] = exif_data is not None
         
         if not exif_data:
-            warnings.append("missing_exif")
+            warnings.append("Missing EXIF - ไม่พบข้อมูลจำเพาะของภาพ (อาจเกิดจากการแคปหน้าจอหรือถูกลบข้อมูล)")
         
         # 2. Software Tag
         software = self._get_software_tag(exif_data)
@@ -59,12 +59,12 @@ class FileMetadataAnalyzer:
             
             # Check for AI software
             if any(ai in software_lower for ai in self.AI_SOFTWARE_SIGNATURES):
-                warnings.append(f"ai_software_detected:{software}")
+                warnings.append(f"AI Software Detected - ตรวจพบร่องรอยซอฟต์แวร์ AI ({software})")
                 features["is_ai_generated"] = True
             
             # Check for editing software
             elif any(editor in software_lower for editor in self.EDITING_SOFTWARE):
-                warnings.append(f"editing_software:{software}")
+                warnings.append(f"Editing Software - ตรวจพบโปรแกรมตัดต่อ ({software})")
                 features["is_edited"] = True
         
         # 3. JPEG Type (baseline vs progressive)
@@ -77,7 +77,7 @@ class FileMetadataAnalyzer:
         
         # Very high entropy can indicate encryption or heavy compression
         if entropy > 7.8:
-            warnings.append(f"high_entropy:{entropy:.2f}")
+            warnings.append(f"High Entropy ({entropy:.2f}) - ความซับซ้อนของข้อมูลสูงผิดปกติ (อาจเป็นภาพสังเคราะห์)")
         
         # 5. Creation/Modification Dates
         date_info = self._extract_dates(exif_data)
@@ -85,7 +85,7 @@ class FileMetadataAnalyzer:
         
         # Check for timestamp anomalies
         if date_info.get("date_mismatch"):
-            warnings.append("timestamp_anomaly")
+            warnings.append("Date Mismatch - วันที่สร้างและแก้ไขไฟล์ไม่สัมพันธ์กัน")
         
         return {
             "features": features,

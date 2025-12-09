@@ -48,7 +48,7 @@ class FrequencyDomainAnalyzer:
             # Check for AI artifact: Low high-frequency energy (Too smooth/blur at fine scales)
             # Threshold needs tuning, but < 0.15 is often suspicious for sharp-looking images
             if features["high_freq_energy"] < 0.15:
-                warnings.append("low_high_frequency_energy")
+                warnings.append("Low High-Frequency Energy - ขาดรายละเอียดความถี่สูงตามธรรมชาติ (ลักษณะคล้ายภาพ AI)")
                 features["is_ai_smooth_spectrum"] = True
                 score += 0.3
             
@@ -59,7 +59,7 @@ class FrequencyDomainAnalyzer:
             features["has_periodic_spikes"] = has_spikes
             
             if has_spikes:
-                warnings.append("periodic_frequency_artifacts")
+                warnings.append("Frequency Artifacts (GAN) - ตรวจพบรูปแบบซ้ำซ้อนในความถี่ (มักพบในภาพที่สร้างโดย AI)")
                 features["is_gan_artifact"] = True
                 score += 0.5
                 
@@ -72,7 +72,7 @@ class FrequencyDomainAnalyzer:
                 "error": str(e), 
                 "score": 0.0, 
                 "features": {}, 
-                "warnings": ["frequency_analysis_failed"]
+                "warnings": ["ไม่สามารถวิเคราะห์ความถี่ภาพได้"]
             }
             
         return {

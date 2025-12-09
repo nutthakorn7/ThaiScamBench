@@ -61,10 +61,10 @@ class JpegForensicsAnalyzer:
         features.update(qt_analysis)
         
         if qt_analysis.get("is_photoshop_qt"):
-            warnings.append("photoshop_quantization_table")
+            warnings.append("Photoshop Signature - ตรวจพบการบันทึกภาพด้วยโปรแกรม Photoshop")
             scores["qt"] = 0.4
         elif qt_analysis.get("is_non_standard_qt"):
-            warnings.append("non_standard_quantization")
+            warnings.append("Non-Standard Compression - ตารางการบีบอัดภาพไม่เป็นมาตรฐาน (อาจผ่านการแก้ไข)")
             scores["qt"] = 0.2
             
         # 4. Estimate Quality
@@ -78,7 +78,7 @@ class JpegForensicsAnalyzer:
         features["double_compression_score"] = double_comp_score
         
         if double_comp_score > 0.6:
-            warnings.append("possible_double_compression")
+            warnings.append("Double Compression - ตรวจพบร่องรอยการบีบอัดไฟล์ซ้ำ (อาจมีการแก้ไขแล้ว Save ทับ)")
             scores["double_comp"] = double_comp_score
             
         return {

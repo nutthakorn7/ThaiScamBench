@@ -58,15 +58,17 @@ class NoiseResidualAnalyzer:
             
             # Check 1: Too Smooth (Typical of AI or excessive filtering)
             # Real cameras usually have variance > 2.0 (depending on ISO)
+            # Check 1: Too Smooth (Typical of AI or excessive filtering)
+            # Real cameras usually have variance > 2.0 (depending on ISO)
             if variance < 0.5:
-                warnings.append("noise_too_smooth")
+                warnings.append("Noise Too Smooth - จุดรบกวนในภาพเรียบเนียนผิดปกติ (มักพบในภาพ AI หรือภาพที่ถูกลบรอย)")
                 features["is_too_smooth"] = True
                 score += 0.4
             
             # Check 2: Non-Gaussian Noise
             # High kurtosis means heavy tails (outliers)
             if kurt > 10.0:
-                warnings.append("noise_highly_peaked")
+                warnings.append("Abnormal Noise Distribution - การกระจายตัวของจุดรบกวนผิดธรรมชาติ")
                 score += 0.2
             
             # Check 3: Local Noise Consistency (Simplified)
@@ -84,7 +86,7 @@ class NoiseResidualAnalyzer:
             
             # If one block has much more noise than others -> Splicing/Editing
             if var_ratio > 3.0: 
-                warnings.append("inconsistent_noise_levels")
+                warnings.append("Inconsistent Noise - ระดับจุดรบกวนไม่สม่ำเสมอ (อาจมีการตัดต่อหรือแก้ไขเฉพาะจุด)")
                 features["has_inconsistent_noise"] = True
                 score += 0.3
                 
@@ -93,7 +95,7 @@ class NoiseResidualAnalyzer:
                 "error": str(e), 
                 "score": 0.0, 
                 "features": {}, 
-                "warnings": ["noise_analysis_failed"]
+                "warnings": ["ไม่สามารถวิเคราะห์จุดรบกวนได้"]
             }
             
         return {

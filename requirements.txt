@@ -37,3 +37,4 @@ email-validator>=2.1.0
 fastapi-mail>=1.4.1
 pyzbar>=0.1.9
 opencv-python-headless>=4.9.0.80
+ImageHash>=4.3.1

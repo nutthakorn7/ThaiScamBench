@@ -102,7 +102,12 @@ async def detect_image_public(
                 visual_analysis=None
              )
 
-        # 4. Analyze Extracted Text
+        # 4. Slip Verification (NEW Layer 🆕)
+        from app.utils.slip_verification import verify_thai_bank_slip, get_slip_verification_advice
+        slip_result = verify_thai_bank_slip(extracted_text)
+        logger.info(f"🏦 Slip Verification: trust_score={slip_result.trust_score:.2f}, genuine={slip_result.is_likely_genuine}")
+        
+        # 5. Analyze Extracted Text (Keyword + AI)
         det_request = DetectionRequest(
             message=extracted_text,
             channel="Image/OCR"
@@ -113,33 +118,48 @@ async def detect_image_public(
             source="public"
         )
         
-        # 5. Fuse Text Risk + Visual Risk (if available)
-        final_risk_score = result.risk_score
-        fusion_reason = result.reason
+        # 6. 🎯 MULTI-LAYER FUSION (Text + Visual + Slip)
+        text_risk = result.risk_score
+        visual_risk = visual_analysis.visual_risk_score if visual_analysis else 0.0
+        slip_risk = 1.0 - slip_result.trust_score  # Invert: High trust = Low risk
         
-        if visual_analysis:
-            # Weighted fusion: 60% text, 40% visual
-            text_risk = result.risk_score
-            visual_risk = visual_analysis.visual_risk_score
-            final_risk_score = (text_risk * 0.6) + (visual_risk * 0.4)
-            
-            # Enhance reason with visual findings
-            if visual_analysis.is_suspicious:
-                patterns_str = ", ".join(visual_analysis.detected_patterns)
-                fusion_reason += f" | Visual: {visual_analysis.reason} (Patterns: {patterns_str})"
-            
-            logger.info(f"📊 Fused Risk: Text={text_risk:.2f}, Visual={visual_risk:.2f}, Final={final_risk_score:.2f}")
+        # Smart Weighted Fusion
+        if slip_result.is_likely_genuine and slip_result.trust_score > 0.7:
+            # If Slip Verification says "Genuine", heavily trust it
+            final_risk_score = (text_risk * 0.3) + (visual_risk * 0.2) + (slip_risk * 0.5)
+            fusion_reason = f"✅ Slip Verification (Trust: {slip_result.trust_score:.0%}) | {result.reason}"
+            logger.info(f"🏦 High-confidence genuine slip detected, risk reduced")
+        else:
+            # Standard fusion for non-slip or suspicious slip
+            final_risk_score = (text_risk * 0.4) + (visual_risk * 0.3) + (slip_risk * 0.3)
+            fusion_reason = result.reason
+        
+        # Enhance reason with all layers
+        if visual_analysis and visual_analysis.is_suspicious:
+            patterns_str = ", ".join(visual_analysis.detected_patterns)
+            fusion_reason += f" | Visual: {visual_analysis.reason} (Patterns: {patterns_str})"
+        
+        if slip_result.warnings:
+            fusion_reason += f" | Slip Warnings: {', '.join(slip_result.warnings[:2])}"  # Max 2 warnings
+        
+        logger.info(f"📊 3-Layer Fusion: Text={text_risk:.2f}, Visual={visual_risk:.2f}, Slip={slip_risk:.2f} → Final={final_risk_score:.2f}")
         
         # Determine if scam based on fused score
         is_scam_final = final_risk_score >= settings.public_threshold
         
-        # 6. Return Enhanced Result
+        # Smart Advice Selection
+        if slip_result.is_likely_genuine and not is_scam_final:
+            advice = get_slip_verification_advice(slip_result)
+        else:
+            advice = result.advice
+        
+        # 7. Return Enhanced Result
         return DetectImageResponse(
             is_scam=is_scam_final,
             risk_score=final_risk_score,
             category=result.category,
             reason=fusion_reason,
-            advice=result.advice,
+            advice=advice,
             model_version=result.model_version,
             llm_version=result.llm_version,
             request_id=result.request_id,
@@ -148,7 +168,15 @@ async def detect_image_public(
                 "enabled": visual_analysis is not None,
                 "is_suspicious": visual_analysis.is_suspicious if visual_analysis else False,
                 "risk_score": visual_analysis.visual_risk_score if visual_analysis else 0.0,
-                "detected_patterns": visual_analysis.detected_patterns if visual_analysis else []
+                "detected_patterns": visual_analysis.detected_patterns if visual_analysis else [],
+                "slip_verification": {
+                    "trust_score": slip_result.trust_score,
+                    "is_genuine": slip_result.is_likely_genuine,
+                    "detected_bank": slip_result.detected_bank,
+                    "detected_amount": slip_result.detected_amount,
+                    "checks_passed": sum(slip_result.checks_passed.values()),
+                    "total_checks": len(slip_result.checks_passed)
+                }
             } if visual_analysis else None
         )
         

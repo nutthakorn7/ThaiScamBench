@@ -55,6 +55,12 @@ def test_analyze(image_path: str):
                 print("    ⚠ Image is unnaturally smooth (AI-like)")
             if noise.get("has_inconsistent_noise"):
                 print("    ⚠ Inconsistent noise levels detected (Splicing)")
+
+        if "frequency_analysis" in result["features"]:
+            fft = result["features"]["frequency_analysis"]
+            print(f"  • FFT: HighFreq={fft.get('high_freq_energy', 0):.2f}, Spikes={fft.get('has_periodic_spikes')}")
+            if fft.get("is_gan_artifact"):
+                print("    ⚠ Periodic frequency artifacts detected (GAN/AI)")
         
         return True
     except Exception as e:

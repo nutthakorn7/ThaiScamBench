@@ -1,0 +1,65 @@
+"""
+Simple manual test for forensics service
+"""
+import requests
+import sys
+from pathlib import Path
+
+def test_health():
+    """Test health endpoint"""
+    print("Testing /health endpoint...")
+    try:
+        resp = requests.get("http://localhost:8001/health", timeout=2)
+        print(f"✓ Status: {resp.status_code}")
+        print(f"  Response: {resp.json()}")
+        return True
+    except Exception as e:
+        print(f"✗ Failed: {e}")
+        return False
+
+def test_analyze(image_path: str):
+    """Test analyze endpoint"""
+    print(f"\nTesting /forensics/analyze with {image_path}...")
+    
+    if not Path(image_path).exists():
+        print(f"✗ File not found: {image_path}")
+        return False
+    
+    try:
+        with open(image_path, 'rb') as f:
+            files = {'file': f}
+            resp = requests.post("http://localhost:8001/forensics/analyze", 
+                               files=files, timeout=10)
+        
+        print(f"✓ Status: {resp.status_code}")
+        result = resp.json()
+        print(f"  Result: {result['forensic_result']}")
+        print(f"  Score: {result['score']:.2f}")
+        print(f"  Reasons: {result['reasons']}")
+        return True
+    except Exception as e:
+        print(f"✗ Failed: {e}")
+        return False
+
+if __name__ == "__main__":
+    print("=" * 50)
+    print("Forensics Service Manual Test")
+    print("=" * 50)
+    
+    # Test health
+    health_ok = test_health()
+    
+    # Test analyze if image provided
+    if len(sys.argv) > 1:
+        analyze_ok = test_analyze(sys.argv[1])
+    else:
+        print("\nSkipping analyze test (no image provided)")
+        print("Usage: python test_manual.py <image_path>")
+        analyze_ok = True
+    
+    print("\n" + "=" * 50)
+    if health_ok and analyze_ok:
+        print("✓ All tests passed!")
+    else:
+        print("✗ Some tests failed")
+    print("=" * 50)

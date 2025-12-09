@@ -93,12 +93,9 @@ export const detectScam = async (data: DetectionRequest): Promise<DetectionRespo
     const formData = new FormData();
     formData.append('file', data.file);
     
-    // Call the new independently hosted forensics service (via Nginx proxy)
-    // Next.js Proxy Rewrite handles /api -> /v1, so we just use /forensics/analyze
-    // API_BASE_URL (/api) + /forensics/analyze -> /api/forensics/analyze
-    // Rewrite Rules: /api/:path -> https://api.../v1/:path
-    // Result: https://api.../v1/forensics/analyze (Correct!)
-    const response = await api.post('/forensics/analyze', formData, {
+    // Call forensics service via specific rewrite rule
+    // /api/v1/forensics/analyze -> https://api.../api/v1/forensics/analyze -> Nginx /api/v1/forensics/ -> forensics:8001
+    const response = await api.post('/api/v1/forensics/analyze', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -321,7 +318,7 @@ export const detectBatchImages = async (files: File[]): Promise<PublicBatchRespo
             const formData = new FormData();
             formData.append('file', file);
             
-            const response = await api.post('/forensics/analyze', formData, {
+            const response = await api.post('/api/v1/forensics/analyze', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             const data = response.data;
